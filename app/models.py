@@ -19,6 +19,7 @@ class Player(db.Model):
     runner = db.Column(db.String)
     corp_deck = db.Column(db.Text)
     runner_deck = db.Column(db.Text)
+    active = db.Column(db.Boolean, default=True)
     tid = db.Column(db.Integer, db.ForeignKey("tournament.id"))
 
     tournament = db.relationship("Tournament", back_populates="players")
@@ -36,6 +37,11 @@ class Tournament(db.Model):
 
     players = db.relationship("Player", back_populates="tournament")
     matches = db.relationship("Match", back_populates="tournament")
+    active_players = db.relationship(
+        "Player",
+        primaryjoin="and_(Tournament.id == Player.tid, Player.active==True)",
+        viewonly=True,
+    )
 
     def __repr__(self) -> str:
         return f"<Tournament> {self.name}: {self.id}"
