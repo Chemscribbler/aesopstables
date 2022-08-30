@@ -1,0 +1,2 @@
+FLASK_APP=aesopstables.py
+FLASK_DEBUG=True

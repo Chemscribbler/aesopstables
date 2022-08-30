@@ -1,0 +1,4 @@
+aesopsenv/
+migrations/
+app.db
+__pycache__/
