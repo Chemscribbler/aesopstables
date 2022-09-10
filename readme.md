@@ -1,4 +1,5 @@
-# WIP on Reimplementing what became Aesop's Tables https://github.com/Chemscribbler/sass
+# WIP on Reimplementing what became Aesop's Tables
+https://github.com/Chemscribbler/sass
 
 Ultimate goal is to have a super easy to deploy (heroku or heroku like)
 
