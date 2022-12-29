@@ -4,6 +4,12 @@ from app.models import Match, Player, Tournament
 from networkx import Graph, max_weight_matching
 from itertools import combinations
 
+# TODO: Unpair round
+
+
+class PairingException(Exception):
+    pass
+
 
 def create_match(tournament: Tournament, corp_player: Player, runner_player: Player):
     m = Match(
@@ -17,7 +23,13 @@ def create_match(tournament: Tournament, corp_player: Player, runner_player: Pla
 
 
 def pair_round(t: Tournament):
+    if all([m.concluded for m in t.active_matches]):
+        raise PairingException("Not all active matches are finished")
+    t.current_round += 1
+    db.session.add(t)
+    db.session.commit()
     graph = Graph()
+    t.bye_setup()
     for player in t.active_players:
         graph.add_node(player.id)
     for pair in combinations(t.active_players, 2):
@@ -26,9 +38,9 @@ def pair_round(t: Tournament):
     pairings = max_weight_matching(graph, maxcardinality=True)
     for pair in pairings:
         assign_side(
-            db.session.query(Player).get(pair[0]), db.session.query(Player).get(pair[1])
+            db.session.query(Player).get(pair[0]),
+            db.session.query(Player).get(pair[1]),
         )
-    pass
 
 
 def legal_options(p1: Player, p2: Player) -> list[bool]:

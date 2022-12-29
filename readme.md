@@ -9,6 +9,8 @@ install requirements using `pip install -r requirements.text`
 
 then run:
 `flask db init`
+`flask db migrate`
+`flask db upgrade`
 
 and then to interface with an environment where the datatables are pre-loaded you can use
 `flask shell`

@@ -1,6 +1,7 @@
 from datetime import date
 from unittest import result
 from app import db
+from sqlalchemy.orm import Mapped
 
 
 class ConclusionError(BaseException):
@@ -8,11 +9,13 @@ class ConclusionError(BaseException):
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    password_hash = db.Column(db.String, nullable=False)
-    admin_rights = db.Column(db.Boolean, default=False)
-    tournaments = db.relationship("Tournament", backref="TO", lazy="dynamic")
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    name: Mapped[bool] = db.Column(db.String, nullable=False)
+    password_hash: Mapped[str] = db.Column(db.String, nullable=False)
+    admin_rights: Mapped[bool] = db.Column(db.Boolean, default=False)
+    tournaments: Mapped["Tournament"] = db.relationship(
+        "Tournament", backref="TO", lazy="dynamic"
+    )
 
     def __repr__(self) -> str:
         return f"<User> {self.name}"
@@ -24,22 +27,28 @@ class User(db.Model):
 
 
 class Player(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    corp = db.Column(db.String)
-    runner = db.Column(db.String)
-    corp_deck = db.Column(db.Text)
-    runner_deck = db.Column(db.Text)
-    active = db.Column(db.Boolean, default=True)
-    tid = db.Column(db.Integer, db.ForeignKey("tournament.id"))
-    recieved_bye = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    name: Mapped[str] = db.Column(db.String, nullable=False)
+    corp: Mapped[str] = db.Column(db.String)
+    runner: Mapped[str] = db.Column(db.String)
+    corp_deck: Mapped[str] = db.Column(db.Text)
+    runner_deck: Mapped[str] = db.Column(db.Text)
+    active: Mapped[bool] = db.Column(db.Boolean, default=True)
+    tid: Mapped[int] = db.Column(
+        db.Integer, db.ForeignKey("tournament.id"), nullable=False
+    )
+    recieved_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
+    score: Mapped[int] = db.Column(db.Integer, default=0)
+    sos: Mapped[float] = db.Column(db.Numeric, default=0.0)
+    esos: Mapped[float] = db.Column(db.Numeric, default=0.0)
+    is_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
 
     tournament = db.relationship("Tournament", back_populates="players")
 
     def __repr__(self) -> str:
         return f"<Player> {self.name}:{self.id} - Tournament {self.tid}"
 
-    def get_record(self) -> dict:
+    def get_record(self) -> dict[str, float]:
         score = 0
         games_played = 0
         for match in self.runner_matches:
@@ -61,9 +70,10 @@ class Player(db.Model):
         return {"score": score, "games_played": games_played}
 
     def get_side_balance(self):
+        # self.corp_matches.quer
         return len(self.corp_matches) - len(self.runner_matches)
 
-    def get_sos(self):
+    def get_sos(self) -> float:
         opp_total_score = 0
         total_opp_matches = 0
         for match in self.runner_matches:
@@ -71,12 +81,12 @@ class Player(db.Model):
             opp_total_score += opp_record["score"]
             total_opp_matches += opp_record["games_played"]
         for match in self.corp_matches:
-            opp_record = match.corp_player.get_record()
+            opp_record = match.runner_player.get_record()
             opp_total_score += opp_record["score"]
             total_opp_matches += opp_record["games_played"]
-        return round(opp_total_score / total_opp_matches, 3)
+        return round(opp_total_score / max(total_opp_matches, 1), 3)
 
-    def get_esos(self):
+    def get_esos(self) -> float:
         opp_total_sos = 0
         total_opp_matches = 0
         for match in self.runner_matches:
@@ -84,10 +94,30 @@ class Player(db.Model):
             opp_total_sos += match.corp_player.get_sos()
             total_opp_matches += opp_record["games_played"]
         for match in self.corp_matches:
-            opp_record = match.corp_player.get_sos()
-            opp_total_sos += opp_record["score"]
+            opp_record = match.runner_player.get_record()
+            opp_total_sos += match.runner_player.get_sos()
             total_opp_matches += opp_record["games_played"]
-        return round(opp_total_sos / total_opp_matches, 3)
+        return round(opp_total_sos / max(total_opp_matches, 1), 3)
+
+    def update_score(self):
+        self.score = self.get_record()["score"]
+        db.session.add(self)
+        db.session.commit()
+
+    def update_sos_esos(self):
+        self.sos = self.get_sos()
+        self.esos = self.get_esos()
+        db.session.add(self)
+        db.session.commit()
+
+    def reset(self):
+        self.update_score()
+        self.update_sos_esos()
+
+    def drop(self):
+        self.active = False
+        db.session.add(self)
+        db.session.commit(self)
 
 
 class Tournament(db.Model):
@@ -97,8 +127,12 @@ class Tournament(db.Model):
     current_round = db.Column(db.Integer, default=0)
     date = db.Column(db.DateTime(timezone=True))
 
-    players = db.relationship("Player", back_populates="tournament")
-    matches = db.relationship("Match", back_populates="tournament")
+    players = db.relationship(
+        "Player", back_populates="tournament", cascade="all, delete-orphan"
+    )
+    matches = db.relationship(
+        "Match", back_populates="tournament", cascade="all, delete-orphan"
+    )
     active_players = db.relationship(
         "Player",
         primaryjoin="and_(Tournament.id == Player.tid, Player.active==True)",
@@ -130,9 +164,32 @@ class Tournament(db.Model):
     def conclude_round(self):
         for match in self.active_matches:
             match.conclude()
-        self.current_round += 1
+        for player in self.players:
+            player.update_score()
+            player.update_sos_esos()
+        # self.current_round += 1
         db.session.add(self)
         db.session.commit()
+
+    def rank_players(self):
+        player_list = self.players
+        player_list.sort(key=lambda x: x.esos, reverse=True)
+        player_list.sort(key=lambda x: x.sos, reverse=True)
+        player_list.sort(key=lambda x: x.get_record()["score"], reverse=True)
+        return player_list
+
+    def bye_setup(self):
+        if len(self.active_players) % 2 == 1:
+            for p in self.active_players:
+                if p.isbye:
+                    p.active = False
+                    db.session.add(p)
+                    db.session.commit()
+                    break
+        if len(self.active_players) % 2 == 1:
+            p = Player(name="Bye", isbye=True, tid=self.id)
+            db.session.add(p)
+            db.session.commit()
 
 
 class Match(db.Model):
@@ -143,9 +200,12 @@ class Match(db.Model):
     runner_player_id = db.Column(db.Integer, db.ForeignKey("player.id"))
     result = db.Column(db.Integer)
     concluded = db.Column(db.Boolean, default=False)
+    is_bye = db.Column(db.Boolean, default=True)
 
     corp_player = db.relationship(
-        "Player", foreign_keys=[corp_player_id], backref="corp_matches"
+        "Player",
+        foreign_keys=[corp_player_id],
+        backref="corp_matches",
     )
     runner_player = db.relationship(
         "Player", foreign_keys=[runner_player_id], backref="runner_matches"
@@ -179,5 +239,6 @@ class Match(db.Model):
 
     def reset(self):
         self.result = None
+        self.concluded = False
         db.session.add(self)
         db.session.commit()
