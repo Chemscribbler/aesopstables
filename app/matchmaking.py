@@ -23,24 +23,27 @@ def create_match(tournament: Tournament, corp_player: Player, runner_player: Pla
 
 
 def pair_round(t: Tournament):
-    if all([m.concluded for m in t.active_matches]):
+    if not all([m.concluded for m in t.active_matches]):
         raise PairingException("Not all active matches are finished")
     t.current_round += 1
     db.session.add(t)
     db.session.commit()
     graph = Graph()
-    t.bye_setup()
-    for player in t.active_players:
+    pairing_pool, bye_player = t.bye_setup()
+    for player in pairing_pool:
         graph.add_node(player.id)
-    for pair in combinations(t.active_players, 2):
+    for pair in combinations(pairing_pool, 2):
         pair_weight = find_min_edge(*pair)
         graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
     pairings = max_weight_matching(graph, maxcardinality=True)
     for pair in pairings:
-        assign_side(
+        corp, runner = assign_side(
             db.session.query(Player).get(pair[0]),
             db.session.query(Player).get(pair[1]),
         )
+        create_match(tournament=t, corp_player=corp, runner_player=runner)
+    if bye_player is not None:
+        create_match(tournament=t, corp_player=bye_player, is_bye=True)
 
 
 def legal_options(p1: Player, p2: Player) -> list[bool]:
@@ -100,4 +103,4 @@ def assign_side(p1: Player, p2: Player):
     else:
         corp = p2
         runner = p1
-    create_match(tournament=p1.tournament, corp_player=corp, runner_player=runner)
+    return (corp, runner)

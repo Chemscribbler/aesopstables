@@ -1,7 +1,7 @@
 from datetime import date
-from unittest import result
 from app import db
 from sqlalchemy.orm import Mapped
+from random import shuffle
 
 
 class ConclusionError(BaseException):
@@ -66,12 +66,14 @@ class Player(db.Model):
                 score += 3
             if match.result == 0 and match.concluded:
                 score += 1
-            games_played += 1
+            # Only doing this here because bye is always Corp side
+            if not match.is_bye:
+                games_played += 1
         return {"score": score, "games_played": games_played}
 
     def get_side_balance(self):
-        # self.corp_matches.quer
-        return len(self.corp_matches) - len(self.runner_matches)
+        played_corp_matchest = [m for m in self.corp_matches if m.is_bye == False]
+        return len(played_corp_matchest) - len(self.runner_matches)
 
     def get_sos(self) -> float:
         opp_total_score = 0
@@ -178,18 +180,22 @@ class Tournament(db.Model):
         player_list.sort(key=lambda x: x.get_record()["score"], reverse=True)
         return player_list
 
-    def bye_setup(self):
-        if len(self.active_players) % 2 == 1:
-            for p in self.active_players:
-                if p.isbye:
-                    p.active = False
-                    db.session.add(p)
-                    db.session.commit()
-                    break
-        if len(self.active_players) % 2 == 1:
-            p = Player(name="Bye", isbye=True, tid=self.id)
-            db.session.add(p)
-            db.session.commit()
+    def bye_setup(self) -> tuple[list[Player], Player]:
+        if len(self.active_players) % 2 == 0:
+            return (self.active_players, None)
+        eligible_players = [p for p in self.active_players if not p.recieved_bye]
+        lowest_score = 100
+        lowest_player = None
+        player_index = None
+        shuffle(eligible_players)
+        for index, p in enumerate(eligible_players):
+            if p.score < lowest_score:
+                lowest_player = p
+                lowest_score = p.score
+                player_index = index
+        bye_player = eligible_players.pop(player_index)
+        non_bye_players = [p for p in self.active_players if p.id != bye_player.id]
+        return (non_bye_players, bye_player)
 
 
 class Match(db.Model):
