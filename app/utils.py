@@ -12,12 +12,14 @@ def create_players(t: Tournament, count: int):
         t.add_player("".join(choices(ascii_uppercase, k=5)))
 
 
-def conclude_round(t: Tournament):
+def sim_round(t: Tournament):
     for m in t.active_matches:
+        if m.concluded:
+            continue
         r = random()
-        if r < 0.45:
+        if r < 0.49:
             m.corp_win()
-        elif r < 0.55:
+        elif r < 0.51:
             m.tie()
         else:
             m.runner_win()
@@ -40,7 +42,7 @@ def sim_tournament(n_players: int, n_rounds: int, name: str = None):
     create_players(t, count=n_players)
     for _ in range(n_rounds):
         pair_round(t)
-        conclude_round(t)
+        sim_round(t)
     return t
 
 

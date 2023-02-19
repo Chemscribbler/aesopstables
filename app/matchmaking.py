@@ -4,20 +4,31 @@ from app.models import Match, Player, Tournament
 from networkx import Graph, max_weight_matching
 from itertools import combinations
 
-# TODO: Unpair round
-
 
 class PairingException(Exception):
     pass
 
 
-def create_match(tournament: Tournament, corp_player: Player, runner_player: Player):
-    m = Match(
-        tid=tournament.id,
-        corp_player_id=corp_player.id,
-        runner_player_id=runner_player.id,
-        rnd=tournament.current_round,
-    )
+def create_match(
+    tournament: Tournament, corp_player: Player, runner_player: Player, is_bye=False
+):
+    if is_bye:
+        m = Match(
+            tid=tournament.id,
+            corp_player_id=corp_player.id,
+            rnd=tournament.current_round,
+            is_bye=is_bye,
+            result=1,
+            concluded=True,
+        )
+    else:
+        m = Match(
+            tid=tournament.id,
+            corp_player_id=corp_player.id,
+            runner_player_id=runner_player.id,
+            rnd=tournament.current_round,
+            is_bye=is_bye,
+        )
     db.session.add(m)
     db.session.commit()
 
@@ -43,7 +54,10 @@ def pair_round(t: Tournament):
         )
         create_match(tournament=t, corp_player=corp, runner_player=runner)
     if bye_player is not None:
-        create_match(tournament=t, corp_player=bye_player, is_bye=True)
+        bye_player.recieved_bye = True
+        create_match(
+            tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
+        )
 
 
 def legal_options(p1: Player, p2: Player) -> list[bool]:
@@ -104,3 +118,8 @@ def assign_side(p1: Player, p2: Player):
         corp = p2
         runner = p1
     return (corp, runner)
+
+
+def unpair_round(t: Tournament):
+    for match in t.active_matches:
+        match.delete()

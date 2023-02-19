@@ -72,8 +72,12 @@ class Player(db.Model):
         return {"score": score, "games_played": games_played}
 
     def get_side_balance(self):
-        played_corp_matchest = [m for m in self.corp_matches if m.is_bye == False]
-        return len(played_corp_matchest) - len(self.runner_matches)
+        played_corp_matchest = [
+            m for m in self.corp_matches if m.is_bye == False and m.concluded
+        ]
+        return len(played_corp_matchest) - len(
+            [m for m in self.runner_matches if m.concluded]
+        )
 
     def get_sos(self) -> float:
         opp_total_score = 0
@@ -83,6 +87,8 @@ class Player(db.Model):
             opp_total_score += opp_record["score"]
             total_opp_matches += opp_record["games_played"]
         for match in self.corp_matches:
+            if match.is_bye:
+                continue
             opp_record = match.runner_player.get_record()
             opp_total_score += opp_record["score"]
             total_opp_matches += opp_record["games_played"]
@@ -96,13 +102,17 @@ class Player(db.Model):
             opp_total_sos += match.corp_player.get_sos()
             total_opp_matches += opp_record["games_played"]
         for match in self.corp_matches:
+            if match.is_bye:
+                continue
             opp_record = match.runner_player.get_record()
             opp_total_sos += match.runner_player.get_sos()
             total_opp_matches += opp_record["games_played"]
         return round(opp_total_sos / max(total_opp_matches, 1), 3)
 
     def update_score(self):
+        old_score = self.score
         self.score = self.get_record()["score"]
+        print(f"Updated {self.name}'s score from {old_score} to {self.score}")
         db.session.add(self)
         db.session.commit()
 
@@ -151,7 +161,7 @@ class Tournament(db.Model):
 
     def add_player(
         self, name, corp=None, runner=None, corp_deck=None, runner_deck=None
-    ):
+    ) -> Player:
         p = Player(
             name=name,
             corp=corp,
@@ -162,6 +172,7 @@ class Tournament(db.Model):
         )
         db.session.add(p)
         db.session.commit()
+        return p
 
     def conclude_round(self):
         for match in self.active_matches:
@@ -184,13 +195,11 @@ class Tournament(db.Model):
         if len(self.active_players) % 2 == 0:
             return (self.active_players, None)
         eligible_players = [p for p in self.active_players if not p.recieved_bye]
-        lowest_score = 100
-        lowest_player = None
+        lowest_score = 1000
         player_index = None
         shuffle(eligible_players)
         for index, p in enumerate(eligible_players):
             if p.score < lowest_score:
-                lowest_player = p
                 lowest_score = p.score
                 player_index = index
         bye_player = eligible_players.pop(player_index)
@@ -247,4 +256,14 @@ class Match(db.Model):
         self.result = None
         self.concluded = False
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        if self.is_bye:
+            self.corp_player.recieved_bye = False
+            self.corp_player.reset()
+        else:
+            self.corp_player.reset()
+            self.runner_player.reset()
+        db.session.delete(self)
         db.session.commit()
