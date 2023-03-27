@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for tournament in tournaments %}
+<div>
+    <a href="{{ url_for('tournament', tid=tournament.id) }}">{{ tournament.name }}</a>
+</div>
+{% endfor %}
+{% endblock %}

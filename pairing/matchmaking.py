@@ -1,6 +1,8 @@
 from random import random
-from app import db
-from app.models import Match, Player, Tournament
+from aesops import db
+from pairing.player import Player
+from pairing.tournament import Tournament
+from pairing.match import Match
 from networkx import Graph, max_weight_matching
 from itertools import combinations
 

@@ -1,8 +1,8 @@
 from random import choices, random
 from string import ascii_uppercase
-from app.models import Tournament
-from app.matchmaking import pair_round
-from app import db
+from pairing.models import Tournament
+from pairing.matchmaking import pair_round
+from aesops import db
 import tqdm
 import cProfile
 

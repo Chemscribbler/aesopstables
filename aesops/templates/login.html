@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Login</h1>
+<form action="/login" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>{{ form.username.label }}<br>
+        {{ form.username(size=32) }}</p>
+    <p>{{ form.password.label }}<br>
+        {{ form.password(size=32) }}</p>
+    <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+    <input type="submit" value="Login" />
+    <p><a href="{{ url_for('register')}}">Register</a></p>
+</form>
+{% endblock %}
