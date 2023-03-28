@@ -33,6 +33,7 @@ class Player(db.Model):
     sos: Mapped[float] = db.Column(db.Numeric, default=0.0)
     esos: Mapped[float] = db.Column(db.Numeric, default=0.0)
     is_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
+    first_round_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
 
     tournament = db.relationship("Tournament", back_populates="players")
 

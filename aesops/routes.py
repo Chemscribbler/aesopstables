@@ -11,6 +11,7 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User
 from pairing.tournament import Tournament
+from pairing.player import Player
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -67,10 +68,51 @@ def create_tournament():
     form = TournamentForm()
     if form.validate_on_submit():
         tournament = Tournament(
-            name=form.name.data, date=form.date.data, description=form.description.data
+            name=form.name.data,
+            date=form.date.data,
+            description=form.description.data,
+            admin_id=current_user.id,
         )
         db.session.add(tournament)
         db.session.commit()
         flash(f"{tournament.name} has been created!")
         return redirect(url_for("tournament", tid=tournament.id))
     return render_template("tournament_creation.html", form=form)
+
+
+@app.route("/<int:tid>/add_player", methods=["GET", "POST"])
+def add_player(tid: int):
+    form = PlayerForm()
+    if form.validate_on_submit():
+        player = Player(
+            name=form.name.data,
+            corp=form.corp.data,
+            corp_deck=form.corp_deck.data,
+            runner=form.runner.data,
+            runner_deck=form.runner_deck.data,
+            tid=tid,
+            first_round_bye=form.bye.data,
+        )
+        db.session.add(player)
+        db.session.commit()
+        flash(f"{player.name} has been added!")
+        return redirect(url_for("tournament", tid=tid))
+
+
+@app.route("/<int:tid>/add_player", methods=["GET", "POST"])
+def add_player(tid: int):
+    form = PlayerForm()
+    if form.validate_on_submit():
+        player = Player(
+            name=form.name.data,
+            corp=form.corp.data,
+            corp_deck=form.corp_deck.data,
+            runner=form.runner.data,
+            runner_deck=form.runner_deck.data,
+            tid=tid,
+            first_round_bye=form.bye.data,
+        )
+        db.session.add(player)
+        db.session.commit()
+        flash(f"{player.name} has been added!")
+        return redirect(url_for("tournament", tid=tid))
