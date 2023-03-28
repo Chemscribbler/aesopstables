@@ -6,6 +6,7 @@ from wtforms import (
     SubmitField,
     SelectField,
     DateField,
+    TextAreaField,
 )
 from wtforms.validators import DataRequired, ValidationError
 from aesops.user import User
@@ -40,7 +41,9 @@ class RegistrationForm(FlaskForm):
 class PlayerForm(FlaskForm):
     name = StringField("Player Name", validators=[DataRequired()])
     corp = SelectField("Corp ID", choices=get_corp_ids())
+    corp_deck = TextAreaField("Corp Deck")
     runner = SelectField("Runner ID", choices=get_runner_ids())
+    runner_deck = TextAreaField("Runner Deck")
     bye = BooleanField("Bye")
     submit = SubmitField("Add Player")
 
@@ -48,5 +51,5 @@ class PlayerForm(FlaskForm):
 class TournamentForm(FlaskForm):
     name = StringField("Tournament Name", validators=[DataRequired()])
     date = DateField("Tournament Date", validators=[DataRequired()])
-    description = StringField("Tournament Description")
+    description = TextAreaField("Tournament Description")
     submit = SubmitField("Add Tournament")
