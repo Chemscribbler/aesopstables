@@ -1,7 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import (
+    StringField,
+    PasswordField,
+    BooleanField,
+    SubmitField,
+    SelectField,
+    DateField,
+)
 from wtforms.validators import DataRequired, ValidationError
 from aesops.user import User
+from aesops.utility import get_corp_ids, get_runner_ids
 
 
 class LoginForm(FlaskForm):
@@ -27,3 +35,18 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError("Please use a different email address.")
+
+
+class PlayerForm(FlaskForm):
+    name = StringField("Player Name", validators=[DataRequired()])
+    corp = SelectField("Corp ID", choices=get_corp_ids())
+    runner = SelectField("Runner ID", choices=get_runner_ids())
+    bye = BooleanField("Bye")
+    submit = SubmitField("Add Player")
+
+
+class TournamentForm(FlaskForm):
+    name = StringField("Tournament Name", validators=[DataRequired()])
+    date = DateField("Tournament Date", validators=[DataRequired()])
+    description = StringField("Tournament Description")
+    submit = SubmitField("Add Tournament")

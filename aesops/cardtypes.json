@@ -1,0 +1,290 @@
+{
+    "data": [
+        {
+            "id": "agenda",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/agenda"
+            },
+            "attributes": {
+                "name": "Agenda",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/agenda/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/agenda/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/agenda/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/agenda/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "asset",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/asset"
+            },
+            "attributes": {
+                "name": "Asset",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/asset/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/asset/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/asset/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/asset/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "corp_identity",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/corp_identity"
+            },
+            "attributes": {
+                "name": "Corp Identity",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/corp_identity/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/corp_identity/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/corp_identity/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/corp_identity/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "event",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/event"
+            },
+            "attributes": {
+                "name": "Event",
+                "side_id": "runner",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/event/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/event/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/event/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/event/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "hardware",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/hardware"
+            },
+            "attributes": {
+                "name": "Hardware",
+                "side_id": "runner",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/hardware/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/hardware/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/hardware/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/hardware/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "ice",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/ice"
+            },
+            "attributes": {
+                "name": "Ice",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/ice/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/ice/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/ice/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/ice/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "operation",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/operation"
+            },
+            "attributes": {
+                "name": "Operation",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/operation/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/operation/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/operation/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/operation/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "program",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/program"
+            },
+            "attributes": {
+                "name": "Program",
+                "side_id": "runner",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/program/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/program/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/program/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/program/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "resource",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/resource"
+            },
+            "attributes": {
+                "name": "Resource",
+                "side_id": "runner",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/resource/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/resource/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/resource/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/resource/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "runner_identity",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/runner_identity"
+            },
+            "attributes": {
+                "name": "Runner Identity",
+                "side_id": "runner",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/runner_identity/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/runner_identity/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/runner_identity/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/runner_identity/cards"
+                    }
+                }
+            }
+        },
+        {
+            "id": "upgrade",
+            "type": "card_types",
+            "links": {
+                "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/upgrade"
+            },
+            "attributes": {
+                "name": "Upgrade",
+                "side_id": "corp",
+                "updated_at": "2023-02-24T20:37:21.969Z"
+            },
+            "relationships": {
+                "side": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/upgrade/relationships/side",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/upgrade/side"
+                    }
+                },
+                "cards": {
+                    "links": {
+                        "self": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/upgrade/relationships/cards",
+                        "related": "https://api-preview.netrunnerdb.com/api/v3/public/card_types/upgrade/cards"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -9,6 +9,7 @@ class Tournament(db.Model):
     name = db.Column(db.String, nullable=False)
     current_round = db.Column(db.Integer, default=0)
     date = db.Column(db.DateTime(timezone=True))
+    description = db.Column(db.String)
 
     players = db.relationship(
         "Player", back_populates="tournament", cascade="all, delete-orphan"

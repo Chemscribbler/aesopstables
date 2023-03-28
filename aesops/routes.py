@@ -1,6 +1,12 @@
 # Routes page for flask app
 from aesops import app, db
-from aesops.forms import LoginForm, RegistrationForm
+from aesops.forms import (
+    LoginForm,
+    RegistrationForm,
+    PlayerForm,
+    TournamentForm,
+    TournamentForm,
+)
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User
@@ -54,3 +60,17 @@ def register():
 @app.route("/<int:tid>/standings", methods=["GET", "POST"])
 def tournament(tid):
     return render_template("tournament.html", tournament=Tournament.query.get(tid))
+
+
+@app.route("/create_tournament", methods=["GET", "POST"])
+def create_tournament():
+    form = TournamentForm()
+    if form.validate_on_submit():
+        tournament = Tournament(
+            name=form.name.data, date=form.date.data, description=form.description.data
+        )
+        db.session.add(tournament)
+        db.session.commit()
+        flash(f"{tournament.name} has been created!")
+        return redirect(url_for("tournament", tid=tournament.id))
+    return render_template("create_tournament.html")
