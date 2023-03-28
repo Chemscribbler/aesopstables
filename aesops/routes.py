@@ -73,4 +73,4 @@ def create_tournament():
         db.session.commit()
         flash(f"{tournament.name} has been created!")
         return redirect(url_for("tournament", tid=tournament.id))
-    return render_template("create_tournament.html")
+    return render_template("tournament_creation.html", form=form)
