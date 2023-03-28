@@ -13,7 +13,8 @@ class User(UserMixin, db.Model):
     admin_rights: Mapped[bool] = db.Column(db.Boolean, default=False)
     email: Mapped[str] = db.Column(db.String, nullable=False)
     tournaments: Mapped["Tournament"] = db.relationship(
-        "Tournament", backref="TO", lazy="dynamic"
+        "Tournament",
+        backref="TO",
     )
 
     def __repr__(self) -> str:
