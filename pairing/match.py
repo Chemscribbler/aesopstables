@@ -2,6 +2,10 @@ from aesops import db
 from sqlalchemy.orm import Mapped
 
 
+def ConclusionError(Exception):
+    pass
+
+
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tid = db.Column(db.Integer, db.ForeignKey("tournament.id"))
@@ -11,6 +15,7 @@ class Match(db.Model):
     result = db.Column(db.Integer)
     concluded = db.Column(db.Boolean, default=False)
     is_bye = db.Column(db.Boolean, default=True)
+    table_number = db.Column(db.Integer)
 
     corp_player = db.relationship(
         "Player",

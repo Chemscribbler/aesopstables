@@ -60,6 +60,19 @@ def pair_round(t: Tournament):
         create_match(
             tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
         )
+    ranked_matches = sorted(
+        t.active_matches,
+        key=lambda m: (
+            (m.corp_player.score + m.runner_player.score)
+            if not m.is_bye
+            else float("inf")
+        ),
+        reverse=True,
+    )
+    for i, match in enumerate(ranked_matches):
+        match.tableNumber = i + 1
+        db.session.add(match)
+    db.session.commit()
 
 
 def legal_options(p1: Player, p2: Player) -> list[bool]:
