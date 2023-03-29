@@ -12,6 +12,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User
 from pairing.tournament import Tournament
 from pairing.player import Player
+from pairing.match import Match
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -97,22 +98,24 @@ def add_player(tid: int):
         db.session.commit()
         flash(f"{player.name} has been added!")
         return redirect(url_for("tournament", tid=tid))
+    tournament = Tournament.query.get(tid)
+    return render_template("player_creation.html", form=form, tournament=tournament)
 
 
-@app.route("/<int:tid>/add_player", methods=["GET", "POST"])
-def add_player(tid: int):
-    form = PlayerForm()
-    if form.validate_on_submit():
-        player = Player(
-            name=form.name.data,
-            corp=form.corp.data,
-            corp_deck=form.corp_deck.data,
-            runner=form.runner.data,
-            runner_deck=form.runner_deck.data,
-            tid=tid,
-            first_round_bye=form.bye.data,
-        )
-        db.session.add(player)
-        db.session.commit()
-        flash(f"{player.name} has been added!")
-        return redirect(url_for("tournament", tid=tid))
+@app.route("/<int:tid>/<int:rid>", methods=["GET", "POST"])
+def round(tid, rid):
+    tournament = Tournament.query.get(tid)
+
+    def format_results(match: Match):
+        if match.result is None:
+            return ""
+        if match.result == 1:
+            return "3 - 0"
+        if match.result == -1:
+            return "0 - 3"
+        if match.result == 0:
+            return "1 - 1"
+
+    return render_template(
+        "round.html", tournament=tournament, rnd=rid, format_results=format_results
+    )

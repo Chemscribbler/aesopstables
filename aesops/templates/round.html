@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1><a href="{{ url_for('tournament',tid=tournament.id)}}">{{ tournament.name }}</a></h1>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Corp Player</th>
+            <th>Corp ID</th>
+            <th>Score</th>
+            <th>Runner Player</th>
+            <th>Runner ID</th>
+            <th>Reporting</th>
+        </tr>
+    </thead>
+    {% for match in tournament.get_round(round=rnd) %}
+    <tr>
+        <th>{{ match.table }}</th>
+        <th>{{ match.corp_player.name }}</th>
+        <th>{{ match.corp_player.corp }}</th>
+        <th>{{ format_results(match) }}</th>
+        <th>{{ match.runner_player.name }}</th>
+        <th>{{match.runner_player.runner }}</th>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

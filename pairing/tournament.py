@@ -1,6 +1,8 @@
 from aesops import db
 from sqlalchemy.orm import Mapped
 from pairing.player import Player
+from pairing.match import Match
+from random import shuffle
 
 
 class Tournament(db.Model):
@@ -77,3 +79,6 @@ class Tournament(db.Model):
         bye_player = eligible_players.pop(player_index)
         non_bye_players = [p for p in self.active_players if p.id != bye_player.id]
         return (non_bye_players, bye_player)
+
+    def get_round(self, round) -> list[Match]:
+        return [m for m in self.matches if m.rnd == round]

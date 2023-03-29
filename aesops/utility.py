@@ -2,6 +2,7 @@ import requests
 import os
 import datetime
 from json import dump, load
+from pairing.player import Player
 
 
 def get_ids():
@@ -27,7 +28,7 @@ def get_ids():
         if os.path.getmtime("ids.json") < datetime.datetime.now().timestamp() - (
             60 * 60 * 24
         ):
-            os.path.remove("ids.json")
+            os.remove("ids.json")
             return get_ids()
         # else, load the file
         with open("ids.json", "r") as f:
@@ -41,6 +42,14 @@ def get_corp_ids():
 
 def get_runner_ids():
     return [id["name"] for id in get_ids() if id["side"] == "runner"]
+
+
+def display_side_bias(player: Player):
+    if player.get_side_balance() > 0:
+        return f"Corp +{player.get_side_balance()}"
+    if player.get_side_balance() < 0:
+        return f"Runner {player.get_side_balance()*-1}"
+    return "Balanced"
 
 
 if __name__ == "__main__":

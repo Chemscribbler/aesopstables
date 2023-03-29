@@ -1,8 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-{% for player in tournament.players %}
-<div>
-    <a>{{ player.name }}</a>
-</div>
+<h1>{{ tournament.name }}</h1>
+{% if tournament.description %}
+<h2>{{ tournament.description }}</h2>
+{% endif %}
+{% if tournament.current_round == 0 or current_user.has_admin_rights(tournament_id = tournament.id)%}
+<h2>Registration</h2>
+<a href="{{ url_for('add_player', tid=tournament.id)}}"></a>
+{% endif %}
+{% if tournament.current_round > 0 %}
+{% for round in range(1,tournament.current_round+1) %}
+<a href="{{ url_for('round', tid=tournament.id, rid=round)}}">{{round}}</a>
 {% endfor %}
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Corp</th>
+            <th>Runner</th>
+            <th>Score</th>
+            <th>SoS</th>
+            <th>ESoS</th>
+            <th>Side Bias</th>
+        </tr>
+    </thead>
+    {% for player in tournament.rank_players() %}
+    <tr>
+        <td>{{ loop.index0 + 1 }}</td>
+        <td>{{ player.name }}</td>
+        <td>{{ player.corp }}</td>
+        <td>{{ player.runner }}</td>
+        <td>{{ player.score }}</td>
+        <td>{{ "%0.3f"|format(player.sos) }}</td>
+        <td>{{ "%0.3f"|format(player.esos) }}</td>
+        <td>{{ player.get_side_balance() }}</td>
+        {% endfor %}
+</table>
+
 {% endblock %}
