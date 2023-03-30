@@ -13,14 +13,14 @@
     </p>
     <p>
         {{ form.corp.label }}<br>
-        {{ form.corp(size=32) }}<br>
+        {{ form.corp }}<br>
     </p>
     <p>
         {{ form.runner.label }}<br>
-        {{ form.runner(size=32) }}<br>
+        {{ form.runner }}<br>
     </p>
     <p>
-        {{form.bye.field}}{{ form.bye.label}}
+        {{form.bye}}{{ form.bye.label}}
     </p>
     <input type="submit" value="Register" />
     <p><a href="{{ url_for('add_player', tid=tournament.id) }}" </p>

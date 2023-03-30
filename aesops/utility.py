@@ -37,11 +37,17 @@ def get_ids():
 
 
 def get_corp_ids():
-    return [id["name"] for id in get_ids() if id["side"] == "corp"]
+    corp_ids = set(id["name"] for id in get_ids() if id["side"] == "corp")
+    corp_ids = list(corp_ids)
+    corp_ids.sort()
+    return corp_ids
 
 
 def get_runner_ids():
-    return [id["name"] for id in get_ids() if id["side"] == "runner"]
+    runner_ids = set(id["name"] for id in get_ids() if id["side"] == "runner")
+    runner_ids = list(runner_ids)
+    runner_ids.sort()
+    return runner_ids
 
 
 def display_side_bias(player: Player):

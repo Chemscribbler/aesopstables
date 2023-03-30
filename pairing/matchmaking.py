@@ -133,8 +133,3 @@ def assign_side(p1: Player, p2: Player):
         corp = p2
         runner = p1
     return (corp, runner)
-
-
-def unpair_round(t: Tournament):
-    for match in t.active_matches:
-        match.delete()

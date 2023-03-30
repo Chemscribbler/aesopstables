@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     )
 
     def __repr__(self) -> str:
-        return f"<User> {self.name}"
+        return f"<User> {self.username} {self.id}"
 
     def create_tournament(self, name, date=date.today()):
         t = Tournament(name=name, date=date, admin_id=self.id)
@@ -31,8 +31,8 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def has_admin_rights(self, tournament_id):
-        t = Tournament.query.get(tournament_id)
+    def has_admin_rights(self, tid):
+        t = Tournament.query.get(tid)
         if t.admin_id == self.id or self.admin_rights:
             return True
         else:

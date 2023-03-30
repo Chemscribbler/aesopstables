@@ -12,7 +12,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User
 from pairing.tournament import Tournament
 from pairing.player import Player
-from pairing.match import Match
+from pairing.match import Match, ConclusionError
+import pairing.matchmaking as mm
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -99,11 +100,11 @@ def add_player(tid: int):
         flash(f"{player.name} has been added!")
         return redirect(url_for("tournament", tid=tid))
     tournament = Tournament.query.get(tid)
-    return render_template("player_creation.html", form=form, tournament=tournament)
+    return render_template("player_registration.html", form=form, tournament=tournament)
 
 
-@app.route("/<int:tid>/<int:rid>", methods=["GET", "POST"])
-def round(tid, rid):
+@app.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])
+def round(tid, rnd):
     tournament = Tournament.query.get(tid)
 
     def format_results(match: Match):
@@ -117,5 +118,51 @@ def round(tid, rid):
             return "1 - 1"
 
     return render_template(
-        "round.html", tournament=tournament, rnd=rid, format_results=format_results
+        "round.html", tournament=tournament, rnd=rnd, format_results=format_results
     )
+
+
+@app.route("/<int:tid>/<int:rnd>/<int:mid>/<int:result>", methods=["GET", "POST"])
+def report_match(tid, rnd, mid, result):
+    tournament = Tournament.query.get(tid)
+    match = Match.query.get(mid)
+    if match.result is None and current_user.is_anonymous:
+        flash("You must be logged in to report a match with an existing result")
+        return redirect(url_for("login"))
+    if result == 2:
+        match.runner_win()
+        return redirect(url_for("round", tid=tid, rnd=rnd))
+    if result == 1:
+        match.corp_win()
+        return redirect(url_for("round", tid=tid, rnd=rnd))
+    if result == 0:
+        match.tie()
+        return redirect(url_for("round", tid=tid, rnd=rnd))
+    return redirect(url_for("round", tournament=tournament, rnd=rnd))
+
+
+@app.route("/<int:tid>/<int:rnd>/conclude", methods=["GET", "POST"])
+def conclude_round(tid, rnd):
+    tournament = Tournament.query.get(tid)
+    try:
+        tournament.conclude_round()
+    except ConclusionError as e:
+        flash(e)
+        return redirect(url_for("round", tournament=tournament, rnd=rnd))
+    return redirect(url_for("tournament", tid=tournament.id))
+
+
+@login_required
+@app.route("/<int:tid>/pair_round", methods=["GET", "POST"])
+def pair_round(tid):
+    tournament = Tournament.query.get(tid)
+    mm.pair_round(tournament)
+    return redirect(url_for("round", tid=tournament.id, rnd=tournament.current_round))
+
+
+@login_required
+@app.route("/<int:tid>/unpair_round", methods=["GET", "POST"])
+def unpair_round(tid):
+    tournament = Tournament.query.get(tid)
+    tournament.unpair_round()
+    return redirect(url_for("tournament", tid=tournament.id))

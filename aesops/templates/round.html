@@ -7,22 +7,34 @@
         <tr>
             <th>#</th>
             <th>Corp Player</th>
-            <th>Corp ID</th>
             <th>Score</th>
             <th>Runner Player</th>
-            <th>Runner ID</th>
             <th>Reporting</th>
         </tr>
     </thead>
     {% for match in tournament.get_round(round=rnd) %}
     <tr>
         <th>{{ match.table }}</th>
-        <th>{{ match.corp_player.name }}</th>
-        <th>{{ match.corp_player.corp }}</th>
+        <th>{{ match.corp_player.name }} {{ match.corp_player.corp }}</th>
         <th>{{ format_results(match) }}</th>
-        <th>{{ match.runner_player.name }}</th>
-        <th>{{match.runner_player.runner }}</th>
+        <th>{{ match.runner_player.name }} {{match.runner_player.runner }}</th>
+        {% if not match.concluded or current_user.has_admin_rights(tournament.id) %}
+        <th>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}">Corp Win</a>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=0)}}">Tie</a>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=2)}}">Runner Win</a>
+        </th>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>
+
+{% if current_user.has_admin_rights(tournament.id) %}
+<p>
+    <a href="{{ url_for('conclude_round',tid=tournament.id, rnd=rnd)}}">Conclude Round</a>
+</p>
+<p>
+    <a href="{{ url_for('unpair_round',tid=tournament.id)}}">Unpair Round</a>
+</p>
+{% endif %}
 {% endblock %}

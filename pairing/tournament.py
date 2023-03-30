@@ -82,3 +82,11 @@ class Tournament(db.Model):
 
     def get_round(self, round) -> list[Match]:
         return [m for m in self.matches if m.rnd == round]
+
+    def unpair_round(self):
+        for match in self.active_matches:
+            match.delete()
+        self.current_round -= 1
+        db.session.add(self)
+        db.session.commit()
+        return self

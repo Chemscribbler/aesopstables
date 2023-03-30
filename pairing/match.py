@@ -2,7 +2,7 @@ from aesops import db
 from sqlalchemy.orm import Mapped
 
 
-def ConclusionError(Exception):
+class ConclusionError(BaseException):
     pass
 
 

@@ -1,16 +1,18 @@
+<!--TODO add delete/drop/edit forms and manual round pairing-->
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ tournament.name }}</h1>
 {% if tournament.description %}
 <h2>{{ tournament.description }}</h2>
 {% endif %}
-{% if tournament.current_round == 0 or current_user.has_admin_rights(tournament_id = tournament.id)%}
-<h2>Registration</h2>
-<a href="{{ url_for('add_player', tid=tournament.id)}}"></a>
+{% if tournament.current_round == 0 or current_user.has_admin_rights(tid = tournament.id)%}
+<a href="{{ url_for('add_player', tid=tournament.id)}}">
+    <h2>Registration</h2>
+</a>
 {% endif %}
 {% if tournament.current_round > 0 %}
 {% for round in range(1,tournament.current_round+1) %}
-<a href="{{ url_for('round', tid=tournament.id, rid=round)}}">{{round}}</a>
+<a href="{{ url_for('round', tid=tournament.id, rnd=round)}}">{{round}}</a>
 {% endfor %}
 {% endif %}
 
@@ -40,4 +42,7 @@
         {% endfor %}
 </table>
 
+{% if current_user.has_admin_rights(tid = tournament.id) %}
+<a href="{{ url_for('pair_round', tid=tournament.id) }}">Pair Round</a>
+{% endif %}
 {% endblock %}
