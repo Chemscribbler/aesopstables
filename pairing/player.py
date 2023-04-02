@@ -3,21 +3,6 @@ from sqlalchemy.orm import Mapped
 
 
 class Player(db.Model):
-    """
-    Player model
-
-    functions:
-    get_record() -> dict[games_played, score] as int
-    get_side_balance() -> int
-    get_sos() -> float
-    get_esos() -> float
-    update_sos() -> None
-    update_esos() -> None
-    update_score() -> None
-    reset() -> None
-    drop() -> None
-    """
-
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     name: Mapped[str] = db.Column(db.String, nullable=False)
     corp: Mapped[str] = db.Column(db.String)

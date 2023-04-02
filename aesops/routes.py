@@ -9,11 +9,12 @@ from aesops.forms import (
 )
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
-from aesops.user import User
+from aesops.user import User, has_admin_rights
 from pairing.tournament import Tournament
 from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
+from aesops.utility import display_side_bias, rank_tables, get_faction
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -62,7 +63,13 @@ def register():
 @app.route("/tournament/<int:tid>", methods=["GET", "POST"])
 @app.route("/<int:tid>/standings", methods=["GET", "POST"])
 def tournament(tid):
-    return render_template("tournament.html", tournament=Tournament.query.get(tid))
+    return render_template(
+        "tournament.html",
+        tournament=Tournament.query.get(tid),
+        admin=has_admin_rights(current_user, tid),
+        display_side_bias=display_side_bias,
+        get_faction=get_faction,
+    )
 
 
 @app.route("/create_tournament", methods=["GET", "POST"])
@@ -118,7 +125,13 @@ def round(tid, rnd):
             return "1 - 1"
 
     return render_template(
-        "round.html", tournament=tournament, rnd=rnd, format_results=format_results
+        "round.html",
+        tournament=tournament,
+        rnd=rnd,
+        format_results=format_results,
+        admin=has_admin_rights(current_user, tid),
+        rank_tables=rank_tables,
+        get_faction=get_faction,
     )
 
 
@@ -147,8 +160,8 @@ def conclude_round(tid, rnd):
     try:
         tournament.conclude_round()
     except ConclusionError as e:
-        flash(e)
-        return redirect(url_for("round", tournament=tournament, rnd=rnd))
+        flash("Not all matches have been reported")
+        return redirect(url_for("round", tid=tournament.id, rnd=rnd))
     return redirect(url_for("tournament", tid=tournament.id))
 
 
@@ -166,3 +179,49 @@ def unpair_round(tid):
     tournament = Tournament.query.get(tid)
     tournament.unpair_round()
     return redirect(url_for("tournament", tid=tournament.id))
+
+
+@login_required
+@app.route("/<int:pid>/edit_player", methods=["GET", "POST"])
+def edit_player(pid):
+    player = Player.query.get(pid)
+    tournament = player.tournament
+    form = PlayerForm()
+    if form.validate_on_submit():
+        player.name = form.name.data
+        player.corp = form.corp.data
+        player.corp_deck = form.corp_deck.data
+        player.runner = form.runner.data
+        player.runner_deck = form.runner_deck.data
+        player.first_round_bye = form.bye.data
+        db.session.commit()
+        flash(f"{player.name} has been edited!")
+        return redirect(url_for("tournament", tid=player.tid))
+    form.name.data = player.name
+    form.corp.data = player.corp
+    form.corp_deck.data = player.corp_deck
+    form.runner.data = player.runner
+    form.runner_deck.data = player.runner_deck
+    form.bye.data = player.first_round_bye
+    return render_template(
+        "edit_player.html", tournament=tournament, form=form, player=player
+    )
+
+
+@login_required
+@app.route("/<int:pid>/delete_player", methods=["GET", "POST"])
+def delete_player(pid):
+    player = Player.query.get(pid)
+    db.session.delete(player)
+    db.session.commit()
+    flash(f"{player.name} has been deleted!")
+    return redirect(url_for("tournament", tid=player.tid))
+
+
+@login_required
+@app.route("/<int:pid>/drop_player", methods=["GET", "POST"])
+def drop_player(pid):
+    player = Player.query.get(pid)
+    player.drop()
+    flash(f"{player.name} has been dropped!")
+    return redirect(url_for("tournament", tid=player.tid))

@@ -31,14 +31,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def has_admin_rights(self, tid):
-        t = Tournament.query.get(tid)
-        if t.admin_id == self.id or self.admin_rights:
-            return True
-        else:
-            return False
-
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+def has_admin_rights(user, tid):
+    if user.is_anonymous:
+        return False
+    t = Tournament.query.get(tid)
+    if t.admin_id == user.id or user.admin_rights:
+        return True
+    return False

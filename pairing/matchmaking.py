@@ -21,7 +21,6 @@ def create_match(
             rnd=tournament.current_round,
             is_bye=is_bye,
             result=1,
-            concluded=True,
         )
     else:
         m = Match(
@@ -63,14 +62,17 @@ def pair_round(t: Tournament):
     ranked_matches = sorted(
         t.active_matches,
         key=lambda m: (
-            (m.corp_player.score + m.runner_player.score)
+            (
+                m.corp_player.get_record()["score"]
+                + m.runner_player.get_record()["score"]
+            )
             if not m.is_bye
-            else float("inf")
+            else -1
         ),
         reverse=True,
     )
     for i, match in enumerate(ranked_matches):
-        match.tableNumber = i + 1
+        match.table_number = i + 1
         db.session.add(match)
     db.session.commit()
 

@@ -2,23 +2,37 @@
 
 {% block content %}
 <h1><a href="{{ url_for('tournament',tid=tournament.id)}}">{{ tournament.name }}</a></h1>
+<h3>Round
+    {% for round in range(1,tournament.current_round+1) %}
+    <a href="{{ url_for('round', tid=tournament.id, rnd=round)}}">{{round}}</a>
+    {% endfor %}
+</h3>
 <table>
     <thead>
         <tr>
-            <th>#</th>
+            <th>Table Number</th>
             <th>Corp Player</th>
             <th>Score</th>
             <th>Runner Player</th>
             <th>Reporting</th>
         </tr>
     </thead>
-    {% for match in tournament.get_round(round=rnd) %}
+    {% for match in rank_tables(tournament.get_round(round=rnd)) %}
     <tr>
-        <th>{{ match.table }}</th>
-        <th>{{ match.corp_player.name }} {{ match.corp_player.corp }}</th>
+        <th>{{ match.table_number }}</th>
+        <th>{{ match.corp_player.name }}<br>
+            <span class="{{get_faction(match.corp_player.corp)}}" style="font-size: small;">{{ match.corp_player.corp
+                }}</span>
+        </th>
         <th>{{ format_results(match) }}</th>
-        <th>{{ match.runner_player.name }} {{match.runner_player.runner }}</th>
-        {% if not match.concluded or current_user.has_admin_rights(tournament.id) %}
+        <th>{% if match.runner_player.name %}{{ match.runner_player.name }}<br>
+            <span class="{{get_faction(match.runner_player.runner)}}"
+                style="font-size: small;">{{match.runner_player.runner }}</span>
+            {% else%}
+            Bye
+            {% endif %}
+        </th>
+        {% if not match.concluded or admin %}
         <th>
             <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}">Corp Win</a>
             <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=0)}}">Tie</a>
@@ -29,7 +43,7 @@
     {% endfor %}
 </table>
 
-{% if current_user.has_admin_rights(tournament.id) %}
+{% if admin %}
 <p>
     <a href="{{ url_for('conclude_round',tid=tournament.id, rnd=rnd)}}">Conclude Round</a>
 </p>

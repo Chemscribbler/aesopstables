@@ -3,6 +3,8 @@ import os
 import datetime
 from json import dump, load
 from pairing.player import Player
+from pairing.match import Match
+import json
 
 
 def get_ids():
@@ -56,6 +58,19 @@ def display_side_bias(player: Player):
     if player.get_side_balance() < 0:
         return f"Runner {player.get_side_balance()*-1}"
     return "Balanced"
+
+
+def rank_tables(match_list: list[Match]):
+    match_list.sort(key=lambda x: x.table_number or 1000)
+    return match_list
+
+
+def get_faction(corp_name: str):
+    with open("ids.json") as f:
+        ids = json.load(f)
+        for id in ids:
+            if id["name"] == corp_name:
+                return id["faction"]
 
 
 if __name__ == "__main__":

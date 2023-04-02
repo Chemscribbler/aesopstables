@@ -4,7 +4,6 @@ from pairing.models import Tournament
 from pairing.matchmaking import pair_round
 from aesops import db
 import tqdm
-import cProfile
 
 
 def create_players(t: Tournament, count: int):

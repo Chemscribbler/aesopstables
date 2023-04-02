@@ -14,7 +14,7 @@ class Match(db.Model):
     runner_player_id = db.Column(db.Integer, db.ForeignKey("player.id"))
     result = db.Column(db.Integer)
     concluded = db.Column(db.Boolean, default=False)
-    is_bye = db.Column(db.Boolean, default=True)
+    is_bye = db.Column(db.Boolean, default=False)
     table_number = db.Column(db.Integer)
 
     corp_player = db.relationship(
