@@ -90,3 +90,8 @@ class Tournament(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+    def top_n_cut(self, n):
+        player_list = self.rank_players()
+        cut_players = player_list[:n]
+        return cut_players
