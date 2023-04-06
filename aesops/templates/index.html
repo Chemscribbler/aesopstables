@@ -4,7 +4,7 @@
 {% if current_user.is_authenticated %}
 <a href="{{ url_for('create_tournament') }}">Create Tournament</a>
 {% endif %}
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Tournament Name</th>
