@@ -56,7 +56,7 @@ def display_side_bias(player: Player):
     if player.get_side_balance() > 0:
         return f"Corp +{player.get_side_balance()}"
     if player.get_side_balance() < 0:
-        return f"Runner {player.get_side_balance()*-1}"
+        return f"Runner +{player.get_side_balance()*-1}"
     return "Balanced"
 
 
