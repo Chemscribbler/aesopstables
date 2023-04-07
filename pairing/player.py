@@ -43,9 +43,7 @@ class Player(db.Model):
                 score += 3
             if match.result == 0 and match.concluded:
                 score += 1
-            # Only doing this here because bye is always Corp side
-            if not match.is_bye:
-                games_played += 1
+            games_played += 1
         return {"score": score, "games_played": games_played}
 
     def get_side_balance(self):
