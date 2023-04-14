@@ -73,6 +73,17 @@ def get_faction(corp_name: str):
                 return id["faction"]
 
 
+def format_results(match: Match):
+    if match.result is None:
+        return ""
+    if match.result == 1:
+        return "3 - 0"
+    if match.result == -1:
+        return "0 - 3"
+    if match.result == 0:
+        return "1 - 1"
+
+
 if __name__ == "__main__":
     print(get_corp_ids())
     print(get_runner_ids())

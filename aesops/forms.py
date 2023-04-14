@@ -7,6 +7,7 @@ from wtforms import (
     SelectField,
     DateField,
     TextAreaField,
+    IntegerField,
 )
 from wtforms.validators import DataRequired, ValidationError
 from aesops.user import User
@@ -38,8 +39,14 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Please use a different email address.")
 
 
+def validate_name(form, field):
+    invalid_names = ["test", "admin", "(BYE)", "root"]
+    if field.data in invalid_names:
+        raise ValidationError("Invalid name. Please choose another.")
+
+
 class PlayerForm(FlaskForm):
-    name = StringField("Player Name", validators=[DataRequired()])
+    name = StringField("Player Name", validators=[DataRequired(), validate_name])
     corp = SelectField("Corp ID", choices=get_corp_ids())
     corp_deck = TextAreaField("Corp Deck")
     runner = SelectField("Runner ID", choices=get_runner_ids())
@@ -53,3 +60,23 @@ class TournamentForm(FlaskForm):
     date = DateField("Tournament Date", validators=[DataRequired()])
     description = TextAreaField("Tournament Description")
     submit = SubmitField("Add Tournament")
+
+
+class EditMatchesForm(
+    FlaskForm,
+):
+    def validate_runner(self, field):
+        if field.data and self.corp_player.data == field.data:
+            raise ValidationError("Runner and Corp cannot be the same player.")
+
+    table_number = IntegerField("Table Number", validators=[DataRequired()])
+    corp_player = SelectField("Corp Player", validators=[DataRequired()])
+    runner_player = SelectField(
+        "Runner Player", validators=[DataRequired(), validate_runner]
+    )
+    submit = SubmitField("Save")
+
+    def populate_players(self, players):
+        self.corp_player.choices = [(p.id, p.name) for p in players]
+        self.runner_player.choices = [(p.id, p.name) for p in players]
+        self.runner_player.choices.append((None, "(BYE)"))

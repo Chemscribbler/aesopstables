@@ -104,4 +104,18 @@ class Player(db.Model):
     def drop(self):
         self.active = False
         db.session.add(self)
-        db.session.commit(self)
+        db.session.commit()
+
+    def undrop(self):
+        self.active = True
+        db.session.add(self)
+        db.session.commit()
+
+    def is_paired(self, rnd):
+        for match in self.runner_matches:
+            if match.rnd == rnd:
+                return True
+        for match in self.corp_matches:
+            if match.rnd == rnd:
+                return True
+        return False

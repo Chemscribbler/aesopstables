@@ -3,16 +3,16 @@
 {% block content %}
 <h1>{{ tournament.name }}</h1>
 {% if tournament.description %}
-<h2>{{ tournament.description }}</h2>
+<p>{{ tournament.description }}</p>
 {% endif %}
-{% if tournament.current_round == 0 or admin%}
-<a href="{{ url_for('add_player', tid=tournament.id)}}">
-    <h2>Registration</h2>
-</a>
+{% if tournament.current_round == 0%}
+<a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
 {% endif %}
 {% if tournament.current_round > 0 %}
+<h3>Round</h3>
 {% for round in range(1,tournament.current_round+1) %}
-<a href="{{ url_for('round', tid=tournament.id, rnd=round)}}">{{round}}</a>
+<a href="{{ url_for('round', tid=tournament.id, rnd=round)}}" class="text-primary fs-4 d-inline-block me-3">{{round}}
+</a>
 {% endfor %}
 {% endif %}
 
@@ -41,15 +41,22 @@
         <td>{{ display_side_bias(player) }}</td>
         {% if admin %}
         <td>
-            <a href="{{ url_for('edit_player', pid=player.id) }}">Edit</a>
-            <a href="{{ url_for('delete_player', pid=player.id) }}">Delete</a>
-            <a href="{{ url_for('drop_player', pid=player.id) }}">Drop</a>
+            <a href="{{ url_for('edit_player', pid=player.id) }}" class="btn btn-success">Edit</a>
+            {% if tournament.current_round == 0 %}
+            <a href="{{ url_for('delete_player', pid=player.id) }}" class="btn btn-danger">Delete</a>
+            {% endif %}
+            {% if player.active %}
+            <a href="{{ url_for('drop_player', pid=player.id) }}" class="btn btn-warning">Drop</a>
+            {% else %}
+            <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
+            {% endif %}
         </td>
         {% endif %}
         {% endfor %}
 </table>
 
 {% if admin %}
-<a href="{{ url_for('pair_round', tid=tournament.id) }}">Pair Round</a>
+<a href="{{ url_for('pair_round', tid=tournament.id) }}" class="btn btn-primary">Pair Round</a>
+<a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
 {% endif %}
 {% endblock %}

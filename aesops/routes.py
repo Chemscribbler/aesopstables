@@ -6,6 +6,7 @@ from aesops.forms import (
     PlayerForm,
     TournamentForm,
     TournamentForm,
+    EditMatchesForm,
 )
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
@@ -14,7 +15,7 @@ from pairing.tournament import Tournament
 from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
-from aesops.utility import display_side_bias, rank_tables, get_faction
+from aesops.utility import display_side_bias, rank_tables, get_faction, format_results
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -113,17 +114,6 @@ def add_player(tid: int):
 @app.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])
 def round(tid, rnd):
     tournament = Tournament.query.get(tid)
-
-    def format_results(match: Match):
-        if match.result is None:
-            return ""
-        if match.result == 1:
-            return "3 - 0"
-        if match.result == -1:
-            return "0 - 3"
-        if match.result == 0:
-            return "1 - 1"
-
     return render_template(
         "round.html",
         tournament=tournament,
@@ -212,6 +202,12 @@ def edit_player(pid):
 @app.route("/<int:pid>/delete_player", methods=["GET", "POST"])
 def delete_player(pid):
     player = Player.query.get(pid)
+    if player.tournament.admin_id != current_user.id:
+        flash("You do not have permission to delete this player")
+        return redirect(url_for("tournament", tid=player.tid))
+    if player.tournament.current_round > 0:
+        flash("You cannot delete a player after the first round")
+        return redirect(url_for("tournament", tid=player.tid))
     db.session.delete(player)
     db.session.commit()
     flash(f"{player.name} has been deleted!")
@@ -225,3 +221,67 @@ def drop_player(pid):
     player.drop()
     flash(f"{player.name} has been dropped!")
     return redirect(url_for("tournament", tid=player.tid))
+
+
+@login_required
+@app.route("/<int:pid>/undrop_player", methods=["GET", "POST"])
+def undrop_player(pid):
+    player = Player.query.get(pid)
+    player.undrop()
+    flash(f"{player.name} has been undropped!")
+    return redirect(url_for("tournament", tid=player.tid))
+
+
+@login_required
+@app.route("/delete_match/<mid>", methods=["GET", "POST"])
+def delete_match(mid):
+    match = Match.query.get(mid)
+    round = match.rnd
+    tid = match.tournament.id
+    db.session.delete(match)
+    db.session.commit()
+    flash("Match deleted")
+    return redirect(url_for("round", tid=tid, rnd=round))
+
+
+@login_required
+@app.route("/<int:tid>/<int:rnd>/edit_pairings", methods=["GET", "POST"])
+def edit_pairings(tid, rnd):
+    tournament = Tournament.query.get(tid)
+    form = EditMatchesForm()
+    if tournament.admin_id != current_user.id:
+        flash("You do not have permission to edit pairings")
+        return redirect(url_for("tournament", tid=tid))
+    if tournament.get_unpaired_players() is not None:
+        form.populate_players(tournament.get_unpaired_players())
+        if form.validate_on_submit():
+            is_bye = form.runner_player.data == "None"
+            print(is_bye)
+            mm.create_match(
+                tournament=tournament,
+                corp_player=Player.query.get(form.corp_player.data),
+                runner_player=Player.query.get(form.runner_player.data),
+                is_bye=is_bye,
+            )
+            print(tournament.active_matches)
+
+            return render_template(
+                "edit_pairings.html",
+                tournament=tournament,
+                form=form,
+                rnd=rnd,
+                format_results=format_results,
+                admin=has_admin_rights(current_user, tid),
+                rank_tables=rank_tables,
+                get_faction=get_faction,
+            )
+    return render_template(
+        "edit_pairings.html",
+        tournament=tournament,
+        form=form,
+        rnd=rnd,
+        format_results=format_results,
+        admin=has_admin_rights(current_user, tid),
+        rank_tables=rank_tables,
+        get_faction=get_faction,
+    )

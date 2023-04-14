@@ -1,0 +1,41 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Table Number</th>
+            <th>Corp Player</th>
+            <th>Score</th>
+            <th>Runner Player</th>
+            <th>Reporting</th>
+        </tr>
+    </thead>
+    {% for match in rank_tables(tournament.get_round(round=rnd)) %}
+    <tr>
+        <th>{{ match.table_number }}</th>
+        <th>{{ match.corp_player.name }}<br>
+            <span class="{{get_faction(match.corp_player.corp)}}" style="font-size: small;">{{ match.corp_player.corp
+                }}</span>
+        </th>
+        <th>{{ format_results(match) }}</th>
+        <th>{% if match.runner_player.name %}{{ match.runner_player.name }}<br>
+            <span class="{{get_faction(match.runner_player.runner)}}"
+                style="font-size: small;">{{match.runner_player.runner }}</span>
+            {% else%}
+            Bye
+            {% endif %}
+        </th>
+        {% if match.result is none or admin %}
+        <th>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}"
+                class="btn btn-primary">Corp Win</a>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=0)}}"
+                class="btn btn-primary">Tie</a>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=2)}}"
+                class="btn btn-primary">Runner Win</a>
+            {% if admin and tournament.current_round == rnd%}
+            <a href="{{ url_for('delete_match', mid=match.id)}}" class="btn btn-danger">Delete Match</a>
+            {% endif %}
+        </th>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>

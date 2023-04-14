@@ -29,6 +29,7 @@ class Tournament(db.Model):
         primaryjoin="and_(Tournament.id == Match.tid, Match.rnd == Tournament.current_round)",
         viewonly=True,
     )
+    cut = db.relationship("Cut", back_populates="tournament")
 
     def __repr__(self) -> str:
         return f"<Tournament> {self.name}: {self.id}"
@@ -95,3 +96,6 @@ class Tournament(db.Model):
         player_list = self.rank_players()
         cut_players = player_list[:n]
         return cut_players
+
+    def get_unpaired_players(self):
+        return [p for p in self.active_players if not p.is_paired(self.current_round)]
