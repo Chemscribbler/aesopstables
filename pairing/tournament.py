@@ -10,7 +10,7 @@ class Tournament(db.Model):
     admin_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String, nullable=False)
     current_round = db.Column(db.Integer, default=0)
-    date = db.Column(db.DateTime(timezone=True))
+    date = db.Column(db.DateTime(timezone=True), default=db.func.now())
     description = db.Column(db.String)
 
     players = db.relationship(

@@ -4,7 +4,9 @@ import datetime
 from json import dump, load
 from pairing.player import Player
 from pairing.match import Match
+from pairing.tournament import Tournament
 import json
+from decimal import Decimal
 
 
 def get_ids():
@@ -82,6 +84,93 @@ def format_results(match: Match):
         return "0 - 3"
     if match.result == 0:
         return "1 - 1"
+
+
+def get_json(tid):
+    t = Tournament.query.get(tid)
+    t_json = {
+        "name": t.name,
+        "cutToTop": t.cut.num_players if t.cut is not None else 0,
+        "preliminaryRounds": t.current_round,
+        "players": [],
+        "eliminationPlayers": [],
+        "rounds": [],
+        "uploadedFrom": "AesopsTables",
+        "links": [
+            {
+                "rel": "schemaderivedfrom",
+                "href": "http://steffens.org/nrtm/nrtm-schema.json",
+            },
+            {"rel": "uploadedfrom", "href": "https://github.com/Chemscribbler/sass"},
+        ],
+    }
+
+    for i, player in enumerate(t.rank_players()):
+        t_json["players"].append(
+            {
+                "id": player.id,
+                "name": player.name,
+                "rank": i + 1,
+                "corpIdentity": player.corp,
+                "runnerIdentity": player.runner,
+                "matchPoints": player.score,
+                "strengthOfSchedule": player.sos,
+                "extendedStrengthOfSchedule": player.esos,
+                "sideBalance": player.get_side_balance(),
+            }
+        )
+    if t.cut is not None:
+        for i, player in enumerate(t.cut.get_standings()["ranked_players"]):
+            t_json["eliminationPlayers"].append(
+                {
+                    "id": player.player.id,
+                    "name": player.player.name,
+                    "rank": i + 1,
+                    "seed": player.seed,
+                }
+            )
+    for rnd in range(1, t.current_round + 1):
+        match_list = []
+        for match in t.get_round(rnd):
+            match_list.append(
+                {
+                    "tableNumber": match.table_number,
+                    "corpPlayer": match.corp_player.id,
+                    "runnerPlayer": match.runner_player.id
+                    if not match.is_bye
+                    else "(BYE)",
+                    "corpIdentity": match.corp_player.corp,
+                    "runnerIdentity": match.runner_player.runner
+                    if not match.is_bye
+                    else "",
+                    "corpScore": format_results(match).split(" - ")[0],
+                    "runnerScore": format_results(match).split(" - ")[1],
+                }
+            )
+        t_json["rounds"].append(match_list)
+    if t.cut is not None:
+        for rnd in range(1, t.cut.rnd + 1):
+            match_list = []
+            for match in t.cut.get_round(rnd):
+                match_list.append(
+                    {
+                        "tableNumber": match.table_number,
+                        "corpPlayer": match.corp_player.player.id,
+                        "runnerPlayer": match.runner_player.player.id,
+                        "winner_id": match.winner_match_id,
+                        "loser_id": match.loser_match_id,
+                    }
+                )
+            t_json["rounds"].append(match_list)
+
+    class DecimalEncoder(json.JSONEncoder):
+        def default(self, o):
+            if isinstance(o, Decimal):
+                return float(o)
+            return super(DecimalEncoder, self).default(o)
+
+    json_data = json.dumps(t_json, cls=DecimalEncoder)
+    return json_data
 
 
 if __name__ == "__main__":

@@ -8,14 +8,20 @@ from aesops.forms import (
     TournamentForm,
     EditMatchesForm,
 )
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User, has_admin_rights
 from pairing.tournament import Tournament
 from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
-from aesops.utility import display_side_bias, rank_tables, get_faction, format_results
+from aesops.utility import (
+    display_side_bias,
+    rank_tables,
+    get_faction,
+    format_results,
+    get_json,
+)
 from top_cut.cut import Cut
 from top_cut.elim_match import ElimMatch
 
@@ -370,4 +376,6 @@ def delete_cut(tid):
 
 @app.route("/<int:tid>/abr_export", methods=["GET"])
 def abr_export(tid):
-    pass
+    response = Response(get_json(tid), mimetype="application/json")
+    response.headers.set("Content-Disposition", "attachment", filename=f"{tid}.json")
+    return response
