@@ -1,3 +1,26 @@
+def get_bracket(num_players: int, double_elim: bool = False):
+    """_summary_: Returns the bracket for the cut.
+    _params_:
+        num_players: The number of players in the cut.
+        double_elim: Whether the cut is double elimination or not.
+    _returns_: A dictionary containing the bracket for the cut.
+    """
+    if num_players not in [3, 4, 8, 16]:
+        raise ValueError("Invalid number of players for cut")
+    if double_elim:
+        if num_players == 4:
+            return double_elim_4
+        elif num_players == 8:
+            return double_elim_8
+        elif num_players == 16:
+            return double_elim_16
+    else:
+        if num_players == 4:
+            return single_elim_4
+        elif num_players == 3:
+            return single_elim_3
+
+
 double_elim_16 = {
     "round_1": [
         {"table": 1, "higher_seed": 1, "lower_seed": 16},
@@ -52,63 +75,167 @@ double_elim_16 = {
 
 double_elim_8 = {
     "round_1": [
-        {"table": 1, "higher_seed": 1, "lower_seed": 8},
-        {"table": 2, "higher_seed": 4, "lower_seed": 5},
-        {"table": 3, "higher_seed": 3, "lower_seed": 6},
-        {"table": 4, "higher_seed": 2, "lower_seed": 76},
+        {"table": 1, "higher_seed": 1, "lower_seed": 8, "elim": False},
+        {"table": 2, "higher_seed": 4, "lower_seed": 5, "elim": False},
+        {"table": 3, "higher_seed": 3, "lower_seed": 6, "elim": False},
+        {"table": 4, "higher_seed": 2, "lower_seed": 7, "elim": False},
     ],
     "round_2": [
-        {"table": 5, "higher_seed": (1, "loser"), "lower_seed": (2, "loser")},
-        {"table": 6, "higher_seed": (3, "loser"), "lower_seed": (4, "loser")},
-        {"table": 7, "higher_seed": (1, "winner"), "lower_seed": (2, "winner")},
-        {"table": 8, "higher_seed": (3, "winner"), "lower_seed": (4, "winner")},
+        {
+            "table": 5,
+            "higher_seed": (1, "loser"),
+            "lower_seed": (2, "loser"),
+            "elim": True,
+        },
+        {
+            "table": 6,
+            "higher_seed": (3, "loser"),
+            "lower_seed": (4, "loser"),
+            "elim": True,
+        },
+        {
+            "table": 7,
+            "higher_seed": (1, "winner"),
+            "lower_seed": (2, "winner"),
+            "elim": False,
+        },
+        {
+            "table": 8,
+            "higher_seed": (3, "winner"),
+            "lower_seed": (4, "winner"),
+            "elim": False,
+        },
     ],
     "round_3": [
-        {"table": 9, "higher_seed": (5, "winner"), "lower_seed": (8, "loser")},
-        {"table": 10, "higher_seed": (6, "winner"), "lower_seed": (7, "loser")},
-        {"table": 11, "higher_seed": (7, "winner"), "lower_seed": (8, "winner")},
+        {
+            "table": 9,
+            "higher_seed": (5, "winner"),
+            "lower_seed": (8, "loser"),
+            "elim": True,
+        },
+        {
+            "table": 10,
+            "higher_seed": (6, "winner"),
+            "lower_seed": (7, "loser"),
+            "elim": True,
+        },
+        {
+            "table": 11,
+            "higher_seed": (7, "winner"),
+            "lower_seed": (8, "winner"),
+            "elim": False,
+        },
     ],
     "round_4": [
-        {"table": 12, "higher_seed": (9, "winner"), "lower_seed": (10, "winner")},
+        {
+            "table": 12,
+            "higher_seed": (9, "winner"),
+            "lower_seed": (10, "winner"),
+            "elim": True,
+        },
     ],
     "round_5": [
-        {"table": 13, "higher_seed": (11, "loser"), "lower_seed": (12, "winner")},
+        {
+            "table": 13,
+            "higher_seed": (11, "loser"),
+            "lower_seed": (12, "winner"),
+            "elim": True,
+        },
     ],
     "round_6": [
-        {"table": 14, "higher_seed": (11, "winner"), "lower_seed": (13, "winner")},
+        {
+            "table": 14,
+            "higher_seed": (11, "winner"),
+            "lower_seed": (13, "winner"),
+            "final": True,
+            "elim": False,
+        },
     ],
     "round_7": [
-        {"table": 15, "higher_seed": (14, "winner"), "lower_seed": (14, "loser")},
+        {
+            "table": 15,
+            "higher_seed": (14, "winner"),
+            "lower_seed": (14, "loser"),
+            "final": True,
+            "elim": True,
+        },
     ],
 }
 
 double_elim_4 = {
     "round_1": [
-        {"table": 1, "higher_seed": 1, "lower_seed": 4},
-        {"table": 2, "higher_seed": 2, "lower_seed": 3},
+        {"table": 1, "higher_seed": 1, "lower_seed": 4, "elim": False},
+        {"table": 2, "higher_seed": 2, "lower_seed": 3, "elim": False},
     ],
     "round_2": [
-        {"table": 3, "higher_seed": (1, "loser"), "lower_seed": (2, "loser")},
-        {"table": 4, "higher_seed": (1, "winner"), "lower_seed": (2, "winner")},
+        {
+            "table": 3,
+            "higher_seed": (1, "loser"),
+            "lower_seed": (2, "loser"),
+            "elim": True,
+        },
+        {
+            "table": 4,
+            "higher_seed": (1, "winner"),
+            "lower_seed": (2, "winner"),
+            "elim": False,
+        },
     ],
     "round_3": [
-        {"table": 5, "higher_seed": (3, "winner"), "lower_seed": (4, "loser")},
+        {
+            "table": 5,
+            "higher_seed": (3, "winner"),
+            "lower_seed": (4, "loser"),
+            "elim": True,
+        },
     ],
     "round_4": [
-        {"table": 6, "higher_seed": (4, "winner"), "lower_seed": (5, "winner")},
+        {
+            "table": 6,
+            "higher_seed": (4, "winner"),
+            "lower_seed": (5, "winner"),
+            "elim": False,
+            "final": True,
+        },
     ],
     "round_5": [
-        {"table": 7, "higher_seed": (6, "winner"), "lower_seed": (6, "loser")},
+        {
+            "table": 7,
+            "higher_seed": (6, "winner"),
+            "lower_seed": (6, "loser"),
+            "elim": True,
+            "final": True,
+        },
     ],
 }
 
 single_elim_4 = {
     "round_1": [
-        {"table": 1, "higher_seed": 1, "lower_seed": 4},
-        {"table": 2, "higher_seed": 2, "lower_seed": 3},
+        {"table": 1, "higher_seed": 1, "lower_seed": 4, "elim": True},
+        {"table": 2, "higher_seed": 2, "lower_seed": 3, "elim": True},
     ],
     "round_2": [
-        {"table": 3, "higher_seed": (1, "loser"), "lower_seed": (2, "loser")},
-        {"table": 4, "higher_seed": (1, "winner"), "lower_seed": (2, "winner")},
+        {
+            "table": 3,
+            "higher_seed": (1, "winner"),
+            "lower_seed": (2, "winner"),
+            "elim": True,
+            "final": True,
+        },
+    ],
+}
+
+single_elim_3 = {
+    "round_1": [
+        {"table": 1, "higher_seed": 2, "lower_seed": 3, "elim": True},
+    ],
+    "round_2": [
+        {
+            "table": 2,
+            "higher_seed": 1,
+            "lower_seed": (1, "winner"),
+            "elim": True,
+            "final": True,
+        }
     ],
 }

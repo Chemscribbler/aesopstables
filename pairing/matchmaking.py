@@ -37,6 +37,8 @@ def create_match(
 def pair_round(t: Tournament):
     if not all([m.concluded for m in t.active_matches]):
         raise PairingException("Not all active matches are finished")
+    if t.cut is not None:
+        raise PairingException("Tournament is in cut - cannot pair swiss rounds")
     t.current_round += 1
     db.session.add(t)
     db.session.commit()

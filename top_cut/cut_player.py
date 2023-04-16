@@ -7,11 +7,17 @@ class CutPlayer(db.Model):
     player_id = db.Column(db.Integer, db.ForeignKey("player.id"))
     seed = db.Column(db.Integer)
     player = db.relationship("Player", backref="cut_player")
-    cut_id = db.Column(db.Integer, db.ForeignKey("cut.id"))
+    cut_id = db.Column(
+        db.Integer,
+        db.ForeignKey("cut.id", ondelete="CASCADE", name="cut_id_fk"),
+    )
+    elim_round = db.Column(db.Integer)
 
     cut = db.relationship("Cut", backref="players")
 
-    __table_args__ = (db.UniqueConstraint("cut_id", "seed"),)
+    __table_args__ = (
+        db.UniqueConstraint("cut_id", "seed", name="cut_player_seed_unique"),
+    )
 
     def __repr__(self) -> str:
         return f"<CutPlayer> ID: {self.id} - {self.player}"

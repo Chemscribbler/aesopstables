@@ -16,6 +16,8 @@ from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
 from aesops.utility import display_side_bias, rank_tables, get_faction, format_results
+from top_cut.cut import Cut
+from top_cut.elim_match import ElimMatch
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -285,3 +287,87 @@ def edit_pairings(tid, rnd):
         rank_tables=rank_tables,
         get_faction=get_faction,
     )
+
+
+@app.route("/<int:tid>/create_cut", methods=["POST"])
+def create_cut(tid):
+    flash(
+        f"Top {request.form.get('num_players')} and Double Elim is {request.form.get('double_elim')}"
+    )
+    tournament = Tournament.query.get(tid)
+    num_players = request.form.get("num_players")
+    double_elim = request.form.get("double_elim")
+    c = Cut()
+    double_elim = bool(int(double_elim))
+    c.create(tournament, int(num_players), double_elim=double_elim)
+    c.generate_round()
+    return redirect(url_for("cut_round", tid=tournament.id, rnd=1))
+
+
+@app.route("/<int:tid>/cut/<int:rnd>", methods=["GET", "POST"])
+def cut_round(tid, rnd):
+    tournament = Tournament.query.get(tid)
+    return render_template(
+        "cut_round.html",
+        tournament=tournament,
+        rnd=rnd,
+        format_results=format_results,
+        admin=has_admin_rights(current_user, tid),
+        rank_tables=rank_tables,
+        get_faction=get_faction,
+    )
+
+
+@login_required
+@app.route("/<int:tid>/edit_cut", methods=["POST"])
+def edit_cut(tid):
+    result = request.form.get("result")
+    action = request.form.get("action")
+    mid = request.form.get("mid")
+    rnd = request.form.get("rnd")
+    cut = Tournament.query.get(tid).cut
+    if result is not None:
+        match = ElimMatch.query.get(mid)
+        if result == "1":
+            match.corp_win()
+        elif result == "0":
+            match.runner_win()
+        else:
+            raise ValueError(f"Invalid result {result == '1'}")
+    elif action is None:
+        raise ValueError("No action specified")
+    else:
+        if action == "delete":
+            cut.delete_round(int(rnd))
+            redirect(url_for("tournament", tid=tid))
+        elif action == "swap":
+            ElimMatch.query.get(mid).swap_sides()
+        elif action == "pair_next":
+            cut.conclude_round()
+            db.session.refresh(cut)
+            try:
+                cut.generate_round()
+            except ValueError as e:
+                print(e)
+                cut.rnd = cut.rnd - 1
+                db.session.add(cut)
+                db.session.commit()
+                return redirect(url_for("tournament", tid=tid))
+            redirect(url_for("cut_round", tid=tid, rnd=int(rnd) + 1))
+        else:
+            raise ValueError("Invalid action")
+    return redirect(url_for("cut_round", tid=tid, rnd=cut.rnd))
+
+
+@login_required
+@app.route("/<int:tid>/delete_cut", methods=["POST"])
+def delete_cut(tid):
+    tournament = Tournament.query.get(tid)
+    cut = Cut.query.get(tournament.cut.id)
+    cut.destroy()
+    return redirect(url_for("tournament", tid=tid))
+
+
+@app.route("/<int:tid>/abr_export", methods=["GET"])
+def abr_export(tid):
+    pass

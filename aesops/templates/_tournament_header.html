@@ -1,0 +1,32 @@
+<h1><a href="{{url_for('tournament', tid=tournament.id)}}">{{ tournament.name }}</a></h1>
+{% if tournament.description %}
+<p>{{ tournament.description }}</p>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-3">
+        {% if tournament.current_round == 0%}
+        <a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
+        {% endif %}
+        {% if tournament.current_round > 0 %}
+        <h3>Rounds</h3>
+        {% for round in range(1,tournament.current_round+1) %}
+        <a href="{{ url_for('round', tid=tournament.id, rnd=round)}}"
+            class="text-primary fs-4 d-inline-block me-3">{{round}}
+        </a>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-md-3">
+        {% if tournament.cut is not none %}
+        <h3>Cut Rounds</h3>
+        {% for round in range(1, tournament.cut.rnd+1) %}
+        <a href="{{ url_for('cut_round', tid=tournament.id, rnd=round)}}"
+            class="text-primary fs-4 d-inline-block me-3">{{round}}</a>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+
+    </div>
+</div>
