@@ -12,27 +12,29 @@ class ElimMatch(db.Model):
         db.Integer,
         db.ForeignKey("cut.id", ondelete="CASCADE", name="cut_id_fk"),
     )
-    rnd = db.Column(db.Integer)
-    higher_seed_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    lower_seed_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    corp_player_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    runner_player_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    result = db.Column(db.Integer)
-    concluded = db.Column(db.Boolean, default=False)
-    winner_match_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    loser_match_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
-    table_number = db.Column(db.Integer)
+    rnd: Mapped[int] = db.Column(db.Integer)
+    higher_seed_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    lower_seed_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    corp_player_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    runner_player_id: Mapped[int] = db.Column(
+        db.Integer, db.ForeignKey("cut_player.id")
+    )
+    result: Mapped[int] = db.Column(db.Integer)
+    concluded: Mapped[bool] = db.Column(db.Boolean, default=False)
+    winner_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    loser_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    table_number: Mapped[int] = db.Column(db.Integer)
     cut = db.relationship("Cut", backref="matches")
-    higher_seed = db.relationship(
+    higher_seed: Mapped[CutPlayer] = db.relationship(
         "CutPlayer", foreign_keys=[higher_seed_id], backref="higher_seed_matches"
     )
-    lower_seed = db.relationship(
+    lower_seed: Mapped[CutPlayer] = db.relationship(
         "CutPlayer", foreign_keys=[lower_seed_id], backref="lower_seed_matches"
     )
-    corp_player = db.relationship(
+    corp_player: Mapped[CutPlayer] = db.relationship(
         "CutPlayer", foreign_keys=[corp_player_id], backref="corp_cut_matches"
     )
-    runner_player = db.relationship(
+    runner_player: Mapped[CutPlayer] = db.relationship(
         "CutPlayer",
         foreign_keys=[runner_player_id],
         backref="runner_cut_matches",
@@ -46,11 +48,11 @@ class ElimMatch(db.Model):
             raise ConclusionError("No result recorded")
         self.concluded = True
         if self.reset == 1:
-            self.winner_match_id = self.corp_player_id
-            self.loser_match_id = self.runner_player_id
+            self.winner_id = self.corp_player_id
+            self.loser_id = self.runner_player_id
         else:
-            self.winner_match_id = self.runner_player_id
-            self.loser_match_id = self.corp_player_id
+            self.winner_id = self.runner_player_id
+            self.loser_id = self.corp_player_id
         self.update_elim()
         db.session.add(self)
         db.session.commit()
@@ -151,7 +153,7 @@ class ElimMatch(db.Model):
                         .get_winner()
                         .id
                     )
-                    if semi_winner_id == self.loser_match_id:
+                    if semi_winner_id == self.loser_id:
                         self.get_loser().elim_round = self.rnd
                         self.get_winner().elim_round = self.rnd + 1
                         db.session.add(self.get_loser())

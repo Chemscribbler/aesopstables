@@ -1,8 +1,8 @@
-"""inital commit
+"""initial commit
 
-Revision ID: 9091ed4a8941
+Revision ID: 7f96dc416dd2
 Revises: 
-Create Date: 2023-04-15 14:07:04.663796
+Create Date: 2023-04-17 17:12:27.400835
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9091ed4a8941'
+revision = '7f96dc416dd2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -99,16 +99,16 @@ def upgrade():
     sa.Column('runner_player_id', sa.Integer(), nullable=True),
     sa.Column('result', sa.Integer(), nullable=True),
     sa.Column('concluded', sa.Boolean(), nullable=True),
-    sa.Column('winner_match_id', sa.Integer(), nullable=True),
-    sa.Column('loser_match_id', sa.Integer(), nullable=True),
+    sa.Column('winner_id', sa.Integer(), nullable=True),
+    sa.Column('loser_id', sa.Integer(), nullable=True),
     sa.Column('table_number', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['corp_player_id'], ['cut_player.id'], ),
     sa.ForeignKeyConstraint(['cut_id'], ['cut.id'], name='cut_id_fk', ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['higher_seed_id'], ['cut_player.id'], ),
-    sa.ForeignKeyConstraint(['loser_match_id'], ['elim_match.id'], ),
+    sa.ForeignKeyConstraint(['loser_id'], ['cut_player.id'], ),
     sa.ForeignKeyConstraint(['lower_seed_id'], ['cut_player.id'], ),
     sa.ForeignKeyConstraint(['runner_player_id'], ['cut_player.id'], ),
-    sa.ForeignKeyConstraint(['winner_match_id'], ['elim_match.id'], ),
+    sa.ForeignKeyConstraint(['winner_id'], ['cut_player.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
