@@ -157,8 +157,8 @@ def get_json(tid):
                         "tableNumber": match.table_number,
                         "corpPlayer": match.corp_player.player.id,
                         "runnerPlayer": match.runner_player.player.id,
-                        "winner_id": match.winner_match_id,
-                        "loser_id": match.loser_match_id,
+                        "winner_id": match.winner_id,
+                        "loser_id": match.loser_id,
                     }
                 )
             t_json["rounds"].append(match_list)

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 {% if current_user.is_authenticated %}
 <a href="{{ url_for('create_tournament') }}">Create Tournament</a>
 {% endif %}
@@ -20,4 +21,5 @@
     </tr>
     {% endfor %}
 </table>
+
 {% endblock %}

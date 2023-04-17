@@ -19,9 +19,11 @@
         {{ form.runner.label }}<br>
         {{ form.runner }}<br>
     </p>
+    <!-- Removing Bye functionality for now
     <p>
         {{form.bye}}{{ form.bye.label}}
     </p>
+    -->
     <input type="submit" value="Register" />
     <p><a href="{{ url_for('add_player', tid=tournament.id) }}" </p>
 

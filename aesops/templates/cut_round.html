@@ -1,63 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    {% include '_tournament_header.html' %}
+{% include '_tournament_header.html' %}
 
-    <table class="table table-striped table-sm">
-        <thead>
-            <tr>
-                <th>Table Number</th>
-                <th>Corp Player</th>
-                <th>Score</th>
-                <th>Runner Player</th>
-                {% if admin %}
-                <th>Reporting</th>
-                {% endif %}
-            </tr>
-        </thead>
-        {% for match in rank_tables(tournament.cut.get_round(rnd=rnd)) %}
+<table class="table table-striped table-sm">
+    <thead>
         <tr>
-            <th>{{ match.table_number }}</th>
-            <th>{{ match.corp_player.player.name }}<br>
-                <span class="{{get_faction(match.corp_player.player.corp)}}" style="font-size: small;">{{
-                    match.corp_player.player.corp
-                    }}</span>
-            </th>
-            <th>{{ format_results(match) }}</th>
-            <th>{{ match.runner_player.player.name }}<br>
-                <span class="{{get_faction(match.runner_player.player.runner)}}"
-                    style="font-size: small;">{{match.runner_player.player.runner }}</span>
-            </th>
+            <th>Table Number</th>
+            <th>Corp Player</th>
+            <th>Score</th>
+            <th>Runner Player</th>
             {% if admin %}
-            <th>
-                <form action="/{{tournament.id}}/edit_cut" method="post">
-                    <div class="btn-group" role="group" aria-label="Results Reporting">
-                        <button type="submit" class="btn btn-primary" name="result" value="1">Corp Win</button>
-                        <button type="submit" class="btn btn-primary" name="result" value="0">Runner Win</button>
-                        <input type="hidden" name="mid" value={{match.id}}>
-                    </div>
-                </form>
-            </th>
-            {% endif %}
-            {% if admin and tournament.cut.rnd == rnd%}
-            <th>
-                <form action="/{{tournament.id}}/edit_cut" method="post">
-                    <button type="submit" class="btn btn-warning" name="action" value='swap'>Swap Sides</button>
-                    <input type="hidden" name="mid" value={{match.id}}>
-                </form>
-            </th>
+            <th>Reporting</th>
             {% endif %}
         </tr>
-        {% endfor %}
-    </table>
-    <form action="/{{tournament.id}}/edit_cut" method="post">
-        <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Round</button>
-        <br>
-        <button type="submit" class="btn btn-danger" id="delete-button" name="action" value='delete'>
-            Delete Round</button>
-        <input type="hidden" name="rnd" value={{rnd}}>
-    </form>
-</div>
+    </thead>
+    {% for match in rank_tables(tournament.cut.get_round(rnd=rnd)) %}
+    <tr>
+        <th>{{ match.table_number }}</th>
+        <th>{{ match.corp_player.player.name }}<br>
+            <span class="{{get_faction(match.corp_player.player.corp)}}" style="font-size: small;">{{
+                match.corp_player.player.corp
+                }}</span>
+        </th>
+        <th>{{ format_results(match) }}</th>
+        <th>{{ match.runner_player.player.name }}<br>
+            <span class="{{get_faction(match.runner_player.player.runner)}}"
+                style="font-size: small;">{{match.runner_player.player.runner }}</span>
+        </th>
+        {% if admin %}
+        <th>
+            <form action="/{{tournament.id}}/edit_cut" method="post">
+                <div class="btn-group" role="group" aria-label="Results Reporting">
+                    <button type="submit" class="btn btn-primary" name="result" value="1">Corp Win</button>
+                    <button type="submit" class="btn btn-primary" name="result" value="0">Runner Win</button>
+                    <input type="hidden" name="mid" value={{match.id}}>
+                </div>
+            </form>
+        </th>
+        {% endif %}
+        {% if admin and tournament.cut.rnd == rnd%}
+        <th>
+            <form action="/{{tournament.id}}/edit_cut" method="post">
+                <button type="submit" class="btn btn-warning" name="action" value='swap'>Swap Sides</button>
+                <input type="hidden" name="mid" value={{match.id}}>
+            </form>
+        </th>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+<form action="/{{tournament.id}}/edit_cut" method="post">
+    <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Round</button>
+    <br>
+    <button type="submit" class="btn btn-danger" id="delete-button" name="action" value='delete'>
+        Delete Round</button>
+    <input type="hidden" name="rnd" value={{rnd}}>
+</form>
+
 
 {% endblock %}

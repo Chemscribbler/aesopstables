@@ -1,130 +1,130 @@
 <!--TODO add delete/drop/edit forms and manual round pairing-->
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    {% include '_tournament_header.html' %}
-    <br>
-    {% if tournament.cut is not none %}
 
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            <h3>Top {{ tournament.cut.num_players }} Final Standings</h3>
-            <table class="table table-striped" style="font-size: larger;">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Player</th>
-                        <th>Finish</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for _ in range(tournament.cut.get_standings()['unranked_players']) %}
-                    <tr>
-                        <td> - </td>
-                        <td> - </td>
-                    </tr>
-                    {% endfor %}
-                    {% for player in tournament.cut.get_standings()['ranked_players'] %}
-                    <tr>
-                        <td>{{ player.player.name }}</td>
-                        <td>{{ loop.index0 + 1 + tournament.cut.get_standings()['unranked_players']}}</td>
-                    </tr>
-                    {% endfor %}
-            </table>
-        </div>
-        <div class="col-md-4"></div>
+{% include '_tournament_header.html' %}
+<br>
+{% if tournament.cut is not none %}
+
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <h3>Top {{ tournament.cut.num_players }} Final Standings</h3>
+        <table class="table table-striped" style="font-size: larger;">
+            <thead class="thead-light">
+                <tr>
+                    <th>Player</th>
+                    <th>Finish</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for _ in range(tournament.cut.get_standings()['unranked_players']) %}
+                <tr>
+                    <td> - </td>
+                    <td> - </td>
+                </tr>
+                {% endfor %}
+                {% for player in tournament.cut.get_standings()['ranked_players'] %}
+                <tr>
+                    <td>{{ player.player.name }}</td>
+                    <td>{{ loop.index0 + 1 + tournament.cut.get_standings()['unranked_players']}}</td>
+                </tr>
+                {% endfor %}
+        </table>
     </div>
+    <div class="col-md-4"></div>
+</div>
 
 
-    {% endif%}
+{% endif%}
 
 
-    <h3>Round {{tournament.current_round}} Standings</h3>
-    <table class="table table-striped table-sm">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Corp</th>
-                <th>Runner</th>
-                <th>Score</th>
-                <th>SoS</th>
-                <th>ESoS</th>
-                <th>Side Bias</th>
-            </tr>
-        </thead>
-        {% for player in tournament.rank_players() %}
+<h3>Round {{tournament.current_round}} Standings</h3>
+<table class="table table-striped table-sm">
+    <thead>
         <tr>
-            <td>{{ loop.index0 + 1 }}</td>
-            <td>{{ player.name }}</td>
-            <td><span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span></td>
-            <td><span class="{{ get_faction(player.runner)}}">{{ player.runner }}</span></td>
-            <td>{{ player.get_record()['score'] }}</td>
-            <td>{{ "%0.3f"|format(player.sos) }}</td>
-            <td>{{ "%0.3f"|format(player.esos) }}</td>
-            <td>{{ display_side_bias(player) }}</td>
-            {% if admin %}
-            <td>
-                <a href="{{ url_for('edit_player', pid=player.id) }}" class="btn btn-success">Edit</a>
-                {% if tournament.current_round == 0 %}
-                <a href="{{ url_for('delete_player', pid=player.id) }}" class="btn btn-danger">Delete</a>
-                {% endif %}
-                {% if player.active %}
-                <a href="{{ url_for('drop_player', pid=player.id) }}" class="btn btn-warning">Drop</a>
-                {% else %}
-                <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
-                {% endif %}
-            </td>
+            <th>#</th>
+            <th>Name</th>
+            <th>Corp</th>
+            <th>Runner</th>
+            <th>Score</th>
+            <th>SoS</th>
+            <th>ESoS</th>
+            <th>Side Bias</th>
+        </tr>
+    </thead>
+    {% for player in tournament.rank_players() %}
+    <tr>
+        <td>{{ loop.index0 + 1 }}</td>
+        <td>{{ player.name }}</td>
+        <td><span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span></td>
+        <td><span class="{{ get_faction(player.runner)}}">{{ player.runner }}</span></td>
+        <td>{{ player.get_record()['score'] }}</td>
+        <td>{{ "%0.3f"|format(player.sos) }}</td>
+        <td>{{ "%0.3f"|format(player.esos) }}</td>
+        <td>{{ display_side_bias(player) }}</td>
+        {% if admin %}
+        <td>
+            <a href="{{ url_for('edit_player', pid=player.id) }}" class="btn btn-success">Edit</a>
+            {% if tournament.current_round == 0 %}
+            <a href="{{ url_for('delete_player', pid=player.id) }}" class="btn btn-danger">Delete</a>
             {% endif %}
-            {% endfor %}
-    </table>
+            {% if player.active %}
+            <a href="{{ url_for('drop_player', pid=player.id) }}" class="btn btn-warning">Drop</a>
+            {% else %}
+            <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
+            {% endif %}
+        </td>
+        {% endif %}
+        {% endfor %}
+</table>
 
 
-    {% if admin %}
-    <p>
-        {% if tournament.cut is none %}
-        <a href="{{ url_for('pair_round', tid=tournament.id) }}" class="btn btn-primary">Pair Round</a>
-        <a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
-        {% else %}
-    <form action="/{{tournament.id}}/edit_cut" method="post">
-        <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Cut Round</button>
-
-    </form>
-    {% endif %}
-    {% if tournament.current_round > 0 %}
-    <a href="{{ url_for('abr_export', tid=tournament.id) }}" class="btn btn-primary">Export to ABR</a>
-    {% endif %}
-    </p>
-    <p>
-        {% if tournament.cut is none %}
-    <form action="/{{tournament.id}}/create_cut" method="post">
-        <div class="btn-group" role="group" aria-label="Double Elim Buttons">
-            <button type="submit" class="btn btn-dark" name="num_players" value="4">Top 4 Double
-                Elim</button>
-            <button type="submit" class="btn btn-dark" name="num_players" value="8">Top 8 Double
-                Elim</button>
-            <button type="submit" class="btn btn-dark" name="num_players" value="8">Top 16 Double
-                Elim</button>
-            <input type="hidden" name="double_elim" value=1>
-        </div>
-    </form>
-    <br>
-    <form action="/{{tournament.id}}/create_cut" method="post">
-        <div class="btn-group" role="group" aria-label="Single Elim Buttons">
-            <button type="submit" class="btn btn-dark" name="num_players" value="3">Top 3 Single
-                Elim</button>
-            <button type="submit" class="btn btn-dark" name="num_players" value="4">Top 4 Single
-                Elim</button>
-            <input type="hidden" name="double_elim" value=0>
-        </div>
-    </form>
-    </p>
+{% if admin %}
+<p>
+    {% if tournament.cut is none %}
+    <a href="{{ url_for('pair_round', tid=tournament.id) }}" class="btn btn-primary">Pair Round</a>
+    <a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
     {% else %}
-    <form action="/{{tournament.id}}/delete_cut" method="post">
-        <button type="submit" class="btn btn-danger">Delete Cut</button>
-    </form>
-    {% endif %}
-    </p>
-</div> <!-- /container -->
+<form action="/{{tournament.id}}/edit_cut" method="post">
+    <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Cut Round</button>
+
+</form>
+{% endif %}
+{% if tournament.current_round > 0 %}
+<a href="{{ url_for('abr_export', tid=tournament.id) }}" class="btn btn-primary">Export to ABR</a>
+{% endif %}
+</p>
+<p>
+    {% if tournament.cut is none %}
+<form action="/{{tournament.id}}/create_cut" method="post">
+    <div class="btn-group" role="group" aria-label="Double Elim Buttons">
+        <button type="submit" class="btn btn-dark" name="num_players" value="4">Top 4 Double
+            Elim</button>
+        <button type="submit" class="btn btn-dark" name="num_players" value="8">Top 8 Double
+            Elim</button>
+        <button type="submit" class="btn btn-dark" name="num_players" value="8">Top 16 Double
+            Elim</button>
+        <input type="hidden" name="double_elim" value=1>
+    </div>
+</form>
+<br>
+<form action="/{{tournament.id}}/create_cut" method="post">
+    <div class="btn-group" role="group" aria-label="Single Elim Buttons">
+        <button type="submit" class="btn btn-dark" name="num_players" value="3">Top 3 Single
+            Elim</button>
+        <button type="submit" class="btn btn-dark" name="num_players" value="4">Top 4 Single
+            Elim</button>
+        <input type="hidden" name="double_elim" value=0>
+    </div>
+</form>
+</p>
+{% else %}
+<form action="/{{tournament.id}}/delete_cut" method="post">
+    <button type="submit" class="btn btn-danger">Delete Cut</button>
+</form>
+{% endif %}
+</p>
+
 {% endif %}
 {% endblock %}

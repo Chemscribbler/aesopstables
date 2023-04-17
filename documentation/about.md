@@ -8,8 +8,8 @@
 * Single sided swiss keeps the good elements of the swiss format, encourages virtually all games will be played
 * Still ensures everyone plays their decks evenly
 
-## The Current State (Summer 2021)
-From release through the present, Netrunner has primarily used double sided swiss as its format for running public tournament. Swiss tournaments means in each round every active player is paired against an opponent. Players are assigned opponents based on the amount of wins they've received so far, such that they're usually playing people with the same overall record.
+## The Current State (Sprint 23)
+From release through the present, Netrunner has primarily used double sided swiss as its format for running public tournament. Swiss tournaments means in each round every active player is paired against an opponent. Players are assigned opponents based on the amount of wins they've received so far, such that they're usually playing people with the same overall record. However earlier versions of Aesop's Tables and a lot of evangalism from me have made a few different metas explore Single Sided Swiss. However there were many problems (mostly web dev side) that I couldn't sort out, so I'm going with easier deployment strategies, and hoping it works out better.
 
 ### Double Sided Swiss
 Netrunner has historically used Double Sided Swiss, where everyone plays both of their decks against each opponent (in theory, see problems below). So a match has two discreet games of Netrunner in it. Players are awarded points based on the outcome of each individual game. After a certain number of rounds the top N players go into a top cut, which is run as a double elimination bracket. At that point everyone else is done playing, and those 4/8/16 players compete for the top spot. This ends up meaning that the Swiss section is not used to determine final standings (though it does seed the top N), and instead serves as a gating function. The general perception is that seeding does not have a huge impact on the final result, though I'll admit to that particular issue being somewhat less discussed.
@@ -63,5 +63,5 @@ If something breaks, or you want to do this by hand, you can do the following:
 * Developed primarily by Jeff "Ysengrin" Pruyne
 * Built using Python/Flask/Jinja/PostgreSQL
 * Would love any contributions/feedback
-* For source code see [the github](https://github.com/Chemscribbler/sass)
+* For source code see [the github](https://github.com/Chemscribbler/aesopstables)
 * To contact Discord (Ysengrin#2501)/Stimslack for quick response if needed
