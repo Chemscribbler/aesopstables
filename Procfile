@@ -1,1 +1,1 @@
-web: gunicorn aesopstables:app
+web: flask db upgrade; gunicorn aesopstables:app

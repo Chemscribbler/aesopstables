@@ -1,5 +1,4 @@
 aesopsenv/
-migrations/
 app.db
 __pycache__/
 venv/
