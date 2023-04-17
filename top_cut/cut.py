@@ -110,10 +110,11 @@ class Cut(db.Model):
         db.session.commit()
 
     def destroy(self):
-        for player in CutPlayer.query.filter_by(cut_id=self.id).all():
-            db.session.delete(player)
         for match in ElimMatch.query.filter_by(cut_id=self.id).all():
             db.session.delete(match)
+
+        for player in CutPlayer.query.filter_by(cut_id=self.id).all():
+            db.session.delete(player)
         db.session.delete(self)
         db.session.commit()
 
