@@ -19,8 +19,8 @@ class ElimMatch(db.Model):
     runner_player_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
     result = db.Column(db.Integer)
     concluded = db.Column(db.Boolean, default=False)
-    winner_match_id = db.Column(db.Integer, db.ForeignKey("elim_match.id"))
-    loser_match_id = db.Column(db.Integer, db.ForeignKey("elim_match.id"))
+    winner_match_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
+    loser_match_id = db.Column(db.Integer, db.ForeignKey("cut_player.id"))
     table_number = db.Column(db.Integer)
     cut = db.relationship("Cut", backref="matches")
     higher_seed = db.relationship(
