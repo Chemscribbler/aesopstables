@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped
 
 class CutPlayer(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey("player.id"))
+    player_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("player.id"))
     seed = db.Column(db.Integer)
     player = db.relationship("Player", backref="cut_player")
     cut_id = db.Column(
