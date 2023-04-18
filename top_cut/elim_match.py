@@ -47,7 +47,7 @@ class ElimMatch(db.Model):
         if self.result not in [-1, 1]:
             raise ConclusionError("No result recorded")
         self.concluded = True
-        if self.reset == 1:
+        if self.result == 1:
             self.winner_id = self.corp_player_id
             self.loser_id = self.runner_player_id
         else:
@@ -153,7 +153,10 @@ class ElimMatch(db.Model):
                         .get_winner()
                         .id
                     )
+                    print(semi_winner_id)
+                    print(self.loser_id)
                     if semi_winner_id == self.loser_id:
+                        print("Second Final Not Needed")
                         self.get_loser().elim_round = self.rnd
                         self.get_winner().elim_round = self.rnd + 1
                         db.session.add(self.get_loser())

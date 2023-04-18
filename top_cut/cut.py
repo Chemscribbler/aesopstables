@@ -161,6 +161,11 @@ class Cut(db.Model):
         self.rnd -= 1
         db.session.add(self)
         db.session.commit()
+        for player in self.players:
+            if player.elim_round >= rnd:
+                player.elim_round = None
+                db.session.add(player)
+                db.session.commit()
 
     def is_second_final(self):
         if not self.double_elim:

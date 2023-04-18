@@ -8,7 +8,7 @@
 * Single sided swiss keeps the good elements of the swiss format, encourages virtually all games will be played
 * Still ensures everyone plays their decks evenly
 
-## The Current State (Sprint 23)
+## The Current State (Spring 23)
 From release through the present, Netrunner has primarily used double sided swiss as its format for running public tournament. Swiss tournaments means in each round every active player is paired against an opponent. Players are assigned opponents based on the amount of wins they've received so far, such that they're usually playing people with the same overall record. However earlier versions of Aesop's Tables and a lot of evangalism from me have made a few different metas explore Single Sided Swiss. However there were many problems (mostly web dev side) that I couldn't sort out, so I'm going with easier deployment strategies, and hoping it works out better.
 
 ### Double Sided Swiss
