@@ -64,7 +64,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(f"{user.username} has been registered!")
+        flash(f"{user.username} has been registered!",category="success")
         return redirect(url_for("login"))
     return render_template("register.html", title="Register", form=form)
 
@@ -94,7 +94,7 @@ def create_tournament():
         )
         db.session.add(tournament)
         db.session.commit()
-        flash(f"{tournament.name} has been created!")
+        flash(f"{tournament.name} has been created!", category="success")
         return redirect(url_for("tournament", tid=tournament.id))
     return render_template("tournament_creation.html", form=form)
 
@@ -114,7 +114,7 @@ def add_player(tid: int):
         )
         db.session.add(player)
         db.session.commit()
-        flash(f"{player.name} has been added!")
+        flash(f"{player.name} has been added!", category="success")
         return redirect(url_for("tournament", tid=tid))
     tournament = Tournament.query.get(tid)
     return render_template("player_registration.html", form=form, tournament=tournament)
@@ -194,7 +194,7 @@ def edit_player(pid):
         player.runner_deck = form.runner_deck.data
         player.first_round_bye = form.bye.data
         db.session.commit()
-        flash(f"{player.name} has been edited!")
+        flash(f"{player.name} has been edited!", category="success")
         return redirect(url_for("tournament", tid=player.tid))
     form.name.data = player.name
     form.corp.data = player.corp
@@ -258,9 +258,6 @@ def delete_match(mid):
 def edit_pairings(tid, rnd):
     tournament = Tournament.query.get(tid)
     form = EditMatchesForm()
-    if tournament.admin_id != current_user.id:
-        flash("You do not have permission to edit pairings")
-        return redirect(url_for("tournament", tid=tid))
     if tournament.get_unpaired_players() is not None:
         form.populate_players(tournament.get_unpaired_players())
         if form.validate_on_submit():
@@ -299,7 +296,7 @@ def edit_pairings(tid, rnd):
 @app.route("/<int:tid>/create_cut", methods=["POST"])
 def create_cut(tid):
     flash(
-        f"Top {request.form.get('num_players')} and Double Elim is {request.form.get('double_elim')}"
+        f"Top {request.form.get('num_players')} and the format is {'Double Elim' if request.form.get('double_elim') else 'Single Elim'}"
     )
     tournament = Tournament.query.get(tid)
     num_players = request.form.get("num_players")
