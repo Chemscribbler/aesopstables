@@ -162,6 +162,8 @@ class Cut(db.Model):
         db.session.add(self)
         db.session.commit()
         for player in self.players:
+            if player.elim_round is None:
+                continue
             if player.elim_round >= rnd:
                 player.elim_round = None
                 db.session.add(player)

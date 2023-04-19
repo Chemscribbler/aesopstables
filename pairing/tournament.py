@@ -85,6 +85,8 @@ class Tournament(db.Model):
         return [m for m in self.matches if m.rnd == round]
 
     def unpair_round(self):
+        if self.cut is not None:
+            raise Exception("Cannot unpair a round after a cut has been made")
         for match in self.active_matches:
             match.delete()
         self.current_round -= 1

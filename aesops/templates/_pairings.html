@@ -23,7 +23,7 @@
             Bye
             {% endif %}
         </th>
-        {% if match.result is none or admin %}
+        {% if (match.result is none or admin) and (not match.is_bye) %}
         <th>
             <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}"
                 class="btn btn-primary">Corp Win</a>
