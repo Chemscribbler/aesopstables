@@ -1,4 +1,4 @@
-from random import random
+from random import random, shuffle
 from aesops import db
 from pairing.player import Player
 from pairing.tournament import Tournament
@@ -44,6 +44,7 @@ def pair_round(t: Tournament):
     db.session.commit()
     graph = Graph()
     pairing_pool, bye_player = t.bye_setup()
+    shuffle(pairing_pool)
     for player in pairing_pool:
         graph.add_node(player.id)
     for pair in combinations(pairing_pool, 2):
