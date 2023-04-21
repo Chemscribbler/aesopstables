@@ -64,7 +64,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(f"{user.username} has been registered!",category="success")
+        flash(f"{user.username} has been registered!", category="success")
         return redirect(url_for("login"))
     return render_template("register.html", title="Register", form=form)
 
@@ -342,7 +342,12 @@ def edit_cut(tid):
         raise ValueError("No action specified")
     else:
         if action == "delete":
-            cut.delete_round(int(rnd))
+            try:
+                cut.delete_round(int(rnd))
+            except ValueError as e:
+                flash(
+                    "To the first round use the delete cut button on the tournament page"
+                )
             redirect(url_for("tournament", tid=tid))
         elif action == "swap":
             ElimMatch.query.get(mid).swap_sides()
