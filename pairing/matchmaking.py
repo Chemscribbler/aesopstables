@@ -125,7 +125,13 @@ def find_min_edge(p1: Player, p2: Player):
 
 
 def assign_side(p1: Player, p2: Player):
-    if p1.get_side_balance() > p2.get_side_balance():
+    if p1.id in [m.corp_player_id for m in p2.runner_matches]:
+        corp = p2
+        runner = p1
+    elif p2.id in [m.corp_player_id for m in p1.runner_matches]:
+        corp = p1
+        runner = p2
+    elif p1.get_side_balance() > p2.get_side_balance():
         corp = p2
         runner = p1
     elif p2.get_side_balance() > p1.get_side_balance():
