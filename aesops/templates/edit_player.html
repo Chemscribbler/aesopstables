@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+<h1>Edit Player</h1>
+{% block content %}
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name(size=32) }}<br>
+        {% for error in form.name.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.corp.label }}<br>
+        {{ form.corp }}<br>
+    </p>
+    <p>
+        {{ form.runner.label }}<br>
+        {{ form.runner }}<br>
+    </p>
+    <p>
+        {{form.bye}}{{ form.bye.label}}
+    </p>
+    <input type="submit" value="Register" />
+    <p><a href="{{ url_for('edit_player', tid=tournament.id, pid=player.id) }}"></a> </p>
+
+</form>
+
+{% endblock %}

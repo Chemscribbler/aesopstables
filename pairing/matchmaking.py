@@ -1,46 +1,83 @@
-from random import random
-from app import db
-from app.models import Match, Player, Tournament
+from random import random, shuffle
+from aesops import db
+from pairing.player import Player
+from pairing.tournament import Tournament
+from pairing.match import Match
 from networkx import Graph, max_weight_matching
 from itertools import combinations
-
-# TODO: Unpair round
 
 
 class PairingException(Exception):
     pass
 
 
-def create_match(tournament: Tournament, corp_player: Player, runner_player: Player):
-    m = Match(
-        tid=tournament.id,
-        corp_player_id=corp_player.id,
-        runner_player_id=runner_player.id,
-        rnd=tournament.current_round,
-    )
+def create_match(
+    tournament: Tournament, corp_player: Player, runner_player: Player, is_bye=False
+):
+    if is_bye:
+        m = Match(
+            tid=tournament.id,
+            corp_player_id=corp_player.id,
+            rnd=tournament.current_round,
+            is_bye=is_bye,
+            result=1,
+        )
+    else:
+        m = Match(
+            tid=tournament.id,
+            corp_player_id=corp_player.id,
+            runner_player_id=runner_player.id,
+            rnd=tournament.current_round,
+            is_bye=is_bye,
+        )
     db.session.add(m)
     db.session.commit()
 
 
 def pair_round(t: Tournament):
-    if all([m.concluded for m in t.active_matches]):
+    if not all([m.concluded for m in t.active_matches]):
         raise PairingException("Not all active matches are finished")
+    if t.cut is not None:
+        raise PairingException("Tournament is in cut - cannot pair swiss rounds")
     t.current_round += 1
     db.session.add(t)
     db.session.commit()
     graph = Graph()
-    t.bye_setup()
-    for player in t.active_players:
+    pairing_pool, bye_player = t.bye_setup()
+    shuffle(pairing_pool)
+    for player in pairing_pool:
         graph.add_node(player.id)
-    for pair in combinations(t.active_players, 2):
+    for pair in combinations(pairing_pool, 2):
         pair_weight = find_min_edge(*pair)
         graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
     pairings = max_weight_matching(graph, maxcardinality=True)
     for pair in pairings:
-        assign_side(
+        corp, runner = assign_side(
             db.session.query(Player).get(pair[0]),
             db.session.query(Player).get(pair[1]),
         )
+        create_match(tournament=t, corp_player=corp, runner_player=runner)
+    if bye_player is not None:
+        bye_player.recieved_bye = True
+        create_match(
+            tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
+        )
+    ranked_matches = sorted(
+        t.active_matches,
+        key=lambda m: (
+            (
+                m.corp_player.get_record()["score"]
+                + m.runner_player.get_record()["score"]
+            )
+            if not m.is_bye
+            else -1
+        ),
+        reverse=True,
+    )
+    for i, match in enumerate(ranked_matches):
+        match.table_number = i + 1
+        db.session.add(match)
+    db.session.commit()
 
 
 def legal_options(p1: Player, p2: Player) -> list[bool]:
@@ -88,7 +125,13 @@ def find_min_edge(p1: Player, p2: Player):
 
 
 def assign_side(p1: Player, p2: Player):
-    if p1.get_side_balance() > p2.get_side_balance():
+    if p1.id in [m.corp_player_id for m in p2.runner_matches]:
+        corp = p2
+        runner = p1
+    elif p2.id in [m.corp_player_id for m in p1.runner_matches]:
+        corp = p1
+        runner = p2
+    elif p1.get_side_balance() > p2.get_side_balance():
         corp = p2
         runner = p1
     elif p2.get_side_balance() > p1.get_side_balance():
@@ -100,4 +143,4 @@ def assign_side(p1: Player, p2: Player):
     else:
         corp = p2
         runner = p1
-    create_match(tournament=p1.tournament, corp_player=corp, runner_player=runner)
+    return (corp, runner)

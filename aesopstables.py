@@ -1,5 +1,8 @@
-from app import app, db
-from app.models import User, Player, Tournament, Match
+from aesops import app, db
+from pairing.match import Match
+from pairing.player import Player
+from pairing.tournament import Tournament
+from aesops.user import User
 
 
 @app.shell_context_processor

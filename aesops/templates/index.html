@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('create_tournament') }}">Create Tournament</a>
+{% endif %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tournament Name</th>
+            <th>Current Round</th>
+            <th>Number of Players</th>
+        </tr>
+    </thead>
+    {% for tournament in tournaments|sort(attribute='date', reverse=True) %}
+    <tr>
+        <th><a href="{{ url_for('tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
+        <th>{{ tournament.current_round }}</th>
+        <th>{{ tournament.players | length}}</th>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

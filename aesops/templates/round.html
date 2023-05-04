@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include '_tournament_header.html' %}
+{% include '_pairings.html' %}
+
+{% if admin %}
+<p>
+    <a href="{{ url_for('conclude_round',tid=tournament.id, rnd=rnd)}}" class="btn btn-success">Conclude Round</a>
+    <a href="{{ url_for('unpair_round',tid=tournament.id)}}" class="btn btn-warning">Unpair Round</a>
+    <a href="{{ url_for('edit_pairings',tid=tournament.id, rnd=rnd)}}" class="btn btn-warning">Edit Pairings</a>
+</p>
+{% endif %}
+
+{% endblock %}
