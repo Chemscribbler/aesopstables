@@ -82,7 +82,7 @@ class Player(db.Model):
             opp_record = match.runner_player.get_record()
             opp_total_sos += match.runner_player.get_sos()
             total_opp_matches += opp_record["games_played"]
-        return round(opp_total_sos / max(total_opp_matches, 1), 3)
+        return round(opp_total_sos / max(self.get_record["games_played"], 1), 3)
 
     def update_score(self):
         old_score = self.score
