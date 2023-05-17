@@ -125,6 +125,7 @@ def find_min_edge(p1: Player, p2: Player):
 
 
 def assign_side(p1: Player, p2: Player):
+    # Currently this sorta breaks if it's the third times players are matched
     if p1.id in [m.corp_player_id for m in p2.runner_matches]:
         corp = p2
         runner = p1
