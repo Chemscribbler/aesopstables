@@ -138,9 +138,9 @@ def round(tid, rnd):
 def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
-    if match.result is None and current_user.is_anonymous:
-        flash("You must be logged in to report a match with an existing result")
-        return redirect(url_for("login"))
+    # if match.result is None and current_user.is_anonymous:
+    #     flash("You must be logged in to report a match with an existing result")
+    #     return redirect(url_for("login"))
     if result == 2:
         match.runner_win()
         return redirect(url_for("round", tid=tid, rnd=rnd))
