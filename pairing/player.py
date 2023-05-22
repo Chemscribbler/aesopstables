@@ -119,3 +119,16 @@ class Player(db.Model):
             if match.rnd == rnd:
                 return True
         return False
+
+    def side_record(self, side):
+        results = {"W": 0, "L": 0, "T": 0}
+        side_function = {"runner": self.runner_matches, "corp": self.corp_matches}
+        for match in side_function[side]:
+            if match.concluded:
+                if match.result == 1:
+                    results["W"] += 1
+                elif match.result == 0:
+                    results["T"] += 1
+                elif match.result == -1:
+                    results["L"] += 1
+        return results
