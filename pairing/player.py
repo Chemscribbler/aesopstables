@@ -58,7 +58,9 @@ class Player(db.Model):
         opp_total_score_per_game = 0
         match_count = 0
         for match in self.runner_matches:
-            opp_total_score_per_game += match.corp_player.get_record()["score"]/max(match.corp_player.get_record()["games_played"], 1)
+            opp_total_score_per_game += match.corp_player.get_record()["score"] / max(
+                match.corp_player.get_record()["games_played"], 1
+            )
             match_count += 1
             # opp_record = match.corp_player.get_record()
             # opp_total_score += opp_record["score"]
@@ -66,7 +68,9 @@ class Player(db.Model):
         for match in self.corp_matches:
             if match.is_bye:
                 continue
-            opp_total_score_per_game += match.runner_player.get_record()["score"]/max(match.runner_player.get_record()["games_played"], 1)
+            opp_total_score_per_game += match.runner_player.get_record()["score"] / max(
+                match.runner_player.get_record()["games_played"], 1
+            )
             # opp_record = match.runner_player.get_record()
             # opp_total_score += opp_record["score"]
             # total_opp_matches += opp_record["games_played"]
@@ -129,10 +133,10 @@ class Player(db.Model):
         side_function = {"runner": self.runner_matches, "corp": self.corp_matches}
         for match in side_function[side]:
             if match.concluded:
-                if match.result == 1:
+                if match.result == -1:
                     results["W"] += 1
                 elif match.result == 0:
                     results["T"] += 1
-                elif match.result == -1:
+                elif match.result == 1:
                     results["L"] += 1
         return results
