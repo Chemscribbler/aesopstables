@@ -134,9 +134,15 @@ class Player(db.Model):
         for match in side_function[side]:
             if match.concluded:
                 if match.result == -1:
-                    results["W"] += 1
-                elif match.result == 0:
-                    results["T"] += 1
+                    if side == "runner":
+                        results["W"] += 1
+                    else:
+                        results["L"] += 1
                 elif match.result == 1:
-                    results["L"] += 1
+                    if side == "corp":
+                        results["W"] += 1
+                    else:
+                        results["L"] += 1
+                else:
+                    results["T"] += 1
         return results
