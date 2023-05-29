@@ -55,11 +55,10 @@ class Tournament(db.Model):
         for player in self.players:
             player.update_score()
             player.update_sos_esos()
-        # self.current_round += 1
         db.session.add(self)
         db.session.commit()
 
-    def rank_players(self):
+    def rank_players(self) -> list[Player]:
         player_list = self.players
         player_list.sort(key=lambda x: x.esos, reverse=True)
         player_list.sort(key=lambda x: x.sos, reverse=True)
@@ -69,17 +68,14 @@ class Tournament(db.Model):
     def bye_setup(self) -> tuple[list[Player], Player]:
         if len(self.active_players) % 2 == 0:
             return (self.active_players, None)
-        eligible_players = [p for p in self.active_players if not p.recieved_bye]
-        lowest_score = 1000
-        player_index = None
-        shuffle(eligible_players)
-        for index, p in enumerate(eligible_players):
-            if p.score < lowest_score:
-                lowest_score = p.score
-                player_index = index
-        bye_player = eligible_players.pop(player_index)
-        non_bye_players = [p for p in self.active_players if p.id != bye_player.id]
-        return (non_bye_players, bye_player)
+        player_list = self.rank_players().copy()
+        elible_player_list = [p for p in player_list if not p.recieved_bye]
+        index = None
+        for i, p in enumerate(player_list):
+            if elible_player_list[-1].id == p.id:
+                index = i
+        bye_player = player_list.pop(index)
+        return (player_list, bye_player)
 
     def get_round(self, round) -> list[Match]:
         return [m for m in self.matches if m.rnd == round]
@@ -107,3 +103,6 @@ class Tournament(db.Model):
 
     def get_unpaired_players(self):
         return [p for p in self.active_players if not p.is_paired(self.current_round)]
+
+    def is_current_round_finished(self):
+        return all([m.concluded for m in self.active_matches])

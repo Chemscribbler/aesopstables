@@ -73,12 +73,16 @@ def register():
 @app.route("/tournament/<int:tid>", methods=["GET", "POST"])
 @app.route("/<int:tid>/standings", methods=["GET", "POST"])
 def tournament(tid):
+    tournament = Tournament.query.get(tid)
     return render_template(
         "tournament.html",
-        tournament=Tournament.query.get(tid),
+        tournament=tournament,
         admin=has_admin_rights(current_user, tid),
         display_side_bias=display_side_bias,
         get_faction=get_faction,
+        last_concluded_round=tournament.current_round
+        if tournament.is_current_round_finished()
+        else tournament.current_round - 1,
     )
 
 
