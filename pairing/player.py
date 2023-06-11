@@ -54,48 +54,40 @@ class Player(db.Model):
             [m for m in self.runner_matches if m.concluded]
         )
 
+    def get_average_score(self) -> float:
+        return self.get_record()["score"] / max(self.get_record()["games_played"], 1)
+
     def get_sos(self) -> float:
-        opp_total_score_per_game = 0
-        match_count = 0
-        for match in self.runner_matches:
-            opp_total_score_per_game += match.corp_player.get_record()["score"] / max(
-                match.corp_player.get_record()["games_played"], 1
-            )
-            match_count += 1
-            # opp_record = match.corp_player.get_record()
-            # opp_total_score += opp_record["score"]
-            # total_opp_matches += opp_record["games_played"]
-        for match in self.corp_matches:
-            if match.is_bye:
-                continue
-            opp_total_score_per_game += match.runner_player.get_record()["score"] / max(
-                match.runner_player.get_record()["games_played"], 1
-            )
-            # opp_record = match.runner_player.get_record()
-            # opp_total_score += opp_record["score"]
-            # total_opp_matches += opp_record["games_played"]
-        return round(opp_total_score_per_game / max(match_count, 1), 3)
+        opp_average_score = sum(
+            [m.corp_player.get_average_score() for m in self.runner_matches]
+        )
+        opp_average_score += sum(
+            [
+                m.runner_player.get_average_score()
+                for m in self.corp_matches
+                if m.is_bye == False
+            ]
+        )
+        return round(opp_average_score / max(self.get_record()["games_played"], 1), 3)
 
     def get_esos(self) -> float:
-        opp_total_sos = 0
-        match_count = 0
-        for match in self.runner_matches:
-            opp_total_sos += match.corp_player.get_sos()
-            match_count += 1
-            # opp_record = match.corp_player.get_record()
-            # opp_total_sos += match.corp_player.get_sos()
-            # total_opp_matches += opp_record["games_played"]
-        for match in self.corp_matches:
-            if match.is_bye:
-                continue
-            opp_total_sos += match.runner_player.get_sos()
-            match_count += 1
-        return round(opp_total_sos / max(match_count, 1), 3)
+        opp_total_sos = sum([m.corp_player.get_sos() for m in self.runner_matches])
+        opp_total_sos += sum(
+            [m.runner_player.get_sos() for m in self.corp_matches if m.is_bye == False]
+        )
+        return round(opp_total_sos / max(self.get_record()["games_played"], 1), 3)
 
     def update_score(self):
         old_score = self.score
+        old_sos = self.sos
+        old_esos = self.esos
         self.score = self.get_record()["score"]
-        print(f"Updated {self.name}'s score from {old_score} to {self.score}")
+        self.sos = self.get_sos()
+        self.esos = self.get_esos()
+        if old_score != self.score:
+            print(f"Updated {self.name}'s score from {old_score} to {self.score}")
+        if old_sos != self.sos:
+            print(f"Updated {self.name}'s sos from {old_sos} to {self.sos}")
         db.session.add(self)
         db.session.commit()
 
