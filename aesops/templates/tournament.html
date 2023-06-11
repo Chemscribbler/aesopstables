@@ -129,6 +129,12 @@
 </form>
 {% endif %}
 </p>
+<p>
+<form method="post" action="/{{tournament.id}}/delete"
+    onSubmit="return confirm('Are you sure you want to delete this tournament? - This cannot be undone')">
+    <button type="submit" class="btn btn-danger" name="action" value="delete">Delete Tournament</button>
+</form>
+</p>
 
 {% endif %}
 {% endblock %}

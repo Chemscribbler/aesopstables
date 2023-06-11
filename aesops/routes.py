@@ -103,6 +103,19 @@ def create_tournament():
     return render_template("tournament_creation.html", form=form)
 
 
+@login_required
+@app.route("/<int:tid>/delete", methods=["GET", "POST"])
+def delete_tournament(tid):
+    tournament = Tournament.query.get(tid)
+    if has_admin_rights(current_user, tid) is False:
+        flash("You do not have permission to delete this tournament")
+        return redirect(url_for("tournament", tid=tournament.id))
+    db.session.delete(tournament)
+    db.session.commit()
+    flash(f"{tournament.name} has been deleted!")
+    return redirect(url_for("index"))
+
+
 @app.route("/<int:tid>/add_player", methods=["GET", "POST"])
 def add_player(tid: int):
     form = PlayerForm()
@@ -142,9 +155,6 @@ def round(tid, rnd):
 def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
-    # if match.result is None and current_user.is_anonymous:
-    #     flash("You must be logged in to report a match with an existing result")
-    #     return redirect(url_for("login"))
     if result == 2:
         match.runner_win()
         return redirect(url_for("round", tid=tid, rnd=rnd))
