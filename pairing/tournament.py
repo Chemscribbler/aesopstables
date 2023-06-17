@@ -69,7 +69,9 @@ class Tournament(db.Model):
         if len(self.active_players) % 2 == 0:
             return (self.active_players, None)
         player_list = self.rank_players().copy()
-        elible_player_list = [p for p in player_list if not p.recieved_bye]
+        elible_player_list = [
+            p for p in player_list if not p.recieved_bye and ~p.active
+        ]
         index = None
         for i, p in enumerate(player_list):
             if elible_player_list[-1].id == p.id:
