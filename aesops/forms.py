@@ -51,6 +51,7 @@ class PlayerForm(FlaskForm):
     corp_deck = TextAreaField("Corp Deck")
     runner = SelectField("Runner ID", choices=get_runner_ids())
     runner_deck = TextAreaField("Runner Deck")
+    pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
     submit = SubmitField("Add Player")
 

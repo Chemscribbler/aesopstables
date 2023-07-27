@@ -3,3 +3,4 @@ app.db
 __pycache__/
 venv/
 .vscode
+*.ipynb

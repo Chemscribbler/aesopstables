@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped
 class Player(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     name: Mapped[str] = db.Column(db.String, nullable=False)
+    pronouns: Mapped[str] = db.Column(db.String)
     corp: Mapped[str] = db.Column(db.String)
     runner: Mapped[str] = db.Column(db.String)
     corp_deck: Mapped[str] = db.Column(db.Text)

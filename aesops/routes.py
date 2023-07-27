@@ -128,6 +128,7 @@ def add_player(tid: int):
             runner_deck=form.runner_deck.data,
             tid=tid,
             first_round_bye=form.bye.data,
+            pronouns=form.pronouns.data,
         )
         db.session.add(player)
         db.session.commit()

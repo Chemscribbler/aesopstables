@@ -56,7 +56,7 @@
     {% for player in tournament.rank_players() %}
     <tr>
         <td>{{ loop.index0 + 1 }}</td>
-        <td>{{ player.name }}</td>
+        <td>{{ player.name }}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>
         <td><span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span><br>{{
             player.side_record("corp")['W']}}-{{
             player.side_record("corp")['L']}}-{{ player.side_record("corp")['T']}}</td>

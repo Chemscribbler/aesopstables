@@ -11,12 +11,15 @@
     {% for match in rank_tables(tournament.get_round(round=rnd)) %}
     <tr>
         <th>{{ match.table_number }}</th>
-        <th>{{ match.corp_player.name }}<br>
+        <th>{{ match.corp_player.name }} {% if match.corp_player.pronouns %} {{match.corp_player.pronouns}} {% endif
+            %}<br>
             <span class="{{get_faction(match.corp_player.corp)}}" style="font-size: small;">{{ match.corp_player.corp
                 }}</span>
         </th>
         <th>{{ format_results(match) }}</th>
-        <th>{% if match.runner_player.name %}{{ match.runner_player.name }}<br>
+        <th>{% if match.runner_player.name %}{{ match.runner_player.name }} {% if match.runner_player.pronouns %}
+            ({{match.runner_player.pronouns}})
+            {% endif %}<br>
             <span class="{{get_faction(match.runner_player.runner)}}"
                 style="font-size: small;">{{match.runner_player.runner }}</span>
             {% else%}
