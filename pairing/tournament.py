@@ -69,15 +69,14 @@ class Tournament(db.Model):
         if len(self.active_players) % 2 == 0:
             return (self.active_players, None)
         player_list = self.rank_players().copy()
-
         elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
-        # return elible_player_list
-        index = None
-        for i, p in enumerate(player_list):
-            if elible_player_list[-1].id == p.id:
-                index = i
-        bye_player = player_list.pop(index)
-        return (elible_player_list, bye_player)
+        if len(elible_player_list) == 0:
+            raise Exception("No elible players for a bye")
+        elible_player_list.sort(key=lambda x: x.get_record()["score"], reverse=True)
+        bye_player = elible_player_list.pop(-1)
+        pairable_players = self.active_players.copy()
+        pairable_players.remove(bye_player)
+        return (pairable_players, bye_player)
 
     def get_round(self, round) -> list[Match]:
         return [m for m in self.matches if m.rnd == round]
