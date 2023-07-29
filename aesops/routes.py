@@ -31,7 +31,7 @@ import markdown
 @app.route("/index", methods=["GET", "POST"])
 def index():
     page = request.args.get("page", 1, type=int)
-    tournament_page = Tournament.query.paginate(
+    tournament_page = Tournament.query.order_by(Tournament.date.desc()).paginate(
         page=page, per_page=app.config["TOURNAMENTS_PER_PAGE"], error_out=False
     )
 
