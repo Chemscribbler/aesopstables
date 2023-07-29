@@ -11,6 +11,7 @@
             <th>Tournament Name</th>
             <th>Current Round</th>
             <th>Number of Players</th>
+            <th>Date</th>
         </tr>
     </thead>
     {% for tournament in tournaments|sort(attribute='date', reverse=True) %}
@@ -18,8 +19,15 @@
         <th><a href="{{ url_for('tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
         <th>{{ tournament.current_round }}</th>
         <th>{{ tournament.players | length}}</th>
+        <th>{{ tournament.date.strftime("%Y-%m-%d") }}</th>
     </tr>
     {% endfor %}
 </table>
+{% if prev_url %}
+<a href="{{ prev_url }}">Newer tournaments</a>
+{% endif %}
+{% if next_url %}
+<a href="{{ next_url }}">Older tournaments</a>
+{% endif %}
 
 {% endblock %}
