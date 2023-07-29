@@ -59,14 +59,14 @@
         <td>{{ player.name }}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>
 
         <td>
-            {% if tournament.current_round != 0 %}
+            {% if tournament.current_round != 0 or admin %}
             <span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span><br>{{
             player.side_record("corp")['W']}}-{{
             player.side_record("corp")['L']}}-{{ player.side_record("corp")['T']}}
             {% endif %}
         </td>
         <td>
-            {% if tournament.current_round != 0 %}
+            {% if tournament.current_round != 0 or admin%}
             <span class="{{ get_faction(player.runner)}}">{{ player.runner }}</span><br> {{
             player.side_record("runner")['W']}}-{{
             player.side_record("runner")['L']}}-{{ player.side_record("runner")['T']}}
