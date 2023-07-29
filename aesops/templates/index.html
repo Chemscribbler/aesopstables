@@ -23,11 +23,11 @@
     </tr>
     {% endfor %}
 </table>
-{% if prev_url %}
-<a href="{{ prev_url }}">Newer tournaments</a>
-{% endif %}
 {% if next_url %}
 <a href="{{ next_url }}">Older tournaments</a>
+{% endif %}
+{% if prev_url %}
+<a href="{{ prev_url }}">Newer tournaments</a>
 {% endif %}
 
 {% endblock %}
