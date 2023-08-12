@@ -5,7 +5,9 @@
             <th>Corp Player</th>
             <th>Score</th>
             <th>Runner Player</th>
+            {% if admin %}
             <th>Reporting</th>
+            {% endif %}
         </tr>
     </thead>
     {% for match in rank_tables(tournament.get_round(round=rnd)) %}
@@ -26,7 +28,7 @@
             Bye
             {% endif %}
         </th>
-        {% if match.result is none or admin %}
+        {% if admin %}
         <th>
             {% if not match.is_bye %}
             <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}"
