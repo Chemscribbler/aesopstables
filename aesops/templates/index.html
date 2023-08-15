@@ -4,8 +4,6 @@
 
 {% if current_user.is_authenticated %}
 <a href="{{ url_for('create_tournament') }}">Create Tournament</a>
-<div class="alert alert-primary" role="alert">Player self reporting disabled for Cascadia - should be restorted on the
-    13th/14th</div>
 {% endif %}
 <table class="table table-striped">
     <thead>
