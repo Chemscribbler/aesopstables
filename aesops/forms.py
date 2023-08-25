@@ -81,3 +81,12 @@ class EditMatchesForm(
         self.corp_player.choices = [(p.id, p.name) for p in players]
         self.runner_player.choices = [(p.id, p.name) for p in players]
         self.runner_player.choices.append((None, "(BYE)"))
+
+
+class EditTOPreferences(
+    FlaskForm,
+):
+    allow_self_registration = BooleanField("Allow Self Registration")
+    allow_self_results_report = BooleanField("Allow Self Results Report")
+    visible = BooleanField("Visible")
+    submit = SubmitField("Update Preferences")

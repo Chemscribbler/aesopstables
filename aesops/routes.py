@@ -417,3 +417,11 @@ def howto():
     return render_template(
         "markdown_page.html", markdown_content=markdown.markdown(html)
     )
+
+
+@login_required
+@app.route("/<int:uid>/tournaments", methods=["GET"])
+def user_tournaments(uid):
+    user = User.query.get(uid)
+    tournaments = Tournament.query.filter_by(admin_id=uid).all()
+    return render_template("user_tournaments.html", user=user, tournaments=tournaments)
