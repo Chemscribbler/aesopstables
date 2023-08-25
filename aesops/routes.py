@@ -227,6 +227,7 @@ def edit_player(pid):
         player.runner = form.runner.data
         player.runner_deck = form.runner_deck.data
         player.first_round_bye = form.bye.data
+        player.pronouns = form.pronouns.data
         db.session.commit()
         flash(f"{player.name} has been edited!", category="success")
         return redirect(url_for("tournament", tid=player.tid))
@@ -236,6 +237,7 @@ def edit_player(pid):
     form.runner.data = player.runner
     form.runner_deck.data = player.runner_deck
     form.bye.data = player.first_round_bye
+    form.pronouns.data = player.pronouns
     return render_template(
         "edit_player.html", tournament=tournament, form=form, player=player
     )
