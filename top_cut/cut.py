@@ -136,7 +136,7 @@ class Cut(db.Model):
         else:
             eliminated_players = [player for player in players if player.elim_round]
             eliminated_players.sort(key=lambda x: x.seed)
-            eliminated_players.sort(key=lambda x: x.elim_round)
+            eliminated_players.sort(key=lambda x: x.elim_round, reverse=True)
             remaining_players = [player for player in players if not player.elim_round]
             return {
                 "ranked_players": eliminated_players,

@@ -30,10 +30,12 @@ At the bottom of the main page for the tournament is a Export to ABR button. Thi
 These are all at various stages of development (almost all ideation) - if there is one that makes a big difference in your interest in the tool please reach out!
 
 - Recommend number of rounds and cut size in the UI
-- First round byes
-- More control of registration and match reporting (aka only TO can report/register)
+- Fix json export (currently cannot get match information)
+- More control of registration and match reporting (aka only TO can register players or report results)
 - Players register with decklists (revealed in cut)
-- Profile pages
-- Optional lower place matches
+- ID Name searching rather than just alphabetized
+- First round byes
 - Cut visualization (looking for help)
+- Stats panel - breaking down ID popularity and winrates
 - Arbitrary number cuts (looking for algorithm help)
+- Make manual pairing less ugly

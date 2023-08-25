@@ -30,8 +30,27 @@ import markdown
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
+    page = request.args.get("page", 1, type=int)
+    tournament_page = Tournament.query.order_by(Tournament.date.desc()).paginate(
+        page=page, per_page=app.config["TOURNAMENTS_PER_PAGE"], error_out=False
+    )
+
+    next_url = (
+        url_for("index", page=tournament_page.next_num)
+        if tournament_page.has_next
+        else None
+    )
+    prev_url = (
+        url_for("index", page=tournament_page.prev_num)
+        if tournament_page.has_prev
+        else None
+    )
     return render_template(
-        "index.html", title="Home", tournaments=Tournament.query.all()
+        "index.html",
+        title="Home",
+        tournaments=tournament_page,
+        next_url=next_url,
+        prev_url=prev_url,
     )
 
 
