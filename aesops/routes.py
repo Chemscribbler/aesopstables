@@ -279,7 +279,6 @@ def edit_pairings(tid, rnd):
             print(is_bye)
             mm.create_match(
                 tournament=tournament,
-                table_number=form.table_number.data,
                 corp_player=Player.query.get(form.corp_player.data),
                 runner_player=Player.query.get(form.runner_player.data),
                 is_bye=is_bye,
