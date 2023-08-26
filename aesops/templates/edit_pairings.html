@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h1><a href="{{ url_for('tournament',tid=tournament.id)}}">{{ tournament.name }}</a></h1>
+<h1><a href="{{ url_for('tournaments.tournament',tid=tournament.id)}}">{{ tournament.name }}</a></h1>
 <h3>Editing Round <a
         href="{{ url_for('round', tid=tournament.id, rnd=tournament.current_round)}}">{{tournament.current_round}}</a>
 </h3>

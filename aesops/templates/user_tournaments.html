@@ -11,7 +11,7 @@
     </thead>
     {% for tournament in tournaments|sort(attribute='date', reverse=True) %}
     <tr>
-        <th><a href="{{ url_for('tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
+        <th><a href="{{ url_for('tournaments.tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
         <th>{{ tournament.current_round }}</th>
         <th>{{ tournament.players | length}}</th>
     </tr>

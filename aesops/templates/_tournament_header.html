@@ -1,4 +1,4 @@
-<h1><a href="{{url_for('tournament', tid=tournament.id)}}">{{ tournament.name }}</a></h1>
+<h1><a href="{{url_for('tournaments.tournament', tid=tournament.id)}}">{{ tournament.name }}</a></h1>
 {% if tournament.description %}
 <p>{{ tournament.description }}</p>
 {% endif %}
