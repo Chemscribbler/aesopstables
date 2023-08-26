@@ -14,6 +14,7 @@ from pairing.tournament import Tournament
 from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
+from pairing.matchmaking import PairingException
 from aesops.utility import (
     display_side_bias,
     rank_tables,
@@ -208,7 +209,11 @@ def conclude_round(tid, rnd):
 @app.route("/<int:tid>/pair_round", methods=["GET", "POST"])
 def pair_round(tid):
     tournament = Tournament.query.get(tid)
-    mm.pair_round(tournament)
+    try:
+        mm.pair_round(tournament)
+    except PairingException as e:
+        flash(str(e))
+        return redirect(url_for("tournament", tid=tournament.id))
     return redirect(url_for("round", tid=tournament.id, rnd=tournament.current_round))
 
 
@@ -337,17 +342,24 @@ def edit_pairings(tid, rnd):
 
 @app.route("/<int:tid>/create_cut", methods=["POST"])
 def create_cut(tid):
-    flash(
-        f"Top {request.form.get('num_players')} and the format is {'Double Elim' if request.form.get('double_elim') else 'Single Elim'}"
-    )
+
     tournament = Tournament.query.get(tid)
     num_players = request.form.get("num_players")
     double_elim = request.form.get("double_elim")
     c = Cut()
     double_elim = bool(int(double_elim))
-    c.create(tournament, int(num_players), double_elim=double_elim)
-    c.generate_round()
-    return redirect(url_for("cut_round", tid=tournament.id, rnd=1))
+    try:
+        c.create(tournament, int(num_players), double_elim=double_elim)
+        c.generate_round()
+        flash(
+            f"Top {request.form.get('num_players')} and the format is {'Double Elim' if request.form.get('double_elim') else 'Single Elim'}"
+        )
+        return redirect(url_for("cut_round", tid=tournament.id, rnd=1))
+    except Exception as e:
+        flash(str(e))
+        db.session.delete(c)
+        db.session.commit()
+        return redirect(url_for("tournament", tid=tournament.id))
 
 
 @app.route("/<int:tid>/cut/<int:rnd>", methods=["GET", "POST"])
