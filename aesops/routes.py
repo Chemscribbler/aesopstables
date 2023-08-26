@@ -283,6 +283,7 @@ def edit_pairings(tid, rnd):
                 corp_player=Player.query.get(form.corp_player.data),
                 runner_player=Player.query.get(form.runner_player.data),
                 is_bye=is_bye,
+                table_number=form.table_number.data,
             )
             print(tournament.active_matches)
 
