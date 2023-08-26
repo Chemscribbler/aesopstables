@@ -31,7 +31,7 @@ def create_match(
             is_bye=is_bye,
         )
     if table_number:
-        m.table_numbe = table_number
+        m.table_number = table_number
     db.session.add(m)
     db.session.commit()
 
