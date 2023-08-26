@@ -53,7 +53,7 @@
             <th>Side Bias</th>
         </tr>
     </thead>
-    {% for player in tournament.rank_players() %}
+    {% for player in t_logic.rank_players(tournament) %}
     <tr>
         <td>{{ loop.index0 + 1 }}</td>
         <td>{{ player.name }}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>

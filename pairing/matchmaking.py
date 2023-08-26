@@ -1,7 +1,8 @@
 from random import random, shuffle
 from aesops import db
 from pairing.player import Player
-from pairing.tournament import Tournament
+from data_models.tournaments import Tournament
+import aesops.business_logic.tournament as t_logic
 from pairing.match import Match
 from networkx import Graph, max_weight_matching
 from itertools import combinations
@@ -45,7 +46,7 @@ def pair_round(t: Tournament):
     db.session.add(t)
     db.session.commit()
     graph = Graph()
-    pairing_pool, bye_player = t.bye_setup()
+    pairing_pool, bye_player = t_logic.bye_setup(t)
     shuffle(pairing_pool)
     for player in pairing_pool:
         graph.add_node(player.id)

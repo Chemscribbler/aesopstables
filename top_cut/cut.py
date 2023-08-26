@@ -3,7 +3,8 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
 from pairing.match import ConclusionError
 from pairing.player import Player
-from pairing.tournament import Tournament
+from data_models.tournaments import Tournament
+import aesops.business_logic.tournament as t_logic
 from random import randint
 from top_cut.cut_tables import get_bracket
 from top_cut.cut_player import CutPlayer
@@ -100,7 +101,7 @@ class Cut(db.Model):
         self.double_elim = double_elim
         db.session.add(self)
         db.session.commit()
-        top_players = tournament.top_n_cut(n=num_players)
+        top_players = t_logic.top_n_cut(tournament, n=num_players)
         for i, player in enumerate(top_players):
             cut_player = CutPlayer()
             cut_player.player_id = player.id

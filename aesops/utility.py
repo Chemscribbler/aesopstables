@@ -4,7 +4,8 @@ import datetime
 from json import dump, load
 from pairing.player import Player
 from pairing.match import Match
-from pairing.tournament import Tournament
+from data_models.tournaments import Tournament
+import aesops.business_logic.tournament as t_logic
 import json
 from decimal import Decimal
 
@@ -105,7 +106,7 @@ def get_json(tid):
         ],
     }
 
-    for i, player in enumerate(t.rank_players()):
+    for i, player in enumerate(t_logic.rank_players(t)):
         t_json["players"].append(
             {
                 "id": player.id,
@@ -131,7 +132,7 @@ def get_json(tid):
             )
     for rnd in range(1, t.current_round + 1):
         match_list = []
-        for match in t.get_round(rnd):
+        for match in t_logic.get_round(t, rnd):
             match_list.append(
                 {
                     "tableNumber": match.table_number,

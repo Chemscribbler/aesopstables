@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 
-
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -12,11 +11,6 @@ db = SQLAlchemy(app=app)
 migrate = Migrate(app=app, db=db, render_as_batch=True)
 login = LoginManager(app)
 login.login_view = "login"
+
 from aesops import routes
-from pairing.player import Player
-from pairing.tournament import Tournament
-from pairing.match import Match
-from aesops.user import User
-from top_cut.cut import Cut
-from top_cut.cut_player import CutPlayer
-from top_cut.elim_match import ElimMatch
+from data_models import model_store

@@ -1,6 +1,6 @@
 from aesops import db, login
 from sqlalchemy.orm import Mapped
-from pairing.tournament import Tournament
+from data_models.tournaments import Tournament
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin

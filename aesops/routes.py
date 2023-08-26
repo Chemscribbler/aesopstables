@@ -10,7 +10,8 @@ from aesops.forms import (
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
 from aesops.user import User, has_admin_rights
-from pairing.tournament import Tournament
+from data_models.tournaments import Tournament
+import aesops.business_logic.tournament as t_logic
 from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
@@ -103,8 +104,9 @@ def tournament(tid):
         admin=has_admin_rights(current_user, tid),
         display_side_bias=display_side_bias,
         get_faction=get_faction,
+        t_logic=t_logic,
         last_concluded_round=tournament.current_round
-        if tournament.is_current_round_finished()
+        if t_logic.is_current_round_finished(tournament)
         else tournament.current_round - 1,
     )
 
@@ -198,7 +200,7 @@ def report_match(tid, rnd, mid, result):
 def conclude_round(tid, rnd):
     tournament = Tournament.query.get(tid)
     try:
-        tournament.conclude_round()
+        t_logic.conclude_round(tournament)
     except ConclusionError as e:
         flash("Not all matches have been reported")
         return redirect(url_for("round", tid=tournament.id, rnd=rnd))
@@ -221,7 +223,7 @@ def pair_round(tid):
 @app.route("/<int:tid>/unpair_round", methods=["GET", "POST"])
 def unpair_round(tid):
     tournament = Tournament.query.get(tid)
-    tournament.unpair_round()
+    t_logic.unpair_round(tournament)
     return redirect(url_for("tournament", tid=tournament.id))
 
 
@@ -305,8 +307,8 @@ def delete_match(mid):
 def edit_pairings(tid, rnd):
     tournament = Tournament.query.get(tid)
     form = EditMatchesForm()
-    if tournament.get_unpaired_players() is not None:
-        form.populate_players(tournament.get_unpaired_players())
+    if t_logic.get_unpaired_players(tournament) is not None:
+        form.populate_players(t_logic.get_unpaired_players(tournament))
         if form.validate_on_submit():
             is_bye = form.runner_player.data == "None"
             print(is_bye)
