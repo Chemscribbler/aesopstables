@@ -13,7 +13,7 @@ class PairingException(Exception):
 
 
 def create_match(
-    tournament: Tournament, corp_player: Player, runner_player: Player, is_bye=False
+    tournament: Tournament, corp_player: Player, runner_player: Player, is_bye=False, table_number=None
 ):
     if is_bye:
         m = Match(
@@ -31,6 +31,8 @@ def create_match(
             rnd=tournament.current_round,
             is_bye=is_bye,
         )
+    if table_number:
+        m.table_number = table_number
     db.session.add(m)
     db.session.commit()
 
