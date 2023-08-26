@@ -12,6 +12,9 @@ class Tournament(db.Model):
     current_round = db.Column(db.Integer, default=0)
     date = db.Column(db.DateTime(timezone=True), default=db.func.now())
     description = db.Column(db.String)
+    allow_self_registration: Mapped[bool] = db.Column(db.Boolean, default=True)
+    allow_self_results_report: Mapped[bool] = db.Column(db.Boolean, default=True)
+    visible: Mapped[bool] = db.Column(db.Boolean, default=True)
 
     players = db.relationship(
         "Player", back_populates="tournament", cascade="all, delete-orphan"

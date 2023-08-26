@@ -2,10 +2,14 @@
 {% if tournament.description %}
 <p>{{ tournament.description }}</p>
 {% endif %}
+{% if admin %}
+<a href="{{ url_for('edit_tournament', tid=tournament.id) }}" class="btn btn-primary">Settings</a>
+<p></p>
+{% endif %}
 
 <div class="row">
     <div class="col-md-3">
-        {% if tournament.current_round == 0%}
+        {% if tournament.current_round == 0 and tournament.allow_self_registration%}
         <a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
         {% endif %}
         {% if tournament.current_round > 0 %}

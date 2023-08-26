@@ -5,7 +5,6 @@ from aesops.forms import (
     RegistrationForm,
     PlayerForm,
     TournamentForm,
-    TournamentForm,
     EditMatchesForm,
 )
 from flask import render_template, flash, redirect, url_for, request, Response
@@ -31,8 +30,12 @@ import markdown
 @app.route("/index", methods=["GET", "POST"])
 def index():
     page = request.args.get("page", 1, type=int)
-    tournament_page = Tournament.query.order_by(Tournament.date.desc()).paginate(
-        page=page, per_page=app.config["TOURNAMENTS_PER_PAGE"], error_out=False
+    tournament_page = (
+        Tournament.query.filter_by(visible=True)
+        .order_by(Tournament.date.desc())
+        .paginate(
+            page=page, per_page=app.config["TOURNAMENTS_PER_PAGE"], error_out=False
+        )
     )
 
     next_url = (
@@ -114,6 +117,9 @@ def create_tournament():
             date=form.date.data,
             description=form.description.data,
             admin_id=current_user.id,
+            allow_self_registration=form.allow_self_registration.data,
+            allow_self_results_report=form.allow_self_results_report.data,
+            visible=form.visible.data,
         )
         db.session.add(tournament)
         db.session.commit()
@@ -227,6 +233,7 @@ def edit_player(pid):
         player.runner = form.runner.data
         player.runner_deck = form.runner_deck.data
         player.first_round_bye = form.bye.data
+        player.pronouns = form.pronouns.data
         db.session.commit()
         flash(f"{player.name} has been edited!", category="success")
         return redirect(url_for("tournament", tid=player.tid))
@@ -236,6 +243,7 @@ def edit_player(pid):
     form.runner.data = player.runner
     form.runner_deck.data = player.runner_deck
     form.bye.data = player.first_round_bye
+    form.pronouns.data = player.pronouns
     return render_template(
         "edit_player.html", tournament=tournament, form=form, player=player
     )
@@ -444,3 +452,30 @@ def user_tournaments(uid):
     user = User.query.get(uid)
     tournaments = Tournament.query.filter_by(admin_id=uid).all()
     return render_template("user_tournaments.html", user=user, tournaments=tournaments)
+
+
+@login_required
+@app.route("/<int:tid>/edit", methods=["GET", "POST"])
+def edit_tournament(tid):
+    if has_admin_rights(current_user, tid) is False:
+        flash("You do not have permission to edit this tournament")
+        return redirect(url_for("tournament", tid=tid))
+    tournament = Tournament.query.get(tid)
+    form = TournamentForm()
+    if form.validate_on_submit():
+        tournament.name = form.name.data
+        tournament.date = form.date.data
+        tournament.description = form.description.data
+        tournament.allow_self_registration = form.allow_self_registration.data
+        tournament.allow_self_results_report = form.allow_self_results_report.data
+        tournament.visible = form.visible.data
+        db.session.commit()
+        flash(f"{tournament.name} has been edited!", category="success")
+        return redirect(url_for("tournament", tid=tournament.id))
+    form.name.data = tournament.name
+    form.date.data = tournament.date
+    form.description.data = tournament.description
+    form.allow_self_registration.data = tournament.allow_self_registration
+    form.allow_self_results_report.data = tournament.allow_self_results_report
+    form.visible.data = tournament.visible
+    return render_template("tournament_edit.html", form=form, tournament=tournament)
