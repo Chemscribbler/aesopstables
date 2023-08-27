@@ -2,7 +2,7 @@ from aesops import db
 from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
 from pairing.match import ConclusionError
-from pairing.player import Player
+from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.tournament as t_logic
 from random import randint

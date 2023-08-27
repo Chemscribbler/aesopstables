@@ -1,7 +1,7 @@
 from aesops import db
 
 from .tournaments import Tournament
-from pairing.player import Player
+from .players import Player
 from pairing.match import Match
 from .users import User
 from top_cut.cut import Cut

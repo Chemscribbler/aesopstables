@@ -9,11 +9,11 @@ from aesops.forms import (
 )
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
-from data_models.users import User
+from data_models.players import Player
 from data_models.tournaments import Tournament
+from data_models.users import User
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
-from pairing.player import Player
 from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
 from pairing.matchmaking import PairingException

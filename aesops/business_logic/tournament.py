@@ -1,5 +1,5 @@
 from aesops import db
-from pairing.player import Player
+from data_models.players import Player
 from pairing.match import Match
 from random import shuffle
 

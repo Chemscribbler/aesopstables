@@ -1,6 +1,6 @@
 from random import random, shuffle
 from aesops import db
-from pairing.player import Player
+from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.tournament as t_logic
 from pairing.match import Match

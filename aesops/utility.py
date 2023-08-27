@@ -2,8 +2,8 @@ import requests
 import os
 import datetime
 from json import dump, load
-from pairing.player import Player
 from pairing.match import Match
+from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.tournament as t_logic
 import json
