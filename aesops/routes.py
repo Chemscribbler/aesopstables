@@ -25,7 +25,6 @@ from aesops.utility import (
 )
 from top_cut.cut import Cut
 from top_cut.elim_match import ElimMatch
-import markdown
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -324,26 +323,6 @@ def abr_export(tid):
     response = Response(get_json(tid), mimetype="application/json")
     response.headers.set("Content-Disposition", "attachment", filename=f"{tid}.json")
     return response
-
-
-@app.route("/about", methods=["GET"])
-def about():
-    with open("documentation/about.md", "r") as f:
-        text = f.read()
-        html = markdown.markdown(text)
-    return render_template(
-        "markdown_page.html", markdown_content=markdown.markdown(html)
-    )
-
-
-@app.route("/howto", methods=["GET"])
-def howto():
-    with open("documentation/howto.md", "r") as f:
-        text = f.read()
-        html = markdown.markdown(text)
-    return render_template(
-        "markdown_page.html", markdown_content=markdown.markdown(html)
-    )
 
 
 @login_required
