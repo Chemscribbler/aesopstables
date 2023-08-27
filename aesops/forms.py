@@ -10,7 +10,7 @@ from wtforms import (
     IntegerField,
 )
 from wtforms.validators import DataRequired, ValidationError
-from aesops.user import User
+from data_models.users import User
 from aesops.utility import get_corp_ids, get_runner_ids
 
 

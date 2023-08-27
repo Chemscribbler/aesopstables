@@ -32,7 +32,7 @@
         </ul>
         <ul class="navbar-nav mb-2 mb-lg-0">
           {% if current_user.is_anonymous %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Log In</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login.login') }}">Log In</a></li>
           {% else %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
@@ -42,7 +42,7 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="{{url_for('user_tournaments', uid=current_user.id)}}">Your
                   Tournaments</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('login.logout') }}">Log Out</a></li>
             </ul>
           </li>
           {% endif %}

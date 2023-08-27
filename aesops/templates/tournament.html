@@ -97,7 +97,7 @@
 <p>
     {% if tournament.cut is none %}
     <a href="{{ url_for('pair_round', tid=tournament.id) }}" class="btn btn-primary">Pair Round</a>
-    <a href="{{ url_for('add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
+    <a href="{{ url_for('tournaments.add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
     {% else %}
 <form action="/{{tournament.id}}/edit_cut" method="post">
     <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Cut Round</button>
