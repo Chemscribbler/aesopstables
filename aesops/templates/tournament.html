@@ -61,18 +61,18 @@
         <td>
             {% if tournament.current_round != 0 or admin %}
             <span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span><br>{{
-            player.side_record("corp")['W']}}-{{
-            player.side_record("corp")['L']}}-{{ player.side_record("corp")['T']}}
+            p_logic.side_record(player, "corp")['W']}}-{{
+            p_logic.side_record(player, "corp")['L']}}-{{ p_logic.side_record(player, "corp")['T']}}
             {% endif %}
         </td>
         <td>
             {% if tournament.current_round != 0 or admin%}
             <span class="{{ get_faction(player.runner)}}">{{ player.runner }}</span><br> {{
-            player.side_record("runner")['W']}}-{{
-            player.side_record("runner")['L']}}-{{ player.side_record("runner")['T']}}
+            p_logic.side_record(player, "runner")['W']}}-{{
+            p_logic.side_record(player, "runner")['L']}}-{{ p_logic.side_record(player, "runner")['T']}}
             {% endif %}
         </td>
-        <td>{{ player.get_record()['score'] }}</td>
+        <td>{{ p_logic.get_record(player)['score'] }}</td>
         <td>{{ "%0.3f"|format(player.sos) }}</td>
         <td>{{ "%0.3f"|format(player.esos) }}</td>
         <td>{{ display_side_bias(player) }}</td>

@@ -1,4 +1,5 @@
 from aesops import db
+import aesops.business_logic.players as p_logic
 from data_models.players import Player
 from pairing.match import Match
 from random import shuffle
@@ -24,8 +25,8 @@ def conclude_round(tournament: Tournament):
     for match in tournament.active_matches:
         match.conclude()
     for player in tournament.players:
-        player.update_score()
-        player.update_sos_esos()
+        p_logic.update_score(player)
+        p_logic.update_sos_esos(player)
     db.session.add(tournament)
     db.session.commit()
 
@@ -33,7 +34,7 @@ def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
     player_list.sort(key=lambda x: x.esos, reverse=True)
     player_list.sort(key=lambda x: x.sos, reverse=True)
-    player_list.sort(key=lambda x: x.get_record()["score"], reverse=True)
+    player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
     return player_list
 
 def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
@@ -43,7 +44,7 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
     if len(elible_player_list) == 0:
         raise Exception("No elible players for a bye")
-    elible_player_list.sort(key=lambda x: x.get_record()["score"], reverse=True)
+    elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
     bye_player = elible_player_list.pop(-1)
     pairable_players = tournament.active_players.copy()
     pairable_players.remove(bye_player)
@@ -74,7 +75,7 @@ def top_n_cut(tournament: Tournament, n):
     return cut_players
 
 def get_unpaired_players(tournament: Tournament):
-    return [p for p in tournament.active_players if not p.is_paired(tournament.current_round)]
+    return [p for p in tournament.active_players if not p_logic.is_paired(p, tournament.current_round)]
 
 def is_current_round_finished(tournament: Tournament):
     return all([m.concluded for m in tournament.active_matches])

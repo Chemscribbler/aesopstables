@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from data_models.players import Player
 from data_models.tournaments import Tournament
 from aesops import db
+import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 from aesops.forms import (
     PlayerForm,
@@ -34,6 +35,7 @@ def tournament(tid):
         display_side_bias=display_side_bias,
         get_faction=get_faction,
         t_logic=t_logic,
+        p_logic=p_logic,
         last_concluded_round=tournament.current_round
         if t_logic.is_current_round_finished(tournament)
         else tournament.current_round - 1,

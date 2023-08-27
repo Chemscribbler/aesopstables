@@ -1,4 +1,5 @@
 from aesops import db
+import aesops.business_logic.players as p_logic
 from sqlalchemy.orm import Mapped
 
 
@@ -61,9 +62,9 @@ class Match(db.Model):
     def delete(self):
         if self.is_bye:
             self.corp_player.recieved_bye = False
-            self.corp_player.reset()
+            p_logic.reset(self.corp_player)
         else:
-            self.corp_player.reset()
-            self.runner_player.reset()
+            p_logic.corp_player.reset(self.corp_player)
+            p_logic.runner_player.reset(self.runner_player)
         db.session.delete(self)
         db.session.commit()

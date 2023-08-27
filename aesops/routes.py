@@ -12,6 +12,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from data_models.players import Player
 from data_models.tournaments import Tournament
 from data_models.users import User
+import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
 from pairing.match import Match, ConclusionError
@@ -160,7 +161,7 @@ def delete_player(pid):
 @app.route("/<int:pid>/drop_player", methods=["GET", "POST"])
 def drop_player(pid):
     player = Player.query.get(pid)
-    player.drop()
+    p_logic.drop(player)
     flash(f"{player.name} has been dropped!")
     return redirect_for_tournament(player.tid)
 
@@ -169,7 +170,7 @@ def drop_player(pid):
 @app.route("/<int:pid>/undrop_player", methods=["GET", "POST"])
 def undrop_player(pid):
     player = Player.query.get(pid)
-    player.undrop()
+    p_logic.undrop(player)
     flash(f"{player.name} has been undropped!")
     return redirect_for_tournament(player.tid)
 

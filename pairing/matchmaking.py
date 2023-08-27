@@ -2,6 +2,7 @@ from random import random, shuffle
 from aesops import db
 from data_models.players import Player
 from data_models.tournaments import Tournament
+import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 from pairing.match import Match
 from networkx import Graph, max_weight_matching
@@ -71,8 +72,8 @@ def pair_round(t: Tournament):
         t.active_matches,
         key=lambda m: (
             (
-                m.corp_player.get_record()["score"]
-                + m.runner_player.get_record()["score"]
+                p_logic.get_record(m.corp_player)["score"]
+                + p_logic.get_record(m.runner_player)["score"]
             )
             if not m.is_bye
             else -1
@@ -96,11 +97,11 @@ def legal_options(p1: Player, p2: Player) -> list[bool]:
 
 
 def side_cost(corp_player: Player, runner_player: Player):
-    balance_post = abs(corp_player.get_side_balance() + 1) + abs(
-        runner_player.get_side_balance() - 1
+    balance_post = abs(p_logic.get_side_balance(corp_player) + 1) + abs(
+        p_logic.get_side_balance(runner_player) - 1
     )
-    balance_pre = abs(corp_player.get_side_balance()) + abs(
-        runner_player.get_side_balance()
+    balance_pre = abs(p_logic.get_side_balance(corp_player)) + abs(
+        p_logic.get_side_balance(runner_player)
     )
     if balance_post > balance_pre and balance_pre != 0:
         return 1000
@@ -108,8 +109,8 @@ def side_cost(corp_player: Player, runner_player: Player):
 
 
 def score_cost(corp_player: Player, runner_player: Player):
-    c_score = corp_player.get_record()["score"]
-    r_score = runner_player.get_record()["score"]
+    c_score = p_logic.get_record(corp_player)["score"]
+    r_score = p_logic.get_record(runner_player)["score"]
     return (c_score - r_score + 1) * (c_score - r_score) / 6
 
 
@@ -137,10 +138,10 @@ def assign_side(p1: Player, p2: Player):
     elif p2.id in [m.corp_player_id for m in p1.runner_matches]:
         corp = p1
         runner = p2
-    elif p1.get_side_balance() > p2.get_side_balance():
+    elif p_logic.get_side_balance(p1) > p_logic.get_side_balance(p2):
         corp = p2
         runner = p1
-    elif p2.get_side_balance() > p1.get_side_balance():
+    elif p_logic.get_side_balance(p1) > p_logic.get_side_balance(p1):
         corp = p1
         runner = p2
     elif random() > 0.5:

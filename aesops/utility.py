@@ -5,6 +5,7 @@ from json import dump, load
 from pairing.match import Match
 from data_models.players import Player
 from data_models.tournaments import Tournament
+import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 import json
 from decimal import Decimal
@@ -56,10 +57,10 @@ def get_runner_ids():
 
 
 def display_side_bias(player: Player):
-    if player.get_side_balance() > 0:
-        return f"Corp +{player.get_side_balance()}"
-    if player.get_side_balance() < 0:
-        return f"Runner +{player.get_side_balance()*-1}"
+    if p_logic.get_side_balance(player) > 0:
+        return f"Corp +{p_logic.get_side_balance(player)}"
+    if p_logic.get_side_balance(player) < 0:
+        return f"Runner +{p_logic.get_side_balance(player)*-1}"
     return "Balanced"
 
 
@@ -117,7 +118,7 @@ def get_json(tid):
                 "matchPoints": player.score,
                 "strengthOfSchedule": player.sos,
                 "extendedStrengthOfSchedule": player.esos,
-                "sideBalance": player.get_side_balance(),
+                "sideBalance": p_logic.get_side_balance(player),
             }
         )
     if t.cut is not None:
