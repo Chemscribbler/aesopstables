@@ -15,7 +15,7 @@
         {% if tournament.current_round > 0 %}
         <h3>Rounds</h3>
         {% for round in range(1,tournament.current_round+1) %}
-        <a href="{{ url_for('round', tid=tournament.id, rnd=round)}}"
+        <a href="{{ url_for('tournaments.round', tid=tournament.id, rnd=round)}}"
             class="text-primary fs-4 d-inline-block me-3">{{round}}
         </a>
         {% endfor %}

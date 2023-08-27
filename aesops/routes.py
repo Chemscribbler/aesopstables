@@ -61,6 +61,8 @@ def index():
 def redirect_for_tournament(tid):
     return redirect(url_for("tournaments.tournament", tid=tid))
 
+def redirect_for_round(tid, rnd):
+    return redirect(url_for("tournaments.round", tid=tid, rnd=rnd))
 
 @app.route("/<int:tid>/<int:rnd>/<int:mid>/<int:result>", methods=["GET", "POST"])
 def report_match(tid, rnd, mid, result):
@@ -68,14 +70,14 @@ def report_match(tid, rnd, mid, result):
     match = Match.query.get(mid)
     if result == 2:
         match.runner_win()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
+        return redirect_for_round(tid=tid, rnd=rnd)
     if result == 1:
         match.corp_win()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
+        return redirect_for_round(tid=tid, rnd=rnd)
     if result == 0:
         match.tie()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
-    return redirect(url_for("round", tournament=tournament, rnd=rnd))
+        return redirect_for_round(tid=tid, rnd=rnd)
+    return redirect(url_for("tournaments.round", tournament=tournament, rnd=rnd))
 
 
 @app.route("/<int:tid>/<int:rnd>/conclude", methods=["GET", "POST"])
@@ -85,7 +87,7 @@ def conclude_round(tid, rnd):
         t_logic.conclude_round(tournament)
     except ConclusionError as e:
         flash("Not all matches have been reported")
-        return redirect(url_for("round", tid=tournament.id, rnd=rnd))
+        return redirect_for_round(tid=tournament.id, rnd=rnd)
     return redirect_for_tournament(tournament.id)
 
 
@@ -98,7 +100,7 @@ def pair_round(tid):
     except PairingException as e:
         flash(str(e))
         return redirect_for_tournament(tournament.id)
-    return redirect(url_for("round", tid=tournament.id, rnd=tournament.current_round))
+    return redirect_for_round(tid=tournament.id, rnd=tournament.current_round)
 
 
 @login_required
