@@ -2,4 +2,4 @@
 
 flask db upgrade
 
-flask run --host=0.0.0.0:5000
+gunicorn --bind=0.0.0.0:5000 aesopstables:app
