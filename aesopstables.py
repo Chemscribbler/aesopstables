@@ -1,4 +1,5 @@
-from aesops import app, db
+from aesops import app
+from data_models.model_store import db
 from pairing.match import Match
 from data_models.players import Player
 from data_models.tournaments import Tournament

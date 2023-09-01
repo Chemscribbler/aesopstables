@@ -1,4 +1,4 @@
-from aesops import db
+from data_models.model_store import db
 from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
 from pairing.match import ConclusionError

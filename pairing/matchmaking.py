@@ -1,5 +1,5 @@
 from random import random, shuffle
-from aesops import db
+from data_models.model_store import db
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.players as p_logic

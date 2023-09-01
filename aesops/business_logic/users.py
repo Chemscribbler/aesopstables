@@ -1,4 +1,5 @@
-from aesops import db, login
+from aesops import login
+from data_models.model_store import db
 from data_models.tournaments import Tournament
 from data_models.users import User
 from datetime import date

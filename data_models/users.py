@@ -1,4 +1,4 @@
-from aesops import db
+from .model_store import db
 from data_models.tournaments import Tournament
 from sqlalchemy.orm import Mapped
 from flask_login import UserMixin

@@ -1,4 +1,4 @@
-from aesops import db
+from .model_store import db
 from sqlalchemy.orm import Mapped
 
 class Tournament(db.Model):

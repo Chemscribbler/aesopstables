@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, url_for, render_template, flash
 from flask_login import login_user, logout_user, current_user
-from aesops import db
+from data_models.model_store import db
 from aesops.forms import (
     LoginForm,
     RegistrationForm,

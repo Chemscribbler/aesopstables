@@ -1,4 +1,4 @@
-from aesops import db
+from data_models.model_store import db
 from data_models.players import Player
 
 def get_record(player :Player) -> dict[str, float]:

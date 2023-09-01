@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 from data_models.players import Player
 from data_models.tournaments import Tournament
-from aesops import db
+from data_models.model_store import db
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 from aesops.forms import (

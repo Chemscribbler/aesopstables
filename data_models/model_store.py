@@ -1,4 +1,6 @@
-from aesops import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 from .players import Player
 from .tournaments import Tournament

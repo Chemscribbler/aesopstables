@@ -4,7 +4,7 @@ from data_models.tournaments import Tournament
 import aesops.business_logic.tournament as t_logic
 from pairing.match import Match
 from pairing.matchmaking import pair_round
-from aesops import db
+from data_models.model_store import db
 import tqdm
 
 

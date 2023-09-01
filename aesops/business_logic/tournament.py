@@ -1,4 +1,4 @@
-from aesops import db
+from data_models.model_store import db
 import aesops.business_logic.players as p_logic
 from data_models.players import Player
 from pairing.match import Match
