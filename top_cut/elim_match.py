@@ -1,8 +1,8 @@
 from data_models.model_store import db
-import aesops.business_logic.players as p_logic
+from data_models.top_cut import CutPlayer
+import aesops.business_logic.top_cut as tc_logic
 from sqlalchemy.orm import Mapped
 from pairing.match import ConclusionError
-from top_cut.cut_player import CutPlayer
 from random import randint
 from top_cut.cut_tables import get_bracket
 
@@ -104,10 +104,10 @@ class ElimMatch(db.Model):
             return self
         higher_seed = CutPlayer.query.get(self.higher_seed_id)
         lower_seed = CutPlayer.query.get(self.lower_seed_id)
-        if p_logic.get_side_balance(higher_seed) > p_logic.get_side_balance(lower_seed):
+        if tc_logic.get_side_balance(higher_seed) > tc_logic.get_side_balance(lower_seed):
             self.corp_player_id = self.lower_seed_id
             self.runner_player_id = self.higher_seed_id
-        elif p_logic.get_side_balance(higher_seed) < p_logic.get_side_balance(lower_seed):
+        elif tc_logic.get_side_balance(higher_seed) < tc_logic.get_side_balance(lower_seed):
             self.corp_player_id = self.higher_seed_id
             self.runner_player_id = self.lower_seed_id
         else:

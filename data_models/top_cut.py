@@ -21,10 +21,3 @@ class CutPlayer(db.Model):
 
     def __repr__(self) -> str:
         return f"<CutPlayer> ID: {self.id} - {self.player}"
-
-    def get_side_balance(self):
-        corp_games = len([match for match in self.corp_cut_matches if match.concluded])
-        runner_games = len(
-            [match for match in self.runner_cut_matches if match.concluded]
-        )
-        return corp_games - runner_games

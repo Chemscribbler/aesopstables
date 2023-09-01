@@ -53,7 +53,7 @@ def run_sims(n_tournaments: int, prefix: str = "Sim_", **kwargs):
         t_list.append(sim_tournament(name=prefix + str(i), **kwargs))
 
     for t in t_list:
-        get_report(t)
+        print(get_report(t))
 
 
 def get_report(t: Tournament, cutoff: int = 1):

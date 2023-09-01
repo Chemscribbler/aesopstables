@@ -1,4 +1,5 @@
 from data_models.model_store import db
+from data_models.top_cut import CutPlayer
 from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
 from pairing.match import ConclusionError
@@ -7,7 +8,6 @@ from data_models.tournaments import Tournament
 import aesops.business_logic.tournament as t_logic
 from random import randint
 from top_cut.cut_tables import get_bracket
-from top_cut.cut_player import CutPlayer
 from top_cut.elim_match import ElimMatch
 
 
