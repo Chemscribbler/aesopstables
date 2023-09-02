@@ -112,9 +112,7 @@ def update_elim(elim_match :ElimMatch):
 
                 lower_semis_table_number = elim_match.table_number - 1
                 semi_winner_id = (
-                    elim_match.cut.get_match_by_table(lower_semis_table_number)
-                    .get_winner()
-                    .id
+                    get_winner(elim_match.cut.get_match_by_table(lower_semis_table_number)).id
                 )
                 print(semi_winner_id)
                 print(elim_match.loser_id)
