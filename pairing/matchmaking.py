@@ -141,13 +141,15 @@ def assign_side(p1: Player, p2: Player):
     elif p_logic.get_side_balance(p1) > p_logic.get_side_balance(p2):
         corp = p2
         runner = p1
-    elif p_logic.get_side_balance(p1) > p_logic.get_side_balance(p1):
+    elif p_logic.get_side_balance(p2) > p_logic.get_side_balance(p1):
         corp = p1
         runner = p2
     elif random() > 0.5:
+        print('random corp pairing')
         corp = p1
         runner = p2
     else:
+        print('random runner pairing')
         corp = p2
         runner = p1
     return (corp, runner)
