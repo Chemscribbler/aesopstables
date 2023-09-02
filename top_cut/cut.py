@@ -1,14 +1,14 @@
 from data_models.model_store import db
-from data_models.top_cut import CutPlayer
+from data_models.top_cut import CutPlayer, ElimMatch
 from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
 from pairing.match import ConclusionError
 from data_models.players import Player
 from data_models.tournaments import Tournament
+import aesops.business_logic.elim_match as e_logic
 import aesops.business_logic.tournament as t_logic
 from random import randint
 from top_cut.cut_tables import get_bracket
-from top_cut.elim_match import ElimMatch
 
 
 class Cut(db.Model):
@@ -44,9 +44,9 @@ class Cut(db.Model):
             plyrs = self.get_players_by_seed()
             for m in bracket["round_1"]:
                 match = ElimMatch(cut_id=self.id, rnd=1, table_number=m["table"])
-                match.add_player(plyrs[m["higher_seed"] - 1])
-                match.add_player(plyrs[m["lower_seed"] - 1])
-                match.determine_sides()
+                e_logic.add_player(match, plyrs[m["higher_seed"] - 1])
+                e_logic.add_player(match, plyrs[m["lower_seed"] - 1])
+                e_logic.determine_sides(match)
                 db.session.add(match)
             db.session.commit()
         else:
@@ -64,26 +64,26 @@ class Cut(db.Model):
                     table_number, who_grab = match["higher_seed"]
                     if who_grab == "winner":
                         print(f"Getting table {table_number} winner")
-                        player = self.get_match_by_table(table_number).get_winner()
+                        player = e_logic.get_winner(self.get_match_by_table(table_number))
                     elif who_grab == "loser":
                         print(f"Getting table {table_number} loser")
-                        player = self.get_match_by_table(table_number).get_loser()
+                        player = e_logic.get_loser(self.get_match_by_table(table_number))
                     else:
                         raise ValueError(f"Invalid value for who_grab: {who_grab}")
                 print(player)
-                cut_match.add_player(player)
+                e_logic.add_player(cut_match, player)
                 print(cut_match.higher_seed)
                 table_number, who_grab = match["lower_seed"]
                 if who_grab == "winner":
                     print(f"Getting table {table_number} winner")
-                    player = self.get_match_by_table(table_number).get_winner()
+                    player = e_logic.get_winner(self.get_match_by_table(table_number))
                 elif who_grab == "loser":
                     print(f"Getting table {table_number} loser")
-                    player = self.get_match_by_table(table_number).get_loser()
-                cut_match.add_player(player)
+                    player = e_logic.get_loser(self.get_match_by_table(table_number))
+                e_logic.add_player(cut_match, player)
                 print(cut_match.higher_seed)
                 print(cut_match.lower_seed)
-                cut_match.determine_sides(is_second_final=self.is_second_final())
+                e_logic.determine_sides(cut_match, is_second_final=self.is_second_final())
                 db.session.add(cut_match)
             db.session.commit()
 
@@ -121,7 +121,7 @@ class Cut(db.Model):
 
     def conclude_round(self):
         for match in self.current_matches:
-            match.conclude()
+            e_logic.conclude(match)
         self.rnd += 1
         db.session.add(self)
         db.session.commit()

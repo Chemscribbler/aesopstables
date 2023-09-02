@@ -9,9 +9,11 @@ from aesops.forms import (
 )
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
+from data_models.top_cut import ElimMatch
 from data_models.players import Player
 from data_models.tournaments import Tournament
 from data_models.users import User
+import aesops.business_logic.elim_match as e_logic
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
@@ -25,7 +27,6 @@ from aesops.utility import (
     get_json,
 )
 from top_cut.cut import Cut
-from top_cut.elim_match import ElimMatch
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -277,9 +278,9 @@ def edit_cut(tid):
     if result is not None:
         match = ElimMatch.query.get(mid)
         if result == "1":
-            match.corp_win()
+            e_logic.corp_win(match)
         elif result == "0":
-            match.runner_win()
+            e_logic.runner_win(match)
         else:
             raise ValueError(f"Invalid result {result == '1'}")
     elif action is None:
@@ -294,7 +295,7 @@ def edit_cut(tid):
                 )
             redirect_for_tournament(tid)
         elif action == "swap":
-            ElimMatch.query.get(mid).swap_sides()
+            e_logic.swap_sides(ElimMatch.query.get(mid))
         elif action == "pair_next":
             cut.conclude_round()
             db.session.refresh(cut)
