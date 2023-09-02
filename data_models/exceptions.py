@@ -1,0 +1,2 @@
+class ConclusionError(BaseException):
+    pass

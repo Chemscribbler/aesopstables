@@ -1,8 +1,8 @@
 from random import choices, random
 from string import ascii_uppercase
 from data_models.tournaments import Tournament
+import aesops.business_logic.match as m_logic
 import aesops.business_logic.tournament as t_logic
-from pairing.match import Match
 from pairing.matchmaking import pair_round
 from data_models.model_store import db
 import tqdm
@@ -19,11 +19,11 @@ def sim_round(t: Tournament):
             continue
         r = random()
         if r < 0.49:
-            m.corp_win()
+            m_logic.corp_win(m)
         elif r < 0.51:
-            m.tie()
+            m_logic.tie(m)
         else:
-            m.runner_win()
+            m_logic.runner_win(m)
 
     t_logic.conclude_round(t)
 

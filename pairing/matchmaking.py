@@ -1,10 +1,10 @@
 from random import random, shuffle
+from data_models.match import Match
 from data_models.model_store import db
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
-from pairing.match import Match
 from networkx import Graph, max_weight_matching
 from itertools import combinations
 

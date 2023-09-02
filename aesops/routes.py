@@ -9,15 +9,17 @@ from aesops.forms import (
 )
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
-from data_models.top_cut import ElimMatch
+from data_models.exceptions import ConclusionError
+from data_models.match import Match
 from data_models.players import Player
+from data_models.top_cut import ElimMatch
 from data_models.tournaments import Tournament
 from data_models.users import User
 import aesops.business_logic.elim_match as e_logic
+import aesops.business_logic.match as m_logic
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
-from pairing.match import Match, ConclusionError
 import pairing.matchmaking as mm
 from pairing.matchmaking import PairingException
 from aesops.utility import (
@@ -71,13 +73,13 @@ def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
     if result == 2:
-        match.runner_win()
+        m_logic.runner_win(m_logic)
         return redirect_for_round(tid=tid, rnd=rnd)
     if result == 1:
-        match.corp_win()
+        m_logic.corp_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
     if result == 0:
-        match.tie()
+        m_logic.tie(m_logic)
         return redirect_for_round(tid=tid, rnd=rnd)
     return redirect(url_for("tournaments.round", tournament=tournament, rnd=rnd))
 

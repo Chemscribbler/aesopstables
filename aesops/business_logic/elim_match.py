@@ -1,7 +1,7 @@
+from data_models.exceptions import ConclusionError
 from data_models.model_store import db
 from data_models.top_cut import CutPlayer, ElimMatch
 import aesops.business_logic.top_cut as tc_logic
-from pairing.match import ConclusionError
 from random import randint
 from top_cut.cut_tables import get_bracket
 

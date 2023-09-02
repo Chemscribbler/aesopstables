@@ -1,7 +1,8 @@
-from data_models.model_store import db
+import aesops.business_logic.match as m_logic
 import aesops.business_logic.players as p_logic
+from data_models.match import Match
+from data_models.model_store import db
 from data_models.players import Player
-from pairing.match import Match
 from random import shuffle
 
 from data_models.model_store import Tournament
@@ -23,7 +24,7 @@ def add_player(
 
 def conclude_round(tournament: Tournament):
     for match in tournament.active_matches:
-        match.conclude()
+        m_logic.conclude(match)
     for player in tournament.players:
         p_logic.update_score(player)
         p_logic.update_sos_esos(player)
@@ -57,7 +58,7 @@ def unpair_round(tournament: Tournament):
     if tournament.cut is not None:
         raise Exception("Cannot unpair a round after a cut has been made")
     for match in tournament.active_matches:
-        match.delete()
+        m_logic.delete(match)
     tournament.current_round -= 1
     db.session.add(tournament)
     db.session.commit()

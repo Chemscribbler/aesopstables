@@ -2,7 +2,7 @@ from data_models.model_store import db
 from data_models.top_cut import CutPlayer, ElimMatch
 from sqlalchemy.orm import Mapped
 from sqlalchemy import and_
-from pairing.match import ConclusionError
+from data_models.exceptions import ConclusionError
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.elim_match as e_logic
