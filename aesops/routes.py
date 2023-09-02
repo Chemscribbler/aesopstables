@@ -8,8 +8,8 @@ from aesops.forms import (
     EditMatchesForm,
 )
 from flask import render_template, flash, redirect, url_for, request, Response
-from flask_login import current_user, login_user, logout_user, login_required
-from data_models.exceptions import ConclusionError
+from flask_login import current_user, login_required
+from data_models.exceptions import ConclusionError, PairingException
 from data_models.match import Match
 from data_models.players import Player
 from data_models.top_cut import ElimMatch
@@ -21,7 +21,6 @@ import aesops.business_logic.matchmaking as mm
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
-from aesops.business_logic.matchmaking import PairingException
 from aesops.utility import (
     rank_tables,
     get_faction,

@@ -1,4 +1,5 @@
 from random import random, shuffle
+from data_models.exceptions import PairingException
 from data_models.match import Match
 from data_models.model_store import db
 from data_models.players import Player
@@ -7,10 +8,6 @@ import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
 from networkx import Graph, max_weight_matching
 from itertools import combinations
-
-
-class PairingException(Exception):
-    pass
 
 
 def create_match(
