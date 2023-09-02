@@ -145,11 +145,9 @@ def assign_side(p1: Player, p2: Player):
         corp = p1
         runner = p2
     elif random() > 0.5:
-        print('random corp pairing')
         corp = p1
         runner = p2
     else:
-        print('random runner pairing')
         corp = p2
         runner = p1
     return (corp, runner)
