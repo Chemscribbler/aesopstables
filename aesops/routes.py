@@ -1,5 +1,6 @@
 # Routes page for flask app
-from aesops import app, db
+from aesops import app
+from data_models.model_store import db
 from aesops.forms import (
     LoginForm,
     RegistrationForm,
@@ -72,13 +73,13 @@ def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
     if result == 2:
-        m_logic.runner_win(m_logic)
+        m_logic.runner_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
     if result == 1:
         m_logic.corp_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
     if result == 0:
-        m_logic.tie(m_logic)
+        m_logic.tie(match)
         return redirect_for_round(tid=tid, rnd=rnd)
     return redirect(url_for("tournaments.round", tournament=tournament, rnd=rnd))
 
