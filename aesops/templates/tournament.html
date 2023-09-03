@@ -18,16 +18,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for _ in range(tournament.cut.get_standings()['unranked_players']) %}
+                {% for _ in range(tc_logic.get_standings(tournament.cut)['unranked_players']) %}
                 <tr>
                     <td> - </td>
                     <td> - </td>
                 </tr>
                 {% endfor %}
-                {% for player in tournament.cut.get_standings()['ranked_players'] %}
+                {% for player in tc_logic.get_standings(tournament.cut)['ranked_players'] %}
                 <tr>
                     <td>{{ player.player.name }}</td>
-                    <td>{{ loop.index0 + 1 + tournament.cut.get_standings()['unranked_players']}}</td>
+                    <td>{{ loop.index0 + 1 + tc_logic.get_standings(tournament.cut)['unranked_players']}}</td>
                 </tr>
                 {% endfor %}
         </table>

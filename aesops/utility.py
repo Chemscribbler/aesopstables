@@ -6,6 +6,7 @@ from data_models.match import Match
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.players as p_logic
+import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
 import json
 from decimal import Decimal
@@ -122,7 +123,7 @@ def get_json(tid):
             }
         )
     if t.cut is not None:
-        for i, player in enumerate(t.cut.get_standings()["ranked_players"]):
+        for i, player in enumerate(tc_logic.get_standings(t.cut)["ranked_players"]):
             t_json["eliminationPlayers"].append(
                 {
                     "id": player.player.id,
@@ -153,7 +154,7 @@ def get_json(tid):
     if t.cut is not None:
         for rnd in range(1, t.cut.rnd + 1):
             match_list = []
-            for match in t.cut.get_round(rnd):
+            for match in tc_logic.get_round(t.cut, rnd):
                 match_list.append(
                     {
                         "tableNumber": match.table_number,

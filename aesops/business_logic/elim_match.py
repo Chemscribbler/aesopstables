@@ -3,7 +3,7 @@ from data_models.model_store import db
 from data_models.top_cut import CutPlayer, ElimMatch
 import aesops.business_logic.top_cut as tc_logic
 from random import randint
-from top_cut.cut_tables import get_bracket
+from .cut_tables import get_bracket
 
 
 def conclude(elim_match :ElimMatch):
@@ -58,7 +58,7 @@ def determine_sides(elim_match :ElimMatch, is_second_final=False):
     Otherwise, the player with the higher side balance will be the runner player.
     """
     if is_second_final:
-        prior_match = elim_match.cut.get_match_by_table(elim_match.table_number - 1)
+        prior_match = tc_logic.get_match_by_table(elim_match.cut, elim_match.table_number - 1)
         elim_match.corp_player_id = prior_match.runner_player_id
         elim_match.runner_player_id = prior_match.corp_player_id
         db.session.add(elim_match)
@@ -112,7 +112,7 @@ def update_elim(elim_match :ElimMatch):
 
                 lower_semis_table_number = elim_match.table_number - 1
                 semi_winner_id = (
-                    get_winner(elim_match.cut.get_match_by_table(lower_semis_table_number)).id
+                    get_winner(tc_logic.get_match_by_table(elim_match.cut, lower_semis_table_number)).id
                 )
                 print(semi_winner_id)
                 print(elim_match.loser_id)

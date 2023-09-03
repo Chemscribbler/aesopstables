@@ -2,6 +2,23 @@ from data_models.model_store import db
 from sqlalchemy.orm import Mapped
 
 
+class Cut(db.Model):
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    tid = db.Column(db.Integer, db.ForeignKey("tournament.id"))
+    rnd = db.Column(db.Integer, default=1)
+    num_players = db.Column(db.Integer)
+    double_elim = db.Column(db.Boolean, default=False)
+    tournament = db.relationship("Tournament", back_populates="cut")
+    current_matches = db.relationship(
+        "ElimMatch",
+        primaryjoin="and_(Cut.id == ElimMatch.cut_id, ElimMatch.rnd == Cut.rnd)",
+        viewonly=True,
+    )
+
+    def __repr__(self) -> str:
+        return f"<Cut> TID: {self.tid} - RND: {self.rnd}"
+
+
 class CutPlayer(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     player_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("player.id"))

@@ -12,13 +12,14 @@ from flask_login import current_user, login_required
 from data_models.exceptions import ConclusionError, PairingException
 from data_models.match import Match
 from data_models.players import Player
-from data_models.top_cut import ElimMatch
+from data_models.top_cut import Cut, ElimMatch
 from data_models.tournaments import Tournament
 from data_models.users import User
 import aesops.business_logic.elim_match as e_logic
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.matchmaking as mm
 import aesops.business_logic.players as p_logic
+import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
 from aesops.utility import (
@@ -27,7 +28,6 @@ from aesops.utility import (
     format_results,
     get_json,
 )
-from top_cut.cut import Cut
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -241,8 +241,8 @@ def create_cut(tid):
     c = Cut()
     double_elim = bool(int(double_elim))
     try:
-        c.create(tournament, int(num_players), double_elim=double_elim)
-        c.generate_round()
+        tc_logic.create(c, tournament, int(num_players), double_elim=double_elim)
+        tc_logic.generate_round(c)
         flash(
             f"Top {request.form.get('num_players')} and the format is {'Double Elim' if request.form.get('double_elim') else 'Single Elim'}"
         )
@@ -265,6 +265,7 @@ def cut_round(tid, rnd):
         admin=u_logic.has_admin_rights(current_user, tid),
         rank_tables=rank_tables,
         get_faction=get_faction,
+        tc_logic=tc_logic,
     )
 
 
@@ -289,7 +290,7 @@ def edit_cut(tid):
     else:
         if action == "delete":
             try:
-                cut.delete_round(int(rnd))
+                tc_logic.delete_round(cut, int(rnd))
             except ValueError as e:
                 flash(
                     "To the first round use the delete cut button on the tournament page"
@@ -298,10 +299,10 @@ def edit_cut(tid):
         elif action == "swap":
             e_logic.swap_sides(ElimMatch.query.get(mid))
         elif action == "pair_next":
-            cut.conclude_round()
+            tc_logic.conclude_round(cut)
             db.session.refresh(cut)
             try:
-                cut.generate_round()
+                tc_logic.generate_round(cut)
             except ValueError as e:
                 print(e)
                 cut.rnd = cut.rnd - 1
@@ -319,7 +320,7 @@ def edit_cut(tid):
 def delete_cut(tid):
     tournament = Tournament.query.get(tid)
     cut = Cut.query.get(tournament.cut.id)
-    cut.destroy()
+    tc_logic.destroy(cut)
     return redirect_for_tournament(tid)
 
 
