@@ -155,13 +155,15 @@ def get_json(tid):
         for rnd in range(1, t.cut.rnd + 1):
             match_list = []
             for match in tc_logic.get_round(t.cut, rnd):
+                corp_id = match.corp_player.player.id
+                runner_id = match.runner_player.player.id
                 match_list.append(
                     {
                         "tableNumber": match.table_number,
-                        "corpPlayer": match.corp_player.player.id,
-                        "runnerPlayer": match.runner_player.player.id,
-                        "winner_id": match.winner_id,
-                        "loser_id": match.loser_id,
+                        "corpPlayer": corp_id,
+                        "runnerPlayer": runner_id,
+                        "winner_id": corp_id if match.result == 1 else runner_id,
+                        "loser_id": runner_id if match.result == 1 else corp_id,
                     }
                 )
             t_json["rounds"].append(match_list)
