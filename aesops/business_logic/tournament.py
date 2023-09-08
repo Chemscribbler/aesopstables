@@ -33,9 +33,12 @@ def conclude_round(tournament: Tournament):
 
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
-    player_list.sort(key=lambda x: x.esos, reverse=True)
-    player_list.sort(key=lambda x: x.sos, reverse=True)
-    player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
+    if tournament.current_round == 0:
+        player_list.sort(key=lambda x: x.name)
+    else:
+        player_list.sort(key=lambda x: x.esos, reverse=True)
+        player_list.sort(key=lambda x: x.sos, reverse=True)
+        player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
     return player_list
 
 def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
