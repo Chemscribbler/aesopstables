@@ -15,7 +15,7 @@
             {% endif %}
         </tr>
     </thead>
-    {% for match in rank_tables(tournament.cut.get_round(rnd=rnd)) %}
+    {% for match in rank_tables(tc_logic.get_round(tournament.cut, rnd=rnd)) %}
     <tr>
         <th>{{ match.table_number }}</th>
         <th>{{ match.corp_player.player.name }}<br>

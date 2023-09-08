@@ -1,15 +1,16 @@
 from random import choices, random
 from string import ascii_uppercase
-from pairing.tournament import Tournament
-from pairing.match import Match
-from pairing.matchmaking import pair_round
-from aesops import db
+from data_models.tournaments import Tournament
+import aesops.business_logic.match as m_logic
+import aesops.business_logic.tournament as t_logic
+from aesops.business_logic.matchmaking import pair_round
+from data_models.model_store import db
 import tqdm
 
 
 def create_players(t: Tournament, count: int):
     for _ in range(count):
-        t.add_player("".join(choices(ascii_uppercase, k=5)))
+        t_logic.add_player(t, "".join(choices(ascii_uppercase, k=5)))
 
 
 def sim_round(t: Tournament):
@@ -18,17 +19,17 @@ def sim_round(t: Tournament):
             continue
         r = random()
         if r < 0.49:
-            m.corp_win()
+            m_logic.corp_win(m)
         elif r < 0.51:
-            m.tie()
+            m_logic.tie(m)
         else:
-            m.runner_win()
+            m_logic.runner_win(m)
 
-    t.conclude_round()
+    t_logic.conclude_round(t)
 
 
 def display_players(t: Tournament):
-    for p in t.rank_players():
+    for p in t_logic.rank_players(t):
         print(f"{p.name} {p.score} {p.sos} {p.esos}")
 
 
@@ -52,11 +53,11 @@ def run_sims(n_tournaments: int, prefix: str = "Sim_", **kwargs):
         t_list.append(sim_tournament(name=prefix + str(i), **kwargs))
 
     for t in t_list:
-        get_report(t)
+        print(get_report(t))
 
 
 def get_report(t: Tournament, cutoff: int = 1):
-    players = t.rank_players()
+    players = t_logic.rank_players(t)
     max_score = 0
     num_max = 0
     cutoff_score = 0

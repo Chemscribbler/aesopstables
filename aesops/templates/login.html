@@ -10,6 +10,6 @@
         {{ form.password(size=32) }}</p>
     <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
     <input type="submit" value="Login" />
-    <p><a href="{{ url_for('register')}}">Register</a></p>
+    <p><a href="{{ url_for('login.register')}}">Register</a></p>
 </form>
 {% endblock %}

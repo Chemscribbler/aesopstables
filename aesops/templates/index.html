@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if current_user.is_authenticated %}
-<a href="{{ url_for('create_tournament') }}">Create Tournament</a>
+<a href="{{ url_for('tournaments.create_tournament') }}">Create Tournament</a>
 {% endif %}
 <table class="table table-striped">
     <thead>
@@ -16,7 +16,7 @@
     </thead>
     {% for tournament in tournaments|sort(attribute='date', reverse=True) %}
     <tr>
-        <th><a href="{{ url_for('tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
+        <th><a href="{{ url_for('tournaments.tournament', tid=tournament.id) }}">{{ tournament.name }}</a></th>
         <th>{{ tournament.current_round }}</th>
         <th>{{ tournament.players | length}}</th>
         <th>{{ tournament.date.strftime("%Y-%m-%d") }}</th>

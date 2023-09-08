@@ -2,9 +2,12 @@ import requests
 import os
 import datetime
 from json import dump, load
-from pairing.player import Player
-from pairing.match import Match
-from pairing.tournament import Tournament
+from data_models.match import Match
+from data_models.players import Player
+from data_models.tournaments import Tournament
+import aesops.business_logic.players as p_logic
+import aesops.business_logic.top_cut as tc_logic
+import aesops.business_logic.tournament as t_logic
 import json
 from decimal import Decimal
 
@@ -55,10 +58,10 @@ def get_runner_ids():
 
 
 def display_side_bias(player: Player):
-    if player.get_side_balance() > 0:
-        return f"Corp +{player.get_side_balance()}"
-    if player.get_side_balance() < 0:
-        return f"Runner +{player.get_side_balance()*-1}"
+    if p_logic.get_side_balance(player) > 0:
+        return f"Corp +{p_logic.get_side_balance(player)}"
+    if p_logic.get_side_balance(player) < 0:
+        return f"Runner +{p_logic.get_side_balance(player)*-1}"
     return "Balanced"
 
 
@@ -105,7 +108,7 @@ def get_json(tid):
         ],
     }
 
-    for i, player in enumerate(t.rank_players()):
+    for i, player in enumerate(t_logic.rank_players(t)):
         t_json["players"].append(
             {
                 "id": player.id,
@@ -116,11 +119,11 @@ def get_json(tid):
                 "matchPoints": player.score,
                 "strengthOfSchedule": player.sos,
                 "extendedStrengthOfSchedule": player.esos,
-                "sideBalance": player.get_side_balance(),
+                "sideBalance": p_logic.get_side_balance(player),
             }
         )
     if t.cut is not None:
-        for i, player in enumerate(t.cut.get_standings()["ranked_players"]):
+        for i, player in enumerate(tc_logic.get_standings(t.cut)["ranked_players"]):
             t_json["eliminationPlayers"].append(
                 {
                     "id": player.player.id,
@@ -131,7 +134,7 @@ def get_json(tid):
             )
     for rnd in range(1, t.current_round + 1):
         match_list = []
-        for match in t.get_round(rnd):
+        for match in t_logic.get_round(t, rnd):
             match_list.append(
                 {
                     "tableNumber": match.table_number,
@@ -151,14 +154,16 @@ def get_json(tid):
     if t.cut is not None:
         for rnd in range(1, t.cut.rnd + 1):
             match_list = []
-            for match in t.cut.get_round(rnd):
+            for match in tc_logic.get_round(t.cut, rnd):
+                corp_id = match.corp_player.player.id
+                runner_id = match.runner_player.player.id
                 match_list.append(
                     {
                         "tableNumber": match.table_number,
-                        "corpPlayer": match.corp_player.player.id,
-                        "runnerPlayer": match.runner_player.player.id,
-                        "winner_id": match.winner_id,
-                        "loser_id": match.loser_id,
+                        "corpPlayer": corp_id,
+                        "runnerPlayer": runner_id,
+                        "winner_id": corp_id if match.result == 1 else runner_id,
+                        "loser_id": runner_id if match.result == 1 else corp_id,
                     }
                 )
             t_json["rounds"].append(match_list)

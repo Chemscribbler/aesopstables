@@ -1,5 +1,6 @@
 # Routes page for flask app
-from aesops import app, db
+from aesops import app
+from data_models.model_store import db
 from aesops.forms import (
     LoginForm,
     RegistrationForm,
@@ -8,23 +9,26 @@ from aesops.forms import (
     EditMatchesForm,
 )
 from flask import render_template, flash, redirect, url_for, request, Response
-from flask_login import current_user, login_user, logout_user, login_required
-from aesops.user import User, has_admin_rights
-from pairing.tournament import Tournament
-from pairing.player import Player
-from pairing.match import Match, ConclusionError
-import pairing.matchmaking as mm
-from pairing.matchmaking import PairingException
+from flask_login import current_user, login_required
+from data_models.exceptions import ConclusionError, PairingException
+from data_models.match import Match
+from data_models.players import Player
+from data_models.top_cut import Cut, ElimMatch
+from data_models.tournaments import Tournament
+from data_models.users import User
+import aesops.business_logic.elim_match as e_logic
+import aesops.business_logic.match as m_logic
+import aesops.business_logic.matchmaking as mm
+import aesops.business_logic.players as p_logic
+import aesops.business_logic.top_cut as tc_logic
+import aesops.business_logic.tournament as t_logic
+import aesops.business_logic.users as u_logic
 from aesops.utility import (
-    display_side_bias,
     rank_tables,
     get_faction,
     format_results,
     get_json,
 )
-from top_cut.cut import Cut
-from top_cut.elim_match import ElimMatch
-import markdown
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -58,151 +62,37 @@ def index():
     )
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash("Invalid username or password")
-            return redirect(url_for("login"))
-        login_user(user, remember=form.remember_me.data)
-        return redirect(url_for("index"))
-    return render_template("login.html", title="Sign In", form=form)
+def redirect_for_tournament(tid):
+    return redirect(url_for("tournaments.tournament", tid=tid))
 
-
-@app.route("/logout")
-def logout():
-    logout_user()
-    return redirect(url_for("index"))
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash(f"{user.username} has been registered!", category="success")
-        return redirect(url_for("login"))
-    return render_template("register.html", title="Register", form=form)
-
-
-@app.route("/<int:tid>", methods=["GET", "POST"])
-@app.route("/tournament/<int:tid>", methods=["GET", "POST"])
-@app.route("/<int:tid>/standings", methods=["GET", "POST"])
-def tournament(tid):
-    tournament = Tournament.query.get(tid)
-    return render_template(
-        "tournament.html",
-        tournament=tournament,
-        admin=has_admin_rights(current_user, tid),
-        display_side_bias=display_side_bias,
-        get_faction=get_faction,
-        last_concluded_round=tournament.current_round
-        if tournament.is_current_round_finished()
-        else tournament.current_round - 1,
-    )
-
-
-@app.route("/create_tournament", methods=["GET", "POST"])
-def create_tournament():
-    form = TournamentForm()
-    if form.validate_on_submit():
-        tournament = Tournament(
-            name=form.name.data,
-            date=form.date.data,
-            description=form.description.data,
-            admin_id=current_user.id,
-            allow_self_registration=form.allow_self_registration.data,
-            allow_self_results_report=form.allow_self_results_report.data,
-            visible=form.visible.data,
-        )
-        db.session.add(tournament)
-        db.session.commit()
-        flash(f"{tournament.name} has been created!", category="success")
-        return redirect(url_for("tournament", tid=tournament.id))
-    return render_template("tournament_creation.html", form=form)
-
-
-@login_required
-@app.route("/<int:tid>/delete", methods=["GET", "POST"])
-def delete_tournament(tid):
-    tournament = Tournament.query.get(tid)
-    if has_admin_rights(current_user, tid) is False:
-        flash("You do not have permission to delete this tournament")
-        return redirect(url_for("tournament", tid=tournament.id))
-    db.session.delete(tournament)
-    db.session.commit()
-    flash(f"{tournament.name} has been deleted!")
-    return redirect(url_for("index"))
-
-
-@app.route("/<int:tid>/add_player", methods=["GET", "POST"])
-def add_player(tid: int):
-    form = PlayerForm()
-    if form.validate_on_submit():
-        player = Player(
-            name=form.name.data,
-            corp=form.corp.data,
-            corp_deck=form.corp_deck.data,
-            runner=form.runner.data,
-            runner_deck=form.runner_deck.data,
-            tid=tid,
-            first_round_bye=form.bye.data,
-            pronouns=form.pronouns.data,
-        )
-        db.session.add(player)
-        db.session.commit()
-        flash(f"{player.name} has been added!", category="success")
-        return redirect(url_for("tournament", tid=tid))
-    tournament = Tournament.query.get(tid)
-    return render_template("player_registration.html", form=form, tournament=tournament)
-
-
-@app.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])
-def round(tid, rnd):
-    tournament = Tournament.query.get(tid)
-    return render_template(
-        "round.html",
-        tournament=tournament,
-        rnd=rnd,
-        format_results=format_results,
-        admin=has_admin_rights(current_user, tid),
-        rank_tables=rank_tables,
-        get_faction=get_faction,
-    )
-
+def redirect_for_round(tid, rnd):
+    return redirect(url_for("tournaments.round", tid=tid, rnd=rnd))
 
 @app.route("/<int:tid>/<int:rnd>/<int:mid>/<int:result>", methods=["GET", "POST"])
 def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
     if result == 2:
-        match.runner_win()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
+        m_logic.runner_win(match)
+        return redirect_for_round(tid=tid, rnd=rnd)
     if result == 1:
-        match.corp_win()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
+        m_logic.corp_win(match)
+        return redirect_for_round(tid=tid, rnd=rnd)
     if result == 0:
-        match.tie()
-        return redirect(url_for("round", tid=tid, rnd=rnd))
-    return redirect(url_for("round", tournament=tournament, rnd=rnd))
+        m_logic.tie(match)
+        return redirect_for_round(tid=tid, rnd=rnd)
+    return redirect(url_for("tournaments.round", tournament=tournament, rnd=rnd))
 
 
 @app.route("/<int:tid>/<int:rnd>/conclude", methods=["GET", "POST"])
 def conclude_round(tid, rnd):
     tournament = Tournament.query.get(tid)
     try:
-        tournament.conclude_round()
+        t_logic.conclude_round(tournament)
     except ConclusionError as e:
         flash("Not all matches have been reported")
-        return redirect(url_for("round", tid=tournament.id, rnd=rnd))
-    return redirect(url_for("tournament", tid=tournament.id))
+        return redirect_for_round(tid=tournament.id, rnd=rnd)
+    return redirect_for_tournament(tournament.id)
 
 
 @login_required
@@ -213,16 +103,16 @@ def pair_round(tid):
         mm.pair_round(tournament)
     except PairingException as e:
         flash(str(e))
-        return redirect(url_for("tournament", tid=tournament.id))
-    return redirect(url_for("round", tid=tournament.id, rnd=tournament.current_round))
+        return redirect_for_tournament(tournament.id)
+    return redirect_for_round(tid=tournament.id, rnd=tournament.current_round)
 
 
 @login_required
 @app.route("/<int:tid>/unpair_round", methods=["GET", "POST"])
 def unpair_round(tid):
     tournament = Tournament.query.get(tid)
-    tournament.unpair_round()
-    return redirect(url_for("tournament", tid=tournament.id))
+    t_logic.unpair_round(tournament)
+    return redirect_for_tournament(tournament.id)
 
 
 @login_required
@@ -241,7 +131,7 @@ def edit_player(pid):
         player.pronouns = form.pronouns.data
         db.session.commit()
         flash(f"{player.name} has been edited!", category="success")
-        return redirect(url_for("tournament", tid=player.tid))
+        return redirect_for_tournament(player.tid)
     form.name.data = player.name
     form.corp.data = player.corp
     form.corp_deck.data = player.corp_deck
@@ -260,32 +150,32 @@ def delete_player(pid):
     player = Player.query.get(pid)
     if player.tournament.admin_id != current_user.id:
         flash("You do not have permission to delete this player")
-        return redirect(url_for("tournament", tid=player.tid))
+        return redirect_for_tournament(player.tid)
     if player.tournament.current_round > 0:
         flash("You cannot delete a player after the first round")
-        return redirect(url_for("tournament", tid=player.tid))
+        return redirect_for_tournament(player.tid)
     db.session.delete(player)
     db.session.commit()
     flash(f"{player.name} has been deleted!")
-    return redirect(url_for("tournament", tid=player.tid))
+    return redirect_for_tournament(player.tid)
 
 
 @login_required
 @app.route("/<int:pid>/drop_player", methods=["GET", "POST"])
 def drop_player(pid):
     player = Player.query.get(pid)
-    player.drop()
+    p_logic.drop(player)
     flash(f"{player.name} has been dropped!")
-    return redirect(url_for("tournament", tid=player.tid))
+    return redirect_for_tournament(player.tid)
 
 
 @login_required
 @app.route("/<int:pid>/undrop_player", methods=["GET", "POST"])
 def undrop_player(pid):
     player = Player.query.get(pid)
-    player.undrop()
+    p_logic.undrop(player)
     flash(f"{player.name} has been undropped!")
-    return redirect(url_for("tournament", tid=player.tid))
+    return redirect_for_tournament(player.tid)
 
 
 @login_required
@@ -305,8 +195,8 @@ def delete_match(mid):
 def edit_pairings(tid, rnd):
     tournament = Tournament.query.get(tid)
     form = EditMatchesForm()
-    if tournament.get_unpaired_players() is not None:
-        form.populate_players(tournament.get_unpaired_players())
+    if t_logic.get_unpaired_players(tournament) is not None:
+        form.populate_players(t_logic.get_unpaired_players(tournament))
         if form.validate_on_submit():
             is_bye = form.runner_player.data == "None"
             print(is_bye)
@@ -325,9 +215,10 @@ def edit_pairings(tid, rnd):
                 form=form,
                 rnd=rnd,
                 format_results=format_results,
-                admin=has_admin_rights(current_user, tid),
+                admin=u_logic.has_admin_rights(current_user, tid),
                 rank_tables=rank_tables,
                 get_faction=get_faction,
+                t_logic=t_logic,
             )
     return render_template(
         "edit_pairings.html",
@@ -335,9 +226,10 @@ def edit_pairings(tid, rnd):
         form=form,
         rnd=rnd,
         format_results=format_results,
-        admin=has_admin_rights(current_user, tid),
+        admin=u_logic.has_admin_rights(current_user, tid),
         rank_tables=rank_tables,
         get_faction=get_faction,
+        t_logic=t_logic,
     )
 
 
@@ -350,8 +242,8 @@ def create_cut(tid):
     c = Cut()
     double_elim = bool(int(double_elim))
     try:
-        c.create(tournament, int(num_players), double_elim=double_elim)
-        c.generate_round()
+        tc_logic.create(c, tournament, int(num_players), double_elim=double_elim)
+        tc_logic.generate_round(c)
         flash(
             f"Top {request.form.get('num_players')} and the format is {'Double Elim' if request.form.get('double_elim') else 'Single Elim'}"
         )
@@ -360,7 +252,7 @@ def create_cut(tid):
         flash(str(e))
         db.session.delete(c)
         db.session.commit()
-        return redirect(url_for("tournament", tid=tournament.id))
+        return redirect_for_tournament(tournament.id)
 
 
 @app.route("/<int:tid>/cut/<int:rnd>", methods=["GET", "POST"])
@@ -371,9 +263,10 @@ def cut_round(tid, rnd):
         tournament=tournament,
         rnd=rnd,
         format_results=format_results,
-        admin=has_admin_rights(current_user, tid),
+        admin=u_logic.has_admin_rights(current_user, tid),
         rank_tables=rank_tables,
         get_faction=get_faction,
+        tc_logic=tc_logic,
     )
 
 
@@ -388,9 +281,9 @@ def edit_cut(tid):
     if result is not None:
         match = ElimMatch.query.get(mid)
         if result == "1":
-            match.corp_win()
+            e_logic.corp_win(match)
         elif result == "0":
-            match.runner_win()
+            e_logic.runner_win(match)
         else:
             raise ValueError(f"Invalid result {result == '1'}")
     elif action is None:
@@ -398,25 +291,25 @@ def edit_cut(tid):
     else:
         if action == "delete":
             try:
-                cut.delete_round(int(rnd))
+                tc_logic.delete_round(cut, int(rnd))
             except ValueError as e:
                 flash(
                     "To the first round use the delete cut button on the tournament page"
                 )
-            redirect(url_for("tournament", tid=tid))
+            redirect_for_tournament(tid)
         elif action == "swap":
-            ElimMatch.query.get(mid).swap_sides()
+            e_logic.swap_sides(ElimMatch.query.get(mid))
         elif action == "pair_next":
-            cut.conclude_round()
+            tc_logic.conclude_round(cut)
             db.session.refresh(cut)
             try:
-                cut.generate_round()
+                tc_logic.generate_round(cut)
             except ValueError as e:
                 print(e)
                 cut.rnd = cut.rnd - 1
                 db.session.add(cut)
                 db.session.commit()
-                return redirect(url_for("tournament", tid=tid))
+                return redirect_for_tournament(tid)
             redirect(url_for("cut_round", tid=tid, rnd=int(rnd) + 1))
         else:
             raise ValueError("Invalid action")
@@ -428,8 +321,8 @@ def edit_cut(tid):
 def delete_cut(tid):
     tournament = Tournament.query.get(tid)
     cut = Cut.query.get(tournament.cut.id)
-    cut.destroy()
-    return redirect(url_for("tournament", tid=tid))
+    tc_logic.destroy(cut)
+    return redirect_for_tournament(tid)
 
 
 @app.route("/<int:tid>/abr_export", methods=["GET"])
@@ -437,26 +330,6 @@ def abr_export(tid):
     response = Response(get_json(tid), mimetype="application/json")
     response.headers.set("Content-Disposition", "attachment", filename=f"{tid}.json")
     return response
-
-
-@app.route("/about", methods=["GET"])
-def about():
-    with open("documentation/about.md", "r") as f:
-        text = f.read()
-        html = markdown.markdown(text)
-    return render_template(
-        "markdown_page.html", markdown_content=markdown.markdown(html)
-    )
-
-
-@app.route("/howto", methods=["GET"])
-def howto():
-    with open("documentation/howto.md", "r") as f:
-        text = f.read()
-        html = markdown.markdown(text)
-    return render_template(
-        "markdown_page.html", markdown_content=markdown.markdown(html)
-    )
 
 
 @login_required
@@ -470,9 +343,9 @@ def user_tournaments(uid):
 @login_required
 @app.route("/<int:tid>/edit", methods=["GET", "POST"])
 def edit_tournament(tid):
-    if has_admin_rights(current_user, tid) is False:
+    if u_logic.has_admin_rights(current_user, tid) is False:
         flash("You do not have permission to edit this tournament")
-        return redirect(url_for("tournament", tid=tid))
+        return redirect_for_tournament(tid)
     tournament = Tournament.query.get(tid)
     form = TournamentForm()
     if form.validate_on_submit():
@@ -484,7 +357,7 @@ def edit_tournament(tid):
         tournament.visible = form.visible.data
         db.session.commit()
         flash(f"{tournament.name} has been edited!", category="success")
-        return redirect(url_for("tournament", tid=tournament.id))
+        return redirect_for_tournament(tournament.id)
     form.name.data = tournament.name
     form.date.data = tournament.date
     form.description.data = tournament.description
