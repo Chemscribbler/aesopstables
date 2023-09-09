@@ -1,4 +1,5 @@
 from data_models.exceptions import ConclusionError
+from data_models.match import MatchResult
 from data_models.model_store import db
 from data_models.top_cut import CutPlayer, ElimMatch
 import aesops.business_logic.top_cut as tc_logic
@@ -7,10 +8,10 @@ from .cut_tables import get_bracket
 
 
 def conclude(elim_match :ElimMatch):
-    if elim_match.result not in [-1, 1]:
+    if elim_match.result not in [MatchResult.CORP_WIN.value, MatchResult.RUNNER_WIN.value]:
         raise ConclusionError("No result recorded")
     elim_match.concluded = True
-    if elim_match.result == 1:
+    if elim_match.result == MatchResult.CORP_WIN.value:
         elim_match.winner_id = elim_match.corp_player_id
         elim_match.loser_id = elim_match.runner_player_id
     else:
@@ -21,12 +22,12 @@ def conclude(elim_match :ElimMatch):
     db.session.commit()
 
 def corp_win(elim_match :ElimMatch):
-    elim_match.result = 1
+    elim_match.result = MatchResult.CORP_WIN.value
     db.session.add(elim_match)
     db.session.commit()
 
 def runner_win(elim_match :ElimMatch):
-    elim_match.result = -1
+    elim_match.result = MatchResult.RUNNER_WIN.value
     db.session.add(elim_match)
     db.session.commit()
 
@@ -85,18 +86,18 @@ def determine_sides(elim_match :ElimMatch, is_second_final=False):
 
 def get_winner(elim_match :ElimMatch):
     """_summary_: Returns the winner of the match."""
-    if elim_match.result == 1:
+    if elim_match.result == MatchResult.CORP_WIN.value:
         return elim_match.corp_player
-    elif elim_match.result == -1:
+    elif elim_match.result == MatchResult.RUNNER_WIN.value:
         return elim_match.runner_player
     else:
         raise ConclusionError("Match has not been concluded")
 
 def get_loser(elim_match :ElimMatch):
     """_summary_: Returns the loser of the match."""
-    if elim_match.result == 1:
+    if elim_match.result == MatchResult.CORP_WIN.value:
         return elim_match.runner_player
-    elif elim_match.result == -1:
+    elif elim_match.result == MatchResult.RUNNER_WIN.value:
         return elim_match.corp_player
     else:
         raise ConclusionError("Match has not been concluded")

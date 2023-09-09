@@ -31,12 +31,14 @@
         {% if (match.result is none and tournament.allow_self_results_report) or admin %}
         <th>
             {% if not match.is_bye %}
-            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=1)}}"
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=match_report.CORP_WIN.value)}}"
                 class="btn btn-primary">Corp Win</a>
-            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=0)}}"
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=match_report.DRAW.value)}}"
                 class="btn btn-primary">Tie</a>
-            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=2)}}"
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=match_report.RUNNER_WIN.value)}}"
                 class="btn btn-primary">Runner Win</a>
+            <a href="{{ url_for('report_match',tid=tournament.id, rnd=rnd, mid=match.id, result=match_report.INTENTIONAL_DRAW.value)}}"
+                class="btn btn-primary">Intentional Draw</a>
             {% endif %}
             {% if admin and tournament.current_round == rnd%}
             <a href="{{ url_for('delete_match', mid=match.id)}}" class="btn btn-danger">Delete Match</a>

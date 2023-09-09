@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
+from data_models.match import MatchReport
 from data_models.players import Player
 from data_models.tournaments import Tournament
 from data_models.model_store import db
@@ -111,4 +112,5 @@ def round(tid, rnd):
         rank_tables=rank_tables,
         get_faction=get_faction,
         t_logic=t_logic,
+        match_report=MatchReport,
     )

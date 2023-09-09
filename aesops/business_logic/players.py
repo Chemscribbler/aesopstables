@@ -1,3 +1,4 @@
+from data_models.match import MatchResult
 from data_models.model_store import db
 from data_models.players import Player
 
@@ -7,17 +8,17 @@ def get_record(player :Player) -> dict[str, float]:
     for match in player.runner_matches:
         if not match.concluded:
             continue
-        if match.result == -1 and match.concluded:
+        if match.result == MatchResult.RUNNER_WIN.value and match.concluded:
             score += 3
-        if match.result == 0 and match.concluded:
+        if match.result in [MatchResult.DRAW.value, MatchResult.INTENTIONAL_DRAW.value] and match.concluded:
             score += 1
         games_played += 1
     for match in player.corp_matches:
         if not match.concluded:
             continue
-        if match.result == 1 and match.concluded:
+        if match.result == MatchResult.CORP_WIN.value and match.concluded:
             score += 3
-        if match.result == 0 and match.concluded:
+        if match.result in [MatchResult.DRAW.value, MatchResult.INTENTIONAL_DRAW.value] and match.concluded:
             score += 1
         games_played += 1
     return {"score": score, "games_played": games_played}
@@ -103,12 +104,12 @@ def side_record(player :Player, side):
         if match.is_bye:
             continue
         if match.concluded:
-            if match.result == -1:
+            if match.result == MatchResult.RUNNER_WIN.value:
                 if side == "runner":
                     results["W"] += 1
                 else:
                     results["L"] += 1
-            elif match.result == 1:
+            elif match.result == MatchResult.CORP_WIN.value:
                 if side == "corp":
                     results["W"] += 1
                 else:

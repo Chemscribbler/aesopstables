@@ -1,27 +1,32 @@
 from data_models.exceptions import ConclusionError
-from data_models.match import Match
+from data_models.match import Match, MatchResult
 from data_models.model_store import db
 from . import players as p_logic
 
 def conclude(match :Match):
-    if match.result not in [-1, 0, 1]:
+    if match.result not in [MatchResult.CORP_WIN.Value, MatchResult.RUNNER_WIN.Value, MatchResult.DRAW.Value, MatchResult.INTENTIONAL_DRAW.Value]:
         raise ConclusionError("No result recorded")
     match.concluded = True
     db.session.add(match)
     db.session.commit()
 
 def corp_win(match :Match):
-    match.result = 1
+    match.result = MatchResult.CORP_WIN.value
     db.session.add(match)
     db.session.commit()
 
 def runner_win(match :Match):
-    match.result = -1
+    match.result = MatchResult.RUNNER_WIN.value
     db.session.add(match)
     db.session.commit()
 
 def tie(match :Match):
-    match.result = 0
+    match.result = MatchResult.DRAW.value
+    db.session.add(match)
+    db.session.commit()
+
+def intentional_draw(match :Match):
+    match.result = MatchResult.INTENTIONAL_DRAW.value
     db.session.add(match)
     db.session.commit()
 
