@@ -11,7 +11,7 @@ from aesops.forms import (
 from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_required
 from data_models.exceptions import ConclusionError, PairingException
-from data_models.match import Match
+from data_models.match import Match, MatchReport
 from data_models.players import Player
 from data_models.top_cut import Cut, ElimMatch
 from data_models.tournaments import Tournament
@@ -72,14 +72,17 @@ def redirect_for_round(tid, rnd):
 def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
-    if result == 2:
+    if result == MatchReport.RUNNER_WIN.value:
         m_logic.runner_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
-    if result == 1:
+    elif result == MatchReport.CORP_WIN.value:
         m_logic.corp_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
-    if result == 0:
+    elif result == MatchReport.DRAW.value:
         m_logic.tie(match)
+        return redirect_for_round(tid=tid, rnd=rnd)
+    elif result == MatchReport.INTENTIONAL_DRAW.value:
+        m_logic.intentional_draw(match)
         return redirect_for_round(tid=tid, rnd=rnd)
     return redirect(url_for("tournaments.round", tournament=tournament, rnd=rnd))
 
@@ -219,6 +222,7 @@ def edit_pairings(tid, rnd):
                 rank_tables=rank_tables,
                 get_faction=get_faction,
                 t_logic=t_logic,
+                match_report=MatchReport,
             )
     return render_template(
         "edit_pairings.html",
@@ -230,6 +234,7 @@ def edit_pairings(tid, rnd):
         rank_tables=rank_tables,
         get_faction=get_faction,
         t_logic=t_logic,
+        match_report=MatchReport,
     )
 
 

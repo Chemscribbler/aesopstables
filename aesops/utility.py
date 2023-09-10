@@ -2,7 +2,7 @@ import requests
 import os
 import datetime
 from json import dump, load
-from data_models.match import Match
+from data_models.match import Match, MatchResult
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.players as p_logic
@@ -58,10 +58,11 @@ def get_runner_ids():
 
 
 def display_side_bias(player: Player):
-    if p_logic.get_side_balance(player) > 0:
-        return f"Corp +{p_logic.get_side_balance(player)}"
-    if p_logic.get_side_balance(player) < 0:
-        return f"Runner +{p_logic.get_side_balance(player)*-1}"
+    side_bal = p_logic.get_side_balance(player)
+    if side_bal > 0:
+        return f"Corp +{side_bal}"
+    elif side_bal < 0:
+        return f"Runner +{side_bal * -1}"
     return "Balanced"
 
 
@@ -81,11 +82,11 @@ def get_faction(corp_name: str):
 def format_results(match: Match):
     if match.result is None:
         return ""
-    if match.result == 1:
+    if match.result == MatchResult.CORP_WIN.value:
         return "3 - 0"
-    if match.result == -1:
+    if match.result == MatchResult.RUNNER_WIN.value:
         return "0 - 3"
-    if match.result == 0:
+    if match.result in [MatchResult.DRAW.value, MatchResult.INTENTIONAL_DRAW.value]:
         return "1 - 1"
 
 
@@ -162,8 +163,8 @@ def get_json(tid):
                         "tableNumber": match.table_number,
                         "corpPlayer": corp_id,
                         "runnerPlayer": runner_id,
-                        "winner_id": corp_id if match.result == 1 else runner_id,
-                        "loser_id": runner_id if match.result == 1 else corp_id,
+                        "winner_id": corp_id if match.result == MatchResult.CORP_WIN.value else runner_id,
+                        "loser_id": runner_id if match.result == MatchResult.CORP_WIN.value else corp_id,
                     }
                 )
             t_json["rounds"].append(match_list)

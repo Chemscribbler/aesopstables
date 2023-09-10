@@ -1,5 +1,19 @@
 from data_models.model_store import db
+from sqlalchemy import Enum
 
+import enum
+
+class MatchResult(enum.Enum):
+    CORP_WIN = 1
+    RUNNER_WIN = -1
+    DRAW = 0
+    INTENTIONAL_DRAW = 9
+
+class MatchReport(enum.Enum):
+    CORP_WIN = 1
+    RUNNER_WIN = 2
+    DRAW = 0
+    INTENTIONAL_DRAW = 9
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
