@@ -37,7 +37,7 @@ def sim_tournament(n_players: int, n_rounds: int, name: str = None):
     if name is None:
         t = Tournament()
     else:
-        t = Tournament(name=name)
+        t = Tournament(name=name, admin_id=1)
     db.session.add(t)
     db.session.commit()
     create_players(t, count=n_players)
