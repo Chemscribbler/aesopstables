@@ -19,10 +19,10 @@ from data_models.users import User
 import aesops.business_logic.elim_match as e_logic
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.matchmaking as mm
-import aesops.business_logic.players as p_logic
 import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
+import aesops.distributed_logic.player_dist as p_logic
 from aesops.distributed_logic.tournament_dist import conclude_round_distributed
 from aesops.utility import (
     rank_tables,

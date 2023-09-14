@@ -1,7 +1,7 @@
 from data_models.exceptions import ConclusionError
 from data_models.match import Match, MatchResult
 from data_models.model_store import db
-from . import players as p_logic
+from ..distributed_logic import player_dist as p_logic
 
 
 def conclude(match: Match):

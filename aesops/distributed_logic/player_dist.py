@@ -74,3 +74,47 @@ def update_sos_esos(player_id :int):
         player.esos = get_esos(player)
         db.session.add(player)
         db.session.commit()
+
+def reset(player :Player):
+    update_score(player.id)
+    update_sos_esos(player.id)
+
+def drop(player :Player):
+    player.active = False
+    db.session.add(player)
+    db.session.commit()
+
+def undrop(player :Player):
+    player.active = True
+    db.session.add(player)
+    db.session.commit()
+
+def is_paired(player :Player, rnd):
+    for match in player.runner_matches:
+        if match.rnd == rnd:
+            return True
+    for match in player.corp_matches:
+        if match.rnd == rnd:
+            return True
+    return False
+
+def side_record(player :Player, side):
+    results = {"W": 0, "L": 0, "T": 0}
+    side_function = {"runner": player.runner_matches, "corp": player.corp_matches}
+    for match in side_function[side]:
+        if match.is_bye:
+            continue
+        if match.concluded:
+            if match.result == MatchResult.RUNNER_WIN.value:
+                if side == "runner":
+                    results["W"] += 1
+                else:
+                    results["L"] += 1
+            elif match.result == MatchResult.CORP_WIN.value:
+                if side == "corp":
+                    results["W"] += 1
+                else:
+                    results["L"] += 1
+            else:
+                results["T"] += 1
+    return results

@@ -4,6 +4,7 @@ from data_models.tournaments import Tournament
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.tournament as t_logic
 from aesops.business_logic.matchmaking import pair_round
+from aesops.distributed_logic.tournament_dist import conclude_round_distributed
 from data_models.model_store import db
 import tqdm
 
@@ -25,7 +26,7 @@ def sim_round(t: Tournament):
         else:
             m_logic.runner_win(m)
 
-    t_logic.conclude_round(t)
+    conclude_round_distributed(t)
 
 
 def display_players(t: Tournament):
