@@ -65,8 +65,10 @@ def index():
 def redirect_for_tournament(tid):
     return redirect(url_for("tournaments.tournament", tid=tid))
 
+
 def redirect_for_round(tid, rnd):
     return redirect(url_for("tournaments.round", tid=tid, rnd=rnd))
+
 
 @app.route("/<int:tid>/<int:rnd>/<int:mid>/<int:result>", methods=["GET", "POST"])
 def report_match(tid, rnd, mid, result):
@@ -190,7 +192,7 @@ def delete_match(mid):
     db.session.delete(match)
     db.session.commit()
     flash("Match deleted")
-    return redirect(url_for("round", tid=tid, rnd=round))
+    return redirect(url_for("tournaments.round", tid=tid, rnd=round))
 
 
 @login_required
