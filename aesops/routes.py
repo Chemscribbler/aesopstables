@@ -66,8 +66,10 @@ def index():
 def redirect_for_tournament(tid):
     return redirect(url_for("tournaments.tournament", tid=tid))
 
+
 def redirect_for_round(tid, rnd):
     return redirect(url_for("tournaments.round", tid=tid, rnd=rnd))
+
 
 @app.route("/<int:tid>/<int:rnd>/<int:mid>/<int:result>", methods=["GET", "POST"])
 def report_match(tid, rnd, mid, result):
@@ -191,7 +193,7 @@ def delete_match(mid):
     db.session.delete(match)
     db.session.commit()
     flash("Match deleted")
-    return redirect(url_for("round", tid=tid, rnd=round))
+    return redirect(url_for("tournaments.round", tid=tid, rnd=round))
 
 
 @login_required
@@ -207,7 +209,9 @@ def edit_pairings(tid, rnd):
             mm.create_match(
                 tournament=tournament,
                 corp_player=Player.query.get(form.corp_player.data),
-                runner_player=Player.query.get(form.runner_player.data),
+                runner_player=None
+                if is_bye
+                else Player.query.get(form.runner_player.data),
                 is_bye=is_bye,
                 table_number=form.table_number.data,
             )
