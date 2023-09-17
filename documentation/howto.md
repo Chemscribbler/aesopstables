@@ -17,6 +17,32 @@ Your tournament url with be something like aesopstables.net/# where the number i
 ## Admin View
 If you are logged in and the tournament creator, you will see a bunch of additional UI elements that allow you to control the event. Whenever you're ready you can pair the round. To unpair a round, or manually adjust the pairings, you do so from the round page, which is just under the *Round* header. Currently I'd recommend only unpairing rounds starting from the highest numbered (most recent) round and working your way down.
 
+### Recommendations for Number of Rounds and Cut Size
+
+Once Round 1 is paired, it's important to determine the appropriate number of rounds for your tournament based on the number of players. Below is a recommendation for the number of rounds and cut size for different player counts in Single Sided Swiss Events (both Casual and Competitive):
+
+#### Single Sided Swiss Events: Casual
+
+| Players | Swiss Rounds | Cut                   |
+| ------- | ------------ | --------------------- |
+| < 12    | 6            | None                  |
+| < 16    | 8            | None, Top 3 or Top 4 Single Elim |
+| < 33    | 8            | Top 4 Double Elim     |
+| < 65    | 10           | Top 8 Double Elim     |
+| < 129   | 12           | Top 8 Double Elim     |
+| 128     | 12           | Top 16                |
+
+#### Single Sided Swiss Events: Competitive
+
+| Players | Swiss Rounds | Cut                   |
+| ------- | ------------ | --------------------- |
+| < 16    | 6            | None                  |
+| < 33    | 8            | Top 4 Double Elim     |
+| < 65    | 10           | Top 8 Double Elim     |
+| < 129   | 10           | Top 8 Double Elim     |
+| < 164   | 12           | Top 16 Double Elim    |
+| 164     | 13           | Top 16 Double Elim    |
+
 Editing the round - once the round is made you can delete matches to get players into an unpaired pool. Then you can create tables however you'd like. Please be careful, I haven't written any code preventing someone from playing multiple matches in one round.
 
 ## Undo Pairings & Close the Round
