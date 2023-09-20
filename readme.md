@@ -1,4 +1,4 @@
-Current repo for [aesopstables.net]
+Current repo for [aesopstables.net](http://www.aesopstables.net)
 
 Program trying to run single sided swiss Netrunner events.
 
