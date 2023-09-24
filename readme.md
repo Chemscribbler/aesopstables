@@ -1,7 +1,6 @@
-# WIP on Reimplementing what became Aesop's Tables
-https://github.com/Chemscribbler/sass
+Current repo for [aesopstables.net](http://www.aesopstables.net)
 
-Ultimate goal is to have a super easy to deploy (heroku or heroku like)
+Program trying to run single sided swiss Netrunner events.
 
 For now to get it started:
 
@@ -16,3 +15,12 @@ and then to interface with an environment where the datatables are pre-loaded yo
 `flask shell`
 
 You will still need to import utility functions
+
+Feature ToDos:
+- Modernize backend to allow for a better control flow and less tight coupling of frontend to backend
+- Enable match slips
+- Incorporate first round byes
+- Allow user logins to report their specific results
+- User overall record tracking/global leaderboard
+- Bracket visualization
+- New coat of paint
