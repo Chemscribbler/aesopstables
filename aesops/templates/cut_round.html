@@ -50,6 +50,7 @@
     </tr>
     {% endfor %}
 </table>
+{% if admin %}
 <form action="/{{tournament.id}}/edit_cut" method="post">
     <button type="submit" class="btn btn-warning" name="action" value='pair_next'>Pair Next Round</button>
     <br>
@@ -57,6 +58,7 @@
         Delete Round</button>
     <input type="hidden" name="rnd" value={{rnd}}>
 </form>
+{% endif %}
 
 
 {% endblock %}
