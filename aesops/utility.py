@@ -163,8 +163,13 @@ def get_json(tid):
                         "tableNumber": match.table_number,
                         "corpPlayer": corp_id,
                         "runnerPlayer": runner_id,
-                        "winner_id": corp_id if match.result == MatchResult.CORP_WIN.value else runner_id,
-                        "loser_id": runner_id if match.result == MatchResult.CORP_WIN.value else corp_id,
+                        "winner_id": corp_id
+                        if match.result == MatchResult.CORP_WIN.value
+                        else runner_id,
+                        "loser_id": runner_id
+                        if match.result == MatchResult.CORP_WIN.value
+                        else corp_id,
+                        "eliminationGame": True,
                     }
                 )
             t_json["rounds"].append(match_list)
