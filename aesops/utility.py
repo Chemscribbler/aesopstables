@@ -5,9 +5,9 @@ from json import dump, load
 from data_models.match import Match, MatchResult
 from data_models.players import Player
 from data_models.tournaments import Tournament
-import aesops.business_logic.players as p_logic
 import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
+import aesops.distributed_logic.player_dist as p_logic
 import json
 from decimal import Decimal
 

@@ -1,5 +1,5 @@
 import aesops.business_logic.match as m_logic
-import aesops.business_logic.players as p_logic
+import aesops.distributed_logic.player_dist as p_logic
 from data_models.match import Match
 from data_models.model_store import db
 from data_models.players import Player
@@ -22,15 +22,6 @@ def add_player(
     db.session.commit()
     return p
 
-def conclude_round(tournament: Tournament):
-    for match in tournament.active_matches:
-        m_logic.conclude(match)
-    for player in tournament.players:
-        p_logic.update_score(player)
-        p_logic.update_sos_esos(player)
-    db.session.add(tournament)
-    db.session.commit()
-
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
     if tournament.current_round == 0:
@@ -38,7 +29,7 @@ def rank_players(tournament: Tournament) -> list[Player]:
     else:
         player_list.sort(key=lambda x: x.esos, reverse=True)
         player_list.sort(key=lambda x: x.sos, reverse=True)
-        player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
+        player_list.sort(key=lambda x: x.score, reverse=True)
     return player_list
 
 def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
@@ -48,7 +39,7 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
     if len(elible_player_list) == 0:
         raise Exception("No elible players for a bye")
-    elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
+    elible_player_list.sort(key=lambda x: x.score, reverse=True)
     bye_player = elible_player_list.pop(-1)
     pairable_players = tournament.active_players.copy()
     pairable_players.remove(bye_player)

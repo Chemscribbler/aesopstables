@@ -19,10 +19,11 @@ from data_models.users import User
 import aesops.business_logic.elim_match as e_logic
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.matchmaking as mm
-import aesops.business_logic.players as p_logic
 import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
 import aesops.business_logic.users as u_logic
+import aesops.distributed_logic.player_dist as p_logic
+from aesops.distributed_logic.tournament_dist import conclude_round_distributed
 from aesops.utility import (
     rank_tables,
     get_faction,
@@ -93,7 +94,7 @@ def report_match(tid, rnd, mid, result):
 def conclude_round(tid, rnd):
     tournament = Tournament.query.get(tid)
     try:
-        t_logic.conclude_round(tournament)
+        conclude_round_distributed(tournament)
     except ConclusionError as e:
         flash("Not all matches have been reported")
         return redirect_for_round(tid=tournament.id, rnd=rnd)
