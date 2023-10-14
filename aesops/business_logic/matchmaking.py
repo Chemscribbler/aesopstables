@@ -4,8 +4,8 @@ from data_models.match import Match
 from data_models.model_store import db
 from data_models.players import Player
 from data_models.tournaments import Tournament
+import aesops.business_logic.players as p_logic
 import aesops.business_logic.tournament as t_logic
-import aesops.distributed_logic.player_dist as p_logic
 from networkx import Graph, max_weight_matching
 from itertools import combinations
 
@@ -69,8 +69,8 @@ def pair_round(t: Tournament):
         t.active_matches,
         key=lambda m: (
             (
-                m.corp_player.score
-                + m.runner_player.score
+                p_logic.get_record(m.corp_player)["score"]
+                + p_logic.get_record(m.runner_player)["score"]
             )
             if not m.is_bye
             else -1
@@ -104,8 +104,8 @@ def side_cost(corp_player: Player, runner_player: Player):
 
 
 def score_cost(corp_player: Player, runner_player: Player):
-    c_score = corp_player.score
-    r_score = runner_player.score
+    c_score = p_logic.get_record(corp_player)["score"]
+    r_score = p_logic.get_record(runner_player)["score"]
     return (c_score - r_score + 1) * (c_score - r_score) / 6
 
 
