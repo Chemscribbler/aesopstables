@@ -62,10 +62,10 @@ def pair_round(t: Tournament):
             db.session.query(Player).get(pair[0]),
             db.session.query(Player).get(pair[1]),
         )
+        table_number = None
         if corp.fixed_table or runner.fixed_table:
-            create_match(tournament=t, corp_player=corp, runner_player=runner, table_number = corp.table_number if corp.fixed_table else runner.table_number)
-        else:
-            create_match(tournament=t, corp_player=corp, runner_player=runner)
+            table_number = corp.table_number if corp.fixed_table else runner.table_number
+        create_match(tournament=t, corp_player=corp, runner_player=runner, table_number=table_number)
     if bye_player is not None:
         bye_player.recieved_bye = True
         create_match(
