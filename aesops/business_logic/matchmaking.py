@@ -86,7 +86,6 @@ def pair_round(t: Tournament):
 
     i = 1
     for match in ranked_matches:
-        print(match.table_number)
         if match.table_number:
             continue
         while i in fixed_table_numbers:
