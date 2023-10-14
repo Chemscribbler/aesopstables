@@ -9,7 +9,7 @@ from wtforms import (
     TextAreaField,
     IntegerField,
 )
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 from data_models.users import User
 from aesops.utility import get_corp_ids, get_runner_ids
 
@@ -44,8 +44,10 @@ def validate_name(form, field):
     if field.data in invalid_names:
         raise ValidationError("Invalid name. Please choose another.")
 
-
 class PlayerForm(FlaskForm):
+    def validate_table_num(self, field):
+        if self.fixed_table.data and field.data == 0:
+            raise ValidationError("If a Fixed Table is required, you must enter a Table Number.")
     name = StringField("Player Name", validators=[DataRequired(), validate_name])
     corp = SelectField("Corp ID", choices=get_corp_ids())
     corp_deck = TextAreaField("Corp Deck")
@@ -53,6 +55,8 @@ class PlayerForm(FlaskForm):
     runner_deck = TextAreaField("Runner Deck")
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
+    fixed_table = BooleanField("Fixed Table Required?")
+    table_number = IntegerField("Fixed Table Number", default=0, validators=[validate_table_num, NumberRange(min=0), Optional()])
     submit = SubmitField("Add Player")
 
 

@@ -27,6 +27,11 @@
         {{form.pronouns.label}}<br>
         {{form.pronouns}}<br>
     </p>
+    <p>
+        {{ form.fixed_table }}{{ form.fixed_table.label }}<br>
+        {{ form.table_number.label }}<br>
+        {{ form.table_number }}<br>
+    </p>
     <input type="submit" value="Register" />
     <p><a href="{{ url_for('edit_player', tid=tournament.id, pid=player.id) }}"></a> </p>
 
