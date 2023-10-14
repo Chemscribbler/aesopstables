@@ -16,7 +16,6 @@ class Player(db.Model):
     )
     recieved_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
     score: Mapped[int] = db.Column(db.Integer, default=0)
-    games_played: Mapped[int] = db.Column(db.Integer, default=0)
     sos: Mapped[float] = db.Column(db.Numeric, default=0.0)
     esos: Mapped[float] = db.Column(db.Numeric, default=0.0)
     is_bye: Mapped[bool] = db.Column(db.Boolean, default=False)

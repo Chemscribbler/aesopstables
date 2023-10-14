@@ -72,7 +72,7 @@
             p_logic.side_record(player, "runner")['L']}}-{{ p_logic.side_record(player, "runner")['T']}}
             {% endif %}
         </td>
-        <td>{{ player.score }}</td>
+        <td>{{ p_logic.get_record(player)['score'] }}</td>
         <td>{{ "%0.3f"|format(player.sos) }}</td>
         <td>{{ "%0.3f"|format(player.esos) }}</td>
         <td>{{ display_side_bias(player) }}</td>
