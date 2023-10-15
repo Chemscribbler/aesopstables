@@ -45,7 +45,16 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     if len(tournament.active_players) % 2 == 0:
         return (tournament.active_players, None)
     player_list = rank_players(tournament).copy()
-    elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
+    if tournament.current_round > 1:
+        elible_player_list = [
+            p
+            for p in player_list
+            if not p.recieved_bye
+            and p.active
+            and (len(p.runner_matches) + len(p.corp_matches) > 0)
+        ]
+    else:
+        elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
     if len(elible_player_list) == 0:
         raise Exception("No elible players for a bye")
     elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
