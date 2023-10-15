@@ -7,8 +7,14 @@ from random import shuffle
 
 from data_models.model_store import Tournament
 
+
 def add_player(
-    tournament: Tournament, name, corp=None, runner=None, corp_deck=None, runner_deck=None
+    tournament: Tournament,
+    name,
+    corp=None,
+    runner=None,
+    corp_deck=None,
+    runner_deck=None,
 ) -> Player:
     p = Player(
         name=name,
@@ -22,6 +28,7 @@ def add_player(
     db.session.commit()
     return p
 
+
 def conclude_round(tournament: Tournament):
     for match in tournament.active_matches:
         m_logic.conclude(match)
@@ -30,6 +37,7 @@ def conclude_round(tournament: Tournament):
         p_logic.update_sos_esos(player)
     db.session.add(tournament)
     db.session.commit()
+
 
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
@@ -41,11 +49,21 @@ def rank_players(tournament: Tournament) -> list[Player]:
         player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
     return player_list
 
+
 def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     if len(tournament.active_players) % 2 == 0:
         return (tournament.active_players, None)
     player_list = rank_players(tournament).copy()
-    elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
+    if tournament.current_round > 1:
+        elible_player_list = [
+            p
+            for p in player_list
+            if not p.recieved_bye
+            and p.active
+            and (len(p.runner_matches) + len(p.corp_matches) > 0)
+        ]
+    else:
+        elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
     if len(elible_player_list) == 0:
         raise Exception("No elible players for a bye")
     elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
@@ -54,8 +72,10 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     pairable_players.remove(bye_player)
     return (pairable_players, bye_player)
 
+
 def get_round(tournament: Tournament, round) -> list[Match]:
     return [m for m in tournament.matches if m.rnd == round]
+
 
 def unpair_round(tournament: Tournament):
     if tournament.cut is not None:
@@ -66,6 +86,7 @@ def unpair_round(tournament: Tournament):
     db.session.add(tournament)
     db.session.commit()
     return tournament
+
 
 def top_n_cut(tournament: Tournament, n):
     player_list = rank_players(tournament)
@@ -78,8 +99,14 @@ def top_n_cut(tournament: Tournament, n):
     # cut_players = player_list[:n]
     return cut_players
 
+
 def get_unpaired_players(tournament: Tournament):
-    return [p for p in tournament.active_players if not p_logic.is_paired(p, tournament.current_round)]
+    return [
+        p
+        for p in tournament.active_players
+        if not p_logic.is_paired(p, tournament.current_round)
+    ]
+
 
 def is_current_round_finished(tournament: Tournament):
     return all([m.concluded for m in tournament.active_matches])
