@@ -91,6 +91,8 @@ def add_player(tid: int):
             tid=tid,
             first_round_bye=form.bye.data,
             pronouns=form.pronouns.data,
+            fixed_table=form.fixed_table.data,
+            table_number=form.table_number.data,
         )
         db.session.add(player)
         db.session.commit()

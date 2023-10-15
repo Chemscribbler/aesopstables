@@ -45,11 +45,14 @@ def pair_round(t: Tournament):
     t.current_round += 1
     db.session.add(t)
     db.session.commit()
+    fixed_table_numbers = []
     graph = Graph()
     pairing_pool, bye_player = t_logic.bye_setup(t)
     shuffle(pairing_pool)
     for player in pairing_pool:
         graph.add_node(player.id)
+        if player.fixed_table:
+            fixed_table_numbers.append(player.table_number)
     for pair in combinations(pairing_pool, 2):
         pair_weight = find_min_edge(*pair)
         graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
@@ -59,7 +62,10 @@ def pair_round(t: Tournament):
             db.session.query(Player).get(pair[0]),
             db.session.query(Player).get(pair[1]),
         )
-        create_match(tournament=t, corp_player=corp, runner_player=runner)
+        table_number = None
+        if corp.fixed_table or runner.fixed_table:
+            table_number = corp.table_number if corp.fixed_table else runner.table_number
+        create_match(tournament=t, corp_player=corp, runner_player=runner, table_number=table_number)
     if bye_player is not None:
         bye_player.recieved_bye = True
         create_match(
@@ -77,9 +83,16 @@ def pair_round(t: Tournament):
         ),
         reverse=True,
     )
-    for i, match in enumerate(ranked_matches):
-        match.table_number = i + 1
+
+    i = 1
+    for match in ranked_matches:
+        if match.table_number:
+            continue
+        while i in fixed_table_numbers:
+            i += 1
+        match.table_number = i
         db.session.add(match)
+        i += 1
     db.session.commit()
 
 

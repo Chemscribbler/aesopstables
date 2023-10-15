@@ -134,6 +134,11 @@ def edit_player(pid):
         player.runner_deck = form.runner_deck.data
         player.first_round_bye = form.bye.data
         player.pronouns = form.pronouns.data
+        player.fixed_table = form.fixed_table.data
+        if player.fixed_table:
+            player.table_number = form.table_number.data
+        else:
+            player.table_number = 0
         db.session.commit()
         flash(f"{player.name} has been edited!", category="success")
         return redirect_for_tournament(player.tid)
@@ -144,6 +149,8 @@ def edit_player(pid):
     form.runner_deck.data = player.runner_deck
     form.bye.data = player.first_round_bye
     form.pronouns.data = player.pronouns
+    form.fixed_table.data = player.fixed_table
+    form.table_number.data = player.table_number
     return render_template(
         "edit_player.html", tournament=tournament, form=form, player=player
     )
