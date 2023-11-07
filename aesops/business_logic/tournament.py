@@ -3,11 +3,9 @@ from typing import Sequence
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.players as p_logic
 from data_models.match import Match
-from data_models.model_store import db
+from data_models.model_store import db, Tournament
 from data_models.players import Player
-from random import shuffle
 
-from data_models.model_store import Tournament
 
 def add_player(
     tournament: Tournament, name, corp=None, runner=None, corp_deck=None, runner_deck=None
