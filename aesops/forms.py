@@ -49,9 +49,19 @@ class PlayerForm(FlaskForm):
         if self.fixed_table.data and field.data == 0:
             raise ValidationError("If a Fixed Table is required, you must enter a Table Number.")
     name = StringField("Player Name", validators=[DataRequired(), validate_name])
-    corp = SelectField("Corp ID", choices=get_corp_ids())
+    corp = SelectField(
+        "Corp ID",
+        choices=[("", "Select Corp ID...")] + [(v, v) for v in get_corp_ids()],
+        render_kw={"placeholder": "Select Corp ID..."},
+        validators=[DataRequired("Corp ID missing")],
+    )
     corp_deck = TextAreaField("Corp Deck")
-    runner = SelectField("Runner ID", choices=get_runner_ids())
+    runner = SelectField(
+        "Runner ID",
+        choices=[("", "Select Runner ID...")] + [(v, v) for v in get_runner_ids()],
+        render_kw={"placeholder": "Select Runner ID..."},
+        validators=[DataRequired("Runner ID missing")],
+    )
     runner_deck = TextAreaField("Runner Deck")
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
