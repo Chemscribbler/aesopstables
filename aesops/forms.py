@@ -49,7 +49,9 @@ def validate_name(form, field):
 class PlayerForm(FlaskForm):
     def validate_table_num(self, field):
         if self.fixed_table.data and field.data == 0:
-            raise ValidationError("If a Fixed Table is required, you must enter a Table Number.")
+            raise ValidationError(
+                "If a Fixed Table is required, you must enter a Table Number."
+            )
 
     name = StringField("Player Name", validators=[DataRequired(), validate_name])
     corp = SelectField(
@@ -72,7 +74,7 @@ class PlayerForm(FlaskForm):
     table_number = IntegerField(
         "Fixed Table Number",
         default=0,
-        validators=[validate_table_num, NumberRange(min=0), Optional()]
+        validators=[validate_table_num, NumberRange(min=0), Optional()],
     )
     submit = SubmitField("Add Player")
 
@@ -103,3 +105,18 @@ class EditMatchesForm(FlaskForm):
         self.corp_player.choices = [(p.id, p.name) for p in players]
         self.runner_player.choices = [(p.id, p.name) for p in players]
         self.runner_player.choices.append((None, "(BYE)"))
+
+
+class UpdatePasswordForm(
+    FlaskForm,
+):
+    def validate_new_password2(self, field):
+        if self.new_password.data != field.data:
+            raise ValidationError("New Passwords do not match.")
+
+    old_password = PasswordField("Old Password", validators=[DataRequired()])
+    new_password = PasswordField("New Password", validators=[DataRequired()])
+    new_password2 = PasswordField(
+        "Repeat New Password", validators=[DataRequired(), validate_new_password2]
+    )
+    submit = SubmitField("Save")
