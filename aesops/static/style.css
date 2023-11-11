@@ -1,3 +1,7 @@
+:root {
+    --id-dropdown-width: 500px;
+}
+
 .anarch {
     stroke: orangered;
     color: orangered;
@@ -41,4 +45,13 @@
 .neutral-corp {
     stroke: gray;
     color: gray;
+}
+
+.ts-dropdown,
+.ts-control,
+.ts-control input {
+  font-size: inherit;
+  max-width: var(--id-dropdown-width);
+  color: black;
+  border-color: gray;
 }

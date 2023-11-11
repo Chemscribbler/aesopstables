@@ -10,8 +10,9 @@ from wtforms import (
     IntegerField,
 )
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
-from data_models.users import User
+
 from aesops.utility import get_corp_ids, get_runner_ids
+from data_models.users import User
 
 
 class LoginForm(FlaskForm):
@@ -53,9 +54,19 @@ class PlayerForm(FlaskForm):
             )
 
     name = StringField("Player Name", validators=[DataRequired(), validate_name])
-    corp = SelectField("Corp ID", choices=get_corp_ids())
+    corp = SelectField(
+        "Corp ID",
+        choices=[("", "Select Corp ID...")] + [(v, v) for v in get_corp_ids()],
+        render_kw={"placeholder": "Select Corp ID..."},
+        validators=[DataRequired("Corp ID missing")],
+    )
     corp_deck = TextAreaField("Corp Deck")
-    runner = SelectField("Runner ID", choices=get_runner_ids())
+    runner = SelectField(
+        "Runner ID",
+        choices=[("", "Select Runner ID...")] + [(v, v) for v in get_runner_ids()],
+        render_kw={"placeholder": "Select Runner ID..."},
+        validators=[DataRequired("Runner ID missing")],
+    )
     runner_deck = TextAreaField("Runner Deck")
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
@@ -78,9 +89,7 @@ class TournamentForm(FlaskForm):
     submit = SubmitField("Add Tournament")
 
 
-class EditMatchesForm(
-    FlaskForm,
-):
+class EditMatchesForm(FlaskForm):
     def validate_runner(self, field):
         if field.data and self.corp_player.data == field.data:
             raise ValidationError("Runner and Corp cannot be the same player.")
