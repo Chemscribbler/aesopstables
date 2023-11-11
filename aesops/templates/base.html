@@ -42,6 +42,8 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="{{url_for('user_tournaments', uid=current_user.id)}}">Your
                   Tournaments</a></li>
+              <li><a class="dropdown-item" href="{{url_for('login.reset_password', uid=current_user.id)}}">Change
+                  Password</a> </li>
               <li><a class="dropdown-item" href="{{ url_for('login.logout') }}">Log Out</a></li>
             </ul>
           </li>
