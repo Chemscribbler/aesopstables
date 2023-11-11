@@ -1,11 +1,11 @@
+from typing import Sequence
+
 import aesops.business_logic.match as m_logic
 import aesops.business_logic.players as p_logic
 from data_models.match import Match
-from data_models.model_store import db
+from data_models.model_store import db, Tournament
 from data_models.players import Player
-from random import shuffle
 
-from data_models.model_store import Tournament
 
 def add_player(
     tournament: Tournament, name, corp=None, runner=None, corp_deck=None, runner_deck=None
@@ -56,12 +56,24 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     else:
         elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
     if len(elible_player_list) == 0:
-        raise Exception("No elible players for a bye")
+        elible_player_list = least_byes(tournament, player_list)
     elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
     bye_player = elible_player_list.pop(-1)
     pairable_players = tournament.active_players.copy()
     pairable_players.remove(bye_player)
     return (pairable_players, bye_player)
+
+def least_byes(tournament: Tournament, all_players: Sequence[Player]) -> list[Player]:
+    bye_count = {p: 0 for p in all_players if p.active}
+    for match in tournament.matches:
+        if not match.is_bye:
+            continue
+        player = match.corp_player
+        if not player.active:
+            continue
+        bye_count[player] += 1
+    min_num_byes = min(bye_count.values())
+    return [player for player, count in bye_count.items() if count < min_num_byes + 1]
 
 def get_round(tournament: Tournament, round) -> list[Match]:
     return [m for m in tournament.matches if m.rnd == round]
