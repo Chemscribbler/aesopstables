@@ -50,10 +50,17 @@
             {{ form.table_number }}<br>
         </div>
     </p>
-    <input type="submit" value="Register" class="btn btn-primary"/>
-    <p>
-        <a href="{{ url_for('tournaments.add_player', tid=tournament.id) }}"></a>
-    </p>
+    {% if edit_player %}
+        <input type="submit" value="Save Edit" class="btn btn-success"/>
+        <p>
+            <a href="{{ url_for('edit_player', tid=tournament.id, pid=player.id) }}"></a>
+        </p>
+    {% else %}
+        <input type="submit" value="Register" class="btn btn-primary"/>
+        <p>
+            <a href="{{ url_for('tournaments.add_player', tid=tournament.id) }}"></a>
+        </p>
+    {% endif %}
 </form>
 
 <script>
