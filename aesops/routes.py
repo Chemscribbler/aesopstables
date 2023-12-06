@@ -152,7 +152,8 @@ def edit_player(pid):
     form.fixed_table.data = player.fixed_table
     form.table_number.data = player.table_number
     return render_template(
-        "edit_player.html", tournament=tournament, form=form, player=player
+        "player_registration.html",
+        tournament=tournament, form=form, player=player, edit_player=True
     )
 
 

@@ -70,7 +70,9 @@ class PlayerForm(FlaskForm):
     runner_deck = TextAreaField("Runner Deck")
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
-    fixed_table = BooleanField("Fixed Table Required?")
+    fixed_table = BooleanField(
+        "Fixed Table Required?", render_kw={"onclick": "toggleElementChecked(event)"}
+    )
     table_number = IntegerField(
         "Fixed Table Number",
         default=0,
