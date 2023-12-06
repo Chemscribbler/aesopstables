@@ -1,4 +1,10 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='markdown.css') }}">
+</head>
+
 {% extends 'base.html' %}
 {% block content %}
-{{markdown_content|safe}}
+{{ markdown_content | safe }}
 {% endblock %}
