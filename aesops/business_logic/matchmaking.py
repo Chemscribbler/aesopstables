@@ -11,7 +11,11 @@ from itertools import combinations
 
 
 def create_match(
-    tournament: Tournament, corp_player: Player, runner_player: Player, is_bye=False, table_number=None
+    tournament: Tournament,
+    corp_player: Player,
+    runner_player: Player,
+    is_bye=False,
+    table_number=None,
 ):
     if is_bye:
         m = Match(
@@ -64,8 +68,15 @@ def pair_round(t: Tournament):
         )
         table_number = None
         if corp.fixed_table or runner.fixed_table:
-            table_number = corp.table_number if corp.fixed_table else runner.table_number
-        create_match(tournament=t, corp_player=corp, runner_player=runner, table_number=table_number)
+            table_number = (
+                corp.table_number if corp.fixed_table else runner.table_number
+            )
+        create_match(
+            tournament=t,
+            corp_player=corp,
+            runner_player=runner,
+            table_number=table_number,
+        )
     if bye_player is not None:
         bye_player.recieved_bye = True
         create_match(
@@ -123,8 +134,10 @@ def score_cost(corp_player: Player, runner_player: Player):
 
 
 def calc_cost(corp_player: Player, runner_player: Player):
-    return side_cost(corp_player, runner_player) + score_cost(
-        corp_player, runner_player
+    return (
+        side_cost(corp_player, runner_player)
+        + score_cost(corp_player, runner_player)
+        + (has_played(corp_player, runner_player) * 0.5)
     )
 
 
@@ -136,6 +149,14 @@ def find_min_edge(p1: Player, p2: Player):
     if options[1]:
         min_cost = min(calc_cost(p2, p1), min_cost)
     return min_cost
+
+
+def has_played(p1: Player, p2: Player):
+    if p2.id in [m.corp_player_id for m in p1.runner_matches]:
+        return True
+    if p2.id in [m.runner_player_id for m in p1.corp_matches]:
+        return True
+    return False
 
 
 def assign_side(p1: Player, p2: Player):
