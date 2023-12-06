@@ -28,23 +28,23 @@ Once Round 1 is paired, it's important to determine the appropriate number of ro
 
 | Players | Swiss Rounds | Cut                   |
 | ------- | ------------ | --------------------- |
-| < 12    | 6            | None                  |
-| < 16    | 8            | None, Top 3 or Top 4 Single Elim |
-| < 33    | 8            | Top 4 Double Elim     |
-| < 65    | 10           | Top 8 Double Elim     |
-| < 129   | 12           | Top 8 Double Elim     |
-| 128     | 12           | Top 16                |
+| < 16    | 5-6          | None                  |
+| 16-36   | 6            | Top 4 Double Elim     |
+| 37-63   | 7            | Top 8 Double Elim     |
+| 64-146  | 8            | Top 8 Double Elim     |
+| 147-219 | 10           | Top 8 Double Elim     |
+| 220+    | 12           | Top 16 Double Elim    |
 
 #### Single Sided Swiss Events: Competitive
 
 | Players | Swiss Rounds | Cut                   |
 | ------- | ------------ | --------------------- |
-| < 16    | 6            | None                  |
-| < 33    | 8            | Top 4 Double Elim     |
-| < 65    | 10           | Top 8 Double Elim     |
-| < 129   | 10           | Top 8 Double Elim     |
-| < 164   | 12           | Top 16 Double Elim    |
-| 164     | 13           | Top 16 Double Elim    |
+| < 16    | 5-6          | None                  |
+| 16-24   | 6          | Top 4 Double Elim     |
+| 25-64   | 6-7           | Top 8 Double Elim     |
+| 65-146   | 8           | Top 8 Double Elim     |
+| 147-219   | 10           | Top 16 Double Elim    |
+| 220+     | 12           | Top 16 Double Elim    |
 
 Editing the round - once the round is made you can delete matches to get players into an unpaired pool. Then you can create tables however you'd like. Please be careful, I haven't written any code preventing someone from playing multiple matches in one round.
 
