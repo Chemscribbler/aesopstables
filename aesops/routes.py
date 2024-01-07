@@ -74,6 +74,12 @@ def redirect_for_round(tid, rnd):
 def report_match(tid, rnd, mid, result):
     tournament = Tournament.query.get(tid)
     match = Match.query.get(mid)
+    if (
+        match.result is not None
+        and u_logic.has_admin_rights(current_user, tid) is False
+    ):
+        flash("This match has already been reported - please contact the TO for edits")
+        return redirect_for_round(tid=tournament.id, rnd=rnd)
     if result == MatchReport.RUNNER_WIN.value:
         m_logic.runner_win(match)
         return redirect_for_round(tid=tid, rnd=rnd)
@@ -153,7 +159,10 @@ def edit_player(pid):
     form.table_number.data = player.table_number
     return render_template(
         "player_registration.html",
-        tournament=tournament, form=form, player=player, edit_player=True
+        tournament=tournament,
+        form=form,
+        player=player,
+        edit_player=True,
     )
 
 
@@ -252,7 +261,6 @@ def edit_pairings(tid, rnd):
 
 @app.route("/<int:tid>/create_cut", methods=["POST"])
 def create_cut(tid):
-
     tournament = Tournament.query.get(tid)
     num_players = request.form.get("num_players")
     double_elim = request.form.get("double_elim")
