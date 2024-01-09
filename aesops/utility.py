@@ -247,9 +247,9 @@ def decklist_parser(decklist: str, id_faction: str):
         )
 
     # create html table with columns: qty, name, influence
-    text = f"<table class='decklist'><tr><th>Cound</th><th>Name</th><th>Influence</th></tr>"
+    text = f"<table class='decklist'><tr><th>Count</th><th>Name</th><th>Influence</th></tr>"
     for key in ordered_decklist:
         for card in ordered_decklist[key]:
-            text += f"<tr><td>{card['qty']}</td><td>{card['name']}</td><td>{['•' for _ in range(card['qty'] * card['influence']) if card['faction'] != id_faction]}</td></tr>"
+            text += f"<tr><td>{card['qty']}</td><td>{card['name']}</td><td>{''.join(['•' for _ in range(card['qty'] * card['influence']) if card['faction'] != id_faction])}</td></tr>"
 
     return text + "</table>"
