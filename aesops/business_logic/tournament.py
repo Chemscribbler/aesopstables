@@ -41,7 +41,7 @@ def conclude_round(tournament: Tournament):
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
     if tournament.current_round == 0:
-        player_list.sort(key=lambda x: x.name)
+        player_list.sort(key=lambda x: x.name.lower())
     else:
         player_list.sort(key=lambda x: x.esos, reverse=True)
         player_list.sort(key=lambda x: x.sos, reverse=True)
