@@ -184,6 +184,72 @@ def get_json(tid):
     return json_data
 
 
-if __name__ == "__main__":
-    print(get_corp_ids())
-    print(get_runner_ids())
+def get_cards():
+    if not os.path.exists("cards.json"):
+        all_cards = requests.get(
+            "https://netrunnerdb.com/api/2.0/public/cards", timeout=15
+        )
+        cards = {
+            card["title"]: {
+                "side": card["side_code"],
+                "faction": card["faction_code"],
+                "name": card["title"],
+                "type": card["type_code"],
+                "influence": card["faction_cost"],
+            }
+            for card in all_cards.json()["data"]
+            if card["type_code"] != "identity"
+        }
+        with open("cards.json", "w") as f:
+            dump(cards, f)
+    else:
+        cards = []
+        # If the file is older than a day, delete it and get a new one
+        if os.path.getmtime("cards.json") < datetime.datetime.now().timestamp() - (
+            60 * 60 * 24
+        ):
+            os.remove("cards.json")
+            return get_cards()
+        # else, load the file
+        with open("cards.json", "r") as f:
+            cards = load(f)
+    return cards
+
+
+def decklist_parser(decklist: str, id_faction: str):
+    all_cards = get_cards()
+    decklist_cards = decklist.split("\n")
+    decklist_dict = {
+        decklist_cards.split(" ", 1)[1]: decklist_cards.split(" ", 1)[0]
+        for decklist_cards in decklist_cards
+    }
+    ordered_decklist = {}
+    for card in decklist_dict:
+        if card not in all_cards:
+            raise ValueError(f"{card} is not a valid card name")
+        if all_cards[card]["type"] not in ordered_decklist.keys():
+            ordered_decklist[all_cards[card]["type"]] = []
+        ordered_decklist[all_cards[card]["type"]].append(
+            {
+                "name": card,
+                "qty": int(decklist_dict[card]),
+                "faction": all_cards[card]["faction"],
+                "influence": int(all_cards[card]["influence"]),
+            }
+        )
+
+    # sort ordered decklist keys
+    ordered_decklist = dict(sorted(ordered_decklist.items(), key=lambda item: item[0]))
+    # sort each list in ordered decklist
+    for key in ordered_decklist:
+        ordered_decklist[key] = sorted(
+            ordered_decklist[key], key=lambda item: item["name"]
+        )
+
+    # create html table with columns: qty, name, influence
+    text = f"<table class='decklist'><tr><th>Cound</th><th>Name</th><th>Influence</th></tr>"
+    for key in ordered_decklist:
+        for card in ordered_decklist[key]:
+            text += f"<tr><td>{card['qty']}</td><td>{card['name']}</td><td>{['•' for _ in range(card['qty'] * card['influence']) if card['faction'] != id_faction]}</td></tr>"
+
+    return text + "</table>"
