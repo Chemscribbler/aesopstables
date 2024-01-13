@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Create Tournament</h1>
+<h1>{{heading}}</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
@@ -37,6 +37,9 @@
         {{form.visible.label}}<br>
         {{form.visible}}<br>
     </p>
+    <p>
+        {{form.require_decklist.label}}<br>
+        {{form.require_decklist}}<br>
     <p>{{ form.submit() }}</p>
 </form>
 {% endblock %}

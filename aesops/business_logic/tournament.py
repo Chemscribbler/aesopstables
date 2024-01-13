@@ -59,7 +59,9 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
             for p in player_list
             if not p.recieved_bye
             and p.active
-            and (len(p.runner_matches) + len(p.corp_matches) > 0)
+            and (
+                len(p.runner_matches) + len(p.corp_matches) > 0
+            )  # This is to prevent late joiners from getting a bye their first round
         ]
     else:
         elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]

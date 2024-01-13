@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.form import _Auto
 from wtforms import (
     StringField,
     PasswordField,
@@ -10,9 +11,10 @@ from wtforms import (
     IntegerField,
 )
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
-
+from data_models.tournaments import Tournament
 from aesops.utility import get_corp_ids, get_runner_ids
 from data_models.users import User
+from aesops.business_logic.decklist import decklist_parser
 
 
 class LoginForm(FlaskForm):
@@ -47,10 +49,28 @@ def validate_name(form, field):
 
 
 class PlayerForm(FlaskForm):
+    def __init__(self, tournament=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tournament = tournament
+
     def validate_table_num(self, field):
         if self.fixed_table.data and field.data == 0:
             raise ValidationError(
                 "If a Fixed Table is required, you must enter a Table Number."
+            )
+
+    def validate_decklist(self, field):
+        if not self.tournament.require_decklist:
+            return True
+        if len(field.data) == 0:
+            print("here")
+            raise ValidationError("Decklist is required.")
+        try:
+            decklist_parser(field.data)
+        except Exception as e:
+            raise ValidationError(
+                "Decklist is invalid. Make sure you're using Jinteki.net format."
+                + str(e)
             )
 
     name = StringField("Player Name", validators=[DataRequired(), validate_name])
@@ -60,14 +80,22 @@ class PlayerForm(FlaskForm):
         render_kw={"placeholder": "Select Corp ID..."},
         validators=[DataRequired("Corp ID missing")],
     )
-    corp_deck = TextAreaField("Corp Deck")
+    corp_deck = TextAreaField(
+        "Corp Deck",
+        validators=[validate_decklist],
+        render_kw={"class": "decklist-entry"},
+    )
     runner = SelectField(
         "Runner ID",
         choices=[("", "Select Runner ID...")] + [(v, v) for v in get_runner_ids()],
         render_kw={"placeholder": "Select Runner ID..."},
         validators=[DataRequired("Runner ID missing")],
     )
-    runner_deck = TextAreaField("Runner Deck")
+    runner_deck = TextAreaField(
+        "Runner Deck",
+        validators=[validate_decklist],
+        render_kw={"class": "decklist-entry"},
+    )
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
     fixed_table = BooleanField(
@@ -88,7 +116,8 @@ class TournamentForm(FlaskForm):
     allow_self_registration = BooleanField("Allow Self Registration", default=True)
     allow_self_results_report = BooleanField("Allow Self Results Report", default=True)
     visible = BooleanField("Visible", default=True)
-    submit = SubmitField("Add Tournament")
+    require_decklist = BooleanField("Require Decklist", default=False)
+    submit = SubmitField("Submit")
 
 
 class EditMatchesForm(FlaskForm):

@@ -135,3 +135,12 @@ def side_record(player: Player, side):
             else:
                 results["T"] += 1
     return results
+
+
+def reveal_decklists(player, tournament):
+    if tournament.reveal_decklists:
+        return True
+    if not tournament.reveal_cut_decklists:
+        return False
+    if player.cut_player:
+        return True

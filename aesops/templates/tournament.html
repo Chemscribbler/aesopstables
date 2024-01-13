@@ -87,8 +87,14 @@
             {% else %}
             <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
             {% endif %}
+            {% if admin or p_logic.reveal_decklist(player, tournament) %}
+            <a href="{{ url_for('tournaments.display_decklist', tid=tournament.id, pid=player.id) }}"
+                class="btn btn-primary">View
+                Decklist</a>
+            {% endif %}
         </td>
         {% endif %}
+
         {% endfor %}
 </table>
 
@@ -107,6 +113,16 @@
 {% if tournament.current_round > 0 %}
 <a href="{{ url_for('abr_export', tid=tournament.id) }}" class="btn btn-primary">Export to ABR</a>
 {% endif %}
+</p>
+<p>
+<form action="/{{tournament.id}}/reveal_decklists" method="post">
+    {% if tournament.decklists_revealed %}
+    <button type="submit" class="btn btn-primary">Hide All Decklists</button>
+    {% else %}
+    <button type="submit" class="btn btn-primary" value="cut">Reveal Cut Decklists Only</button>
+    <button type="submit" class="btn btn-primary">Reveal All Decklists</button>
+    {% endif %}
+</form>
 </p>
 <p>
     {% if tournament.cut is none %}

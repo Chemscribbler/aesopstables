@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from data_models.match import MatchReport
 from data_models.players import Player
@@ -7,6 +7,7 @@ from data_models.model_store import db
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
+import aesops.business_logic.decklist as d_logic
 from aesops.forms import (
     PlayerForm,
     TournamentForm,
@@ -20,10 +21,12 @@ from aesops.utility import (
     rank_tables,
 )
 
-tournament_blueprint = Blueprint('tournaments', __name__)
+tournament_blueprint = Blueprint("tournaments", __name__)
+
 
 def redirect_for_tournament(tid):
     return redirect(url_for("tournaments.tournament", tid=tid))
+
 
 @tournament_blueprint.route("/<int:tid>", methods=["GET", "POST"])
 @tournament_blueprint.route("/tournament/<int:tid>", methods=["GET", "POST"])
@@ -57,12 +60,13 @@ def create_tournament():
             allow_self_registration=form.allow_self_registration.data,
             allow_self_results_report=form.allow_self_results_report.data,
             visible=form.visible.data,
+            require_decklist=form.require_decklist.data,
         )
         db.session.add(tournament)
         db.session.commit()
         flash(f"{tournament.name} has been created!", category="success")
         return redirect_for_tournament(tournament.id)
-    return render_template("tournament_creation.html", form=form)
+    return render_template("tournament_creation.html", form=form, heading="Create")
 
 
 @login_required
@@ -80,7 +84,7 @@ def delete_tournament(tid):
 
 @tournament_blueprint.route("/<int:tid>/add_player", methods=["GET", "POST"])
 def add_player(tid: int):
-    form = PlayerForm()
+    form = PlayerForm(tournament=Tournament.query.get(tid))
     if form.validate_on_submit():
         player = Player(
             name=form.name.data,
@@ -116,3 +120,52 @@ def round(tid, rnd):
         t_logic=t_logic,
         match_report=MatchReport,
     )
+
+
+@login_required
+@tournament_blueprint.route("/<int:tid>/reveal_decklists", methods=["GET", "POST"])
+def reveal_decklists(tid):
+    tournament = Tournament.query.get(tid)
+    if u_logic.has_admin_rights(current_user, tid) is False:
+        flash("You do not have permission to reveal decklists for this tournament")
+        return redirect_for_tournament(tournament.id)
+    if tournament.decklists_revealed:
+        flash("Making decklists private")
+        tournament.decklists_revealed = False
+        tournament.reveal_cut_decklists = False
+    elif request.form.get("value") == "cut":
+        flash("Revealing cut decklists")
+        tournament.decklists_revealed = True
+        tournament.reveal_cut_decklists = True
+    else:
+        flash("Revealing all decklists")
+        tournament.reveal_cut_decklists = True
+        tournament.decklists_revealed = True
+    db.session.add(tournament)
+    db.session.commit()
+    return redirect_for_tournament(tournament.id)
+
+
+@tournament_blueprint.route("/<int:tid>/<int:pid>/decklists", methods=["GET", "POST"])
+def display_decklist(tid, pid):
+    tournament = Tournament.query.get(tid)
+    player = Player.query.get(pid)
+    if p_logic.reveal_decklists(
+        player=player, tournament=tournament
+    ) or u_logic.has_admin_rights(current_user, tid):
+        return render_template(
+            "decklist.html",
+            tournament=tournament,
+            player=player,
+            admin=u_logic.has_admin_rights(current_user, tid),
+            corp_deck=d_logic.generate_decklist_html(
+                player.corp_deck, get_faction(player.corp)
+            ),
+            runner_deck=d_logic.generate_decklist_html(
+                player.runner_deck, get_faction(player.runner)
+            ),
+            get_faction=get_faction,
+        )
+    else:
+        flash("Decklists are not revealed for this tournament")
+        return redirect_for_tournament(tournament.id)
