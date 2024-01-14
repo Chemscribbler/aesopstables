@@ -133,9 +133,9 @@ def reveal_decklists(tid):
         flash("Making decklists private")
         tournament.reveal_decklists = False
         tournament.reveal_cut_decklists = False
-    elif request.form.get("value") == "cut":
+    elif request.form.get("cut") == "cut":
         flash("Revealing cut decklists")
-        tournament.reveal_decklists = True
+        tournament.reveal_decklists = False
         tournament.reveal_cut_decklists = True
     else:
         flash("Revealing all decklists")

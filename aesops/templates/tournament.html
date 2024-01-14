@@ -118,7 +118,7 @@
 </p>
 <p>
 <form action="/{{tournament.id}}/reveal_decklists" method="post">
-    {% if tournament.decklists_revealed %}
+    {% if tournament.reveal_decklists %}
     <button type="submit" class="btn btn-primary">Hide All Decklists</button>
     {% else %}
     <button type="submit" class="btn btn-primary">Reveal All Decklists</button>
@@ -128,7 +128,9 @@
 <p>
 <form action="/{{tournament.id}}/reveal_decklists" method="post">
     {% if not tournament.reveal_cut_decklists %}
-    <button type="submit" class="btn btn-primary" value="cut">Reveal Cut Decklists</button>
+    <button type="submit" class="btn btn-primary" name="cut" value="cut">Reveal Cut Decklists</button>
+    {% else %}
+    <button type="submit" class="btn btn-primary" name="cut" value="cut">Hide All Decklists</button>
     {% endif %}
 </form>
 </p>
