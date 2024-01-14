@@ -76,8 +76,9 @@
         <td>{{ "%0.3f"|format(player.sos) }}</td>
         <td>{{ "%0.3f"|format(player.esos) }}</td>
         <td>{{ display_side_bias(player) }}</td>
-        {% if admin %}
+
         <td>
+            {% if admin %}
             <a href="{{ url_for('edit_player', pid=player.id) }}" class="btn btn-success">Edit</a>
             {% if tournament.current_round == 0 %}
             <a href="{{ url_for('delete_player', pid=player.id) }}" class="btn btn-danger">Delete</a>
@@ -87,13 +88,14 @@
             {% else %}
             <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
             {% endif %}
-            {% if admin or p_logic.reveal_decklist(player, tournament) %}
+            {% endif %}
+            {% if admin or p_logic.reveal_decklists(player, tournament) %}
             <a href="{{ url_for('tournaments.display_decklist', tid=tournament.id, pid=player.id) }}"
                 class="btn btn-primary">View
                 Decklist</a>
             {% endif %}
         </td>
-        {% endif %}
+
 
         {% endfor %}
 </table>
@@ -119,11 +121,19 @@
     {% if tournament.decklists_revealed %}
     <button type="submit" class="btn btn-primary">Hide All Decklists</button>
     {% else %}
-    <button type="submit" class="btn btn-primary" value="cut">Reveal Cut Decklists Only</button>
     <button type="submit" class="btn btn-primary">Reveal All Decklists</button>
     {% endif %}
 </form>
 </p>
+<p>
+<form action="/{{tournament.id}}/reveal_decklists" method="post">
+    {% if not tournament.reveal_cut_decklists %}
+    <button type="submit" class="btn btn-primary" value="cut">Reveal Cut Decklists</button>
+    {% endif %}
+</form>
+</p>
+
+
 <p>
     {% if tournament.cut is none %}
 <form action="/{{tournament.id}}/create_cut" method="post">

@@ -129,18 +129,18 @@ def reveal_decklists(tid):
     if u_logic.has_admin_rights(current_user, tid) is False:
         flash("You do not have permission to reveal decklists for this tournament")
         return redirect_for_tournament(tournament.id)
-    if tournament.decklists_revealed:
+    if tournament.reveal_decklists:
         flash("Making decklists private")
-        tournament.decklists_revealed = False
+        tournament.reveal_decklists = False
         tournament.reveal_cut_decklists = False
     elif request.form.get("value") == "cut":
         flash("Revealing cut decklists")
-        tournament.decklists_revealed = True
+        tournament.reveal_decklists = True
         tournament.reveal_cut_decklists = True
     else:
         flash("Revealing all decklists")
         tournament.reveal_cut_decklists = True
-        tournament.decklists_revealed = True
+        tournament.reveal_decklists = True
     db.session.add(tournament)
     db.session.commit()
     return redirect_for_tournament(tournament.id)
