@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 
 <head>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css"
-        integrity="sha256-yBaPa0X4zwPuREx6DS1hhQiZ/RDdE+LlI8oV4k+xNAw="
-        crossorigin="anonymous"
-    >
-    <script
-        src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"
-        integrity="sha256-KNeF6xW5o/tW1oae5XlS4JCNADoM+RHqrnoUqL6pvHY="
-        crossorigin="anonymous"
-    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css"
+        integrity="sha256-yBaPa0X4zwPuREx6DS1hhQiZ/RDdE+LlI8oV4k+xNAw=" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"
+        integrity="sha256-KNeF6xW5o/tW1oae5XlS4JCNADoM+RHqrnoUqL6pvHY=" crossorigin="anonymous"></script>
 </head>
 
 {% extends "base.html" %}
@@ -29,11 +22,22 @@
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>
+    <p>
         {{ form.corp.label }}<br>
         {{ form.corp }}<br>
-
+        {{ form.corp_deck}}<br>
+        {% for error in form.corp_deck.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
         {{ form.runner.label }}<br>
         {{ form.runner }}<br>
+        {{ form.runner_deck}}<br>
+        {% for error in form.runner_deck.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
     <!-- Removing Bye functionality for now
     <p>
         {{form.bye}}{{ form.bye.label}}
@@ -45,21 +49,21 @@
     </p>
     <p>
         {{ form.fixed_table }}{{ form.fixed_table.label }}
-        <div id="fixed-table-number">
-            {{ form.table_number.label }}<br>
-            {{ form.table_number }}<br>
-        </div>
+    <div id="fixed-table-number">
+        {{ form.table_number.label }}<br>
+        {{ form.table_number }}<br>
+    </div>
     </p>
     {% if edit_player %}
-        <input type="submit" value="Save Edit" class="btn btn-success"/>
-        <p>
-            <a href="{{ url_for('edit_player', tid=tournament.id, pid=player.id) }}"></a>
-        </p>
+    <input type="submit" value="Save Edit" class="btn btn-success" />
+    <p>
+        <a href="{{ url_for('edit_player', tid=tournament.id, pid=player.id) }}"></a>
+    </p>
     {% else %}
-        <input type="submit" value="Register" class="btn btn-primary"/>
-        <p>
-            <a href="{{ url_for('tournaments.add_player', tid=tournament.id) }}"></a>
-        </p>
+    <input type="submit" value="Register" class="btn btn-primary" />
+    <p>
+        <a href="{{ url_for('tournaments.add_player', tid=tournament.id) }}"></a>
+    </p>
     {% endif %}
 </form>
 
@@ -113,7 +117,7 @@
     }
 
     toggleElementChecked(
-        {"target": {"checked": document.getElementById("fixed_table").checked}}
+        { "target": { "checked": document.getElementById("fixed_table").checked } }
     );
     calculateWidth();
     new TomSelect("#corp");

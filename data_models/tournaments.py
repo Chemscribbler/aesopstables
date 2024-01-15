@@ -1,6 +1,7 @@
 from .model_store import db
 from sqlalchemy.orm import Mapped
 
+
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     admin_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -11,6 +12,9 @@ class Tournament(db.Model):
     allow_self_registration: Mapped[bool] = db.Column(db.Boolean, default=True)
     allow_self_results_report: Mapped[bool] = db.Column(db.Boolean, default=True)
     visible: Mapped[bool] = db.Column(db.Boolean, default=True)
+    require_decklist: Mapped[bool] = db.Column(db.Boolean, default=False)
+    reveal_cut_decklists: Mapped[bool] = db.Column(db.Boolean, default=False)
+    reveal_decklists: Mapped[bool] = db.Column(db.Boolean, default=False)
 
     players = db.relationship(
         "Player", back_populates="tournament", cascade="all, delete-orphan"

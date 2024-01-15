@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include '_tournament_header.html' %}
+
+<h2>{{ player.name }} {% if player.pronouns %} ({{player.pronouns}}) {% endif%}</h2>
+<br>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <span class="{{get_faction(player.corp)}}" style="font-size: 1.3em; font-weight: bold;">{{
+                player.corp}}</span>
+            {{corp_deck | safe}}
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-3">
+            <span class="{{get_faction(player.runner)}}" style="font-size: 1.3em; font-weight: bold;">{{
+                player.runner}}</span>
+            {{runner_deck | safe}}
+        </div>
+    </div>
+</div>
+
+<!-- <table>
+    <tr>
+        <th>
+            <span class="{{get_faction(player.corp)}}" style="font-size: large;">{{
+                player.corp}}</span>
+        </th>
+        <th></th>
+        <th>
+            <span class="{{get_faction(player.runner)}}" style="font-size: large;">{{player.runner }}</span>
+        </th>
+    </tr>
+    <tr>
+        <th>
+            {{corp_deck | safe}}
+        </th>
+        <th></th>
+        <th>
+            {{runner_deck | safe}}
+        </th>
+    </tr>
+</table>  -->
+
+{% endblock %}

@@ -131,7 +131,7 @@ def unpair_round(tid):
 def edit_player(pid):
     player = Player.query.get(pid)
     tournament = player.tournament
-    form = PlayerForm()
+    form = PlayerForm(tournament=tournament)
     if form.validate_on_submit():
         player.name = form.name.data
         player.corp = form.corp.data
@@ -380,6 +380,7 @@ def edit_tournament(tid):
         tournament.allow_self_registration = form.allow_self_registration.data
         tournament.allow_self_results_report = form.allow_self_results_report.data
         tournament.visible = form.visible.data
+        tournament.require_decklist = form.require_decklist.data
         db.session.commit()
         flash(f"{tournament.name} has been edited!", category="success")
         return redirect_for_tournament(tournament.id)
@@ -389,4 +390,7 @@ def edit_tournament(tid):
     form.allow_self_registration.data = tournament.allow_self_registration
     form.allow_self_results_report.data = tournament.allow_self_results_report
     form.visible.data = tournament.visible
-    return render_template("tournament_edit.html", form=form, tournament=tournament)
+    form.require_decklist.data = tournament.require_decklist
+    return render_template(
+        "tournament_creation.html", form=form, tournament=tournament, heading="Edit"
+    )

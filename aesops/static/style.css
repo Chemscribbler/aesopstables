@@ -50,8 +50,15 @@
 .ts-dropdown,
 .ts-control,
 .ts-control input {
-  font-size: inherit;
-  max-width: var(--id-dropdown-width);
-  color: black;
-  border-color: gray;
+    font-size: inherit;
+    max-width: var(--id-dropdown-width);
+    color: black;
+    border-color: gray;
+}
+
+.decklist-entry {
+    width: 50%;
+    height: 100px;
+    box-sizing: border-box;
+    padding: 8px;
 }
