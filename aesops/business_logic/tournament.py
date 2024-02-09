@@ -14,6 +14,7 @@ def add_player(
     runner=None,
     corp_deck=None,
     runner_deck=None,
+    user_id=None,
 ) -> Player:
     p = Player(
         name=name,
@@ -22,6 +23,7 @@ def add_player(
         corp_deck=corp_deck,
         runner_deck=runner_deck,
         tid=tournament.id,
+        uid=None if user_id is None else user_id,
     )
     db.session.add(p)
     db.session.commit()

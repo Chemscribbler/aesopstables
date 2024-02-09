@@ -61,6 +61,7 @@ def create_tournament():
             allow_self_results_report=form.allow_self_results_report.data,
             visible=form.visible.data,
             require_decklist=form.require_decklist.data,
+            require_login=form.require_login.data,
         )
         db.session.add(tournament)
         db.session.commit()
@@ -98,6 +99,7 @@ def add_player(tid: int):
             pronouns=form.pronouns.data,
             fixed_table=form.fixed_table.data,
             table_number=form.table_number.data,
+            uid=current_user.id,
         )
         db.session.add(player)
         db.session.commit()
@@ -122,6 +124,7 @@ def round(tid, rnd):
         get_faction=get_faction,
         t_logic=t_logic,
         match_report=MatchReport,
+        has_reporting_rights=u_logic.has_reporting_rights,
     )
 
 

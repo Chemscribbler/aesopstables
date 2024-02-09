@@ -115,6 +115,9 @@ class TournamentForm(FlaskForm):
     description = TextAreaField("Tournament Description")
     allow_self_registration = BooleanField("Allow Self Registration", default=True)
     allow_self_results_report = BooleanField("Allow Self Results Report", default=True)
+    require_login = BooleanField(
+        "Require Login for Registration & Reporting", default=False
+    )
     visible = BooleanField("Visible", default=True)
     require_decklist = BooleanField("Require Decklist", default=False)
     submit = SubmitField("Submit")

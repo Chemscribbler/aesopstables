@@ -15,6 +15,7 @@ class Tournament(db.Model):
     require_decklist: Mapped[bool] = db.Column(db.Boolean, default=False)
     reveal_cut_decklists: Mapped[bool] = db.Column(db.Boolean, default=False)
     reveal_decklists: Mapped[bool] = db.Column(db.Boolean, default=False)
+    require_login: Mapped[bool] = db.Column(db.Boolean, default=False)
 
     players = db.relationship(
         "Player", back_populates="tournament", cascade="all, delete-orphan"

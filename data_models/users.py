@@ -3,6 +3,7 @@ from data_models.tournaments import Tournament
 from sqlalchemy.orm import Mapped
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
     username: Mapped[bool] = db.Column(db.String, nullable=False)
@@ -13,6 +14,8 @@ class User(UserMixin, db.Model):
         "Tournament",
         backref="TO",
     )
+
+    players = db.relationship("Player", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User> {self.username} {self.id}"

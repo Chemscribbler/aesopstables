@@ -22,6 +22,8 @@ class Player(db.Model):
     first_round_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
     fixed_table: Mapped[bool] = db.Column(db.Boolean, default=False)
     table_number: Mapped[int] = db.Column(db.Integer, default=0)
+    uid = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user = db.relationship("User", back_populates="players")
 
     tournament = db.relationship("Tournament", back_populates="players")
 

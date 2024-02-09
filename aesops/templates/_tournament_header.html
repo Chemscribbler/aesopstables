@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-3">
-        {% if tournament.current_round == 0 and tournament.allow_self_registration%}
+        {% if tournament.current_round == 0 and (tournament.allow_self_registration or not current_user.is_anonymous)%}
         <a href="{{ url_for('tournaments.add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
         {% endif %}
         {% if tournament.current_round > 0 %}
