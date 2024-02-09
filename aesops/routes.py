@@ -379,6 +379,7 @@ def edit_tournament(tid):
         tournament.description = form.description.data
         tournament.allow_self_registration = form.allow_self_registration.data
         tournament.allow_self_results_report = form.allow_self_results_report.data
+        tournament.require_login = form.require_login.data
         tournament.visible = form.visible.data
         tournament.require_decklist = form.require_decklist.data
         db.session.commit()
