@@ -25,7 +25,9 @@
     <p>
         {{ form.corp.label }}<br>
         {{ form.corp }}<br>
+        {% if tournament.require_decklist %}
         {{ form.corp_deck}}<br>
+        {% endif %}
         {% for error in form.corp_deck.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
@@ -33,7 +35,9 @@
     <p>
         {{ form.runner.label }}<br>
         {{ form.runner }}<br>
+        {% if tournament.require_decklist %}
         {{ form.runner_deck}}<br>
+        {% endif %}
         {% for error in form.runner_deck.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
@@ -47,13 +51,16 @@
         {{ form.pronouns.label }}<br>
         {{ form.pronouns }}<br>
     </p>
+    {% if admin %}
     <p>
+
         {{ form.fixed_table }}{{ form.fixed_table.label }}
     <div id="fixed-table-number">
         {{ form.table_number.label }}<br>
         {{ form.table_number }}<br>
     </div>
     </p>
+    {% endif %}
     {% if edit_player %}
     <input type="submit" value="Save Edit" class="btn btn-success" />
     <p>

@@ -85,6 +85,7 @@ def delete_tournament(tid):
 @tournament_blueprint.route("/<int:tid>/add_player", methods=["GET", "POST"])
 def add_player(tid: int):
     form = PlayerForm(tournament=Tournament.query.get(tid))
+    admin = u_logic.has_admin_rights(current_user, tid)
     if form.validate_on_submit():
         player = Player(
             name=form.name.data,
@@ -103,7 +104,9 @@ def add_player(tid: int):
         flash(f"{player.name} has been added!", category="success")
         return redirect_for_tournament(tid)
     tournament = Tournament.query.get(tid)
-    return render_template("player_registration.html", form=form, tournament=tournament)
+    return render_template(
+        "player_registration.html", admin=admin, form=form, tournament=tournament
+    )
 
 
 @tournament_blueprint.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])

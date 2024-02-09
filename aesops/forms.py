@@ -99,7 +99,7 @@ class PlayerForm(FlaskForm):
     pronouns = StringField("Pronouns")
     bye = BooleanField("First Round Bye")
     fixed_table = BooleanField(
-        "Fixed Table Required?", render_kw={"onclick": "toggleElementChecked(event)"}
+        " Fixed Seating required", render_kw={"onclick": "toggleElementChecked(event)"}
     )
     table_number = IntegerField(
         "Fixed Table Number",
