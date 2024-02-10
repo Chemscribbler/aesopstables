@@ -379,6 +379,7 @@ def edit_tournament(tid):
         tournament.description = form.description.data
         tournament.allow_self_registration = form.allow_self_registration.data
         tournament.allow_self_results_report = form.allow_self_results_report.data
+        tournament.require_login = form.require_login.data
         tournament.visible = form.visible.data
         tournament.require_decklist = form.require_decklist.data
         db.session.commit()
@@ -391,6 +392,7 @@ def edit_tournament(tid):
     form.allow_self_results_report.data = tournament.allow_self_results_report
     form.visible.data = tournament.visible
     form.require_decklist.data = tournament.require_decklist
+    form.require_login.data = tournament.require_login
     return render_template(
         "tournament_creation.html", form=form, tournament=tournament, heading="Edit"
     )

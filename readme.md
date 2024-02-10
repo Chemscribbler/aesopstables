@@ -4,7 +4,7 @@ Program trying to run single sided swiss Netrunner events.
 
 For now to get it started:
 
-install requirements using `pip install -r requirements.text`
+install requirements using `pip install -r requirements.txt`
 
 then run:
 `flask db init`
