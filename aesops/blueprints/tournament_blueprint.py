@@ -42,9 +42,11 @@ def tournament(tid):
         t_logic=t_logic,
         tc_logic=tc_logic,
         p_logic=p_logic,
-        last_concluded_round=tournament.current_round
-        if t_logic.is_current_round_finished(tournament)
-        else tournament.current_round - 1,
+        last_concluded_round=(
+            tournament.current_round
+            if t_logic.is_current_round_finished(tournament)
+            else tournament.current_round - 1
+        ),
     )
 
 
@@ -99,7 +101,7 @@ def add_player(tid: int):
             pronouns=form.pronouns.data,
             fixed_table=form.fixed_table.data,
             table_number=form.table_number.data,
-            uid=current_user.id,
+            uid=current_user.id if not current_user.is_anonymous else None,
         )
         db.session.add(player)
         db.session.commit()
