@@ -170,7 +170,7 @@ def edit_player(pid):
 @app.route("/<int:pid>/delete_player", methods=["GET", "POST"])
 def delete_player(pid):
     player = Player.query.get(pid)
-    if player.tournament.admin_id != current_user.id:
+    if u_logic.has_admin_rights(current_user, player.tid) is False:
         flash("You do not have permission to delete this player")
         return redirect_for_tournament(player.tid)
     if player.tournament.current_round > 0:
@@ -225,9 +225,9 @@ def edit_pairings(tid, rnd):
             mm.create_match(
                 tournament=tournament,
                 corp_player=Player.query.get(form.corp_player.data),
-                runner_player=None
-                if is_bye
-                else Player.query.get(form.runner_player.data),
+                runner_player=(
+                    None if is_bye else Player.query.get(form.runner_player.data)
+                ),
                 is_bye=is_bye,
                 table_number=form.table_number.data,
             )
