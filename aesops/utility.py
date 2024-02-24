@@ -72,11 +72,29 @@ def rank_tables(match_list: list[Match]):
 
 
 def get_faction(corp_name: str):
-    with open("ids.json") as f:
-        ids = json.load(f)
-        for id in ids:
-            if id["name"] == corp_name:
-                return id["faction"]
+
+    ids = get_ids()
+    for id in ids:
+        if id["name"] == corp_name:
+            return id["faction"]
+
+
+def get_faction_color(faction: str):
+
+    colors = {
+        "anarch": "orangered",
+        "criminal": "royalblue",
+        "shaper": "limegreen",
+        "neutral-runner": "gray",
+        "haas-bioroid": "blueviolet",
+        "jinteki": "crimson",
+        "nbn": "#ffc107",
+        "weyland-consortium": "darkgreen",
+        "neutral-corp": "gray",
+    }
+    if faction not in colors:
+        return "gray"
+    return colors[faction]
 
 
 def format_results(match: Match):
@@ -140,13 +158,13 @@ def get_json(tid):
                 {
                     "tableNumber": match.table_number,
                     "corpPlayer": match.corp_player.id,
-                    "runnerPlayer": match.runner_player.id
-                    if not match.is_bye
-                    else "(BYE)",
+                    "runnerPlayer": (
+                        match.runner_player.id if not match.is_bye else "(BYE)"
+                    ),
                     "corpIdentity": match.corp_player.corp,
-                    "runnerIdentity": match.runner_player.runner
-                    if not match.is_bye
-                    else "",
+                    "runnerIdentity": (
+                        match.runner_player.runner if not match.is_bye else ""
+                    ),
                     "corpScore": format_results(match).split(" - ")[0],
                     "runnerScore": format_results(match).split(" - ")[1],
                 }
@@ -163,12 +181,16 @@ def get_json(tid):
                         "tableNumber": match.table_number,
                         "corpPlayer": corp_id,
                         "runnerPlayer": runner_id,
-                        "winner_id": corp_id
-                        if match.result == MatchResult.CORP_WIN.value
-                        else runner_id,
-                        "loser_id": runner_id
-                        if match.result == MatchResult.CORP_WIN.value
-                        else corp_id,
+                        "winner_id": (
+                            corp_id
+                            if match.result == MatchResult.CORP_WIN.value
+                            else runner_id
+                        ),
+                        "loser_id": (
+                            runner_id
+                            if match.result == MatchResult.CORP_WIN.value
+                            else corp_id
+                        ),
                         "eliminationGame": True,
                     }
                 )
