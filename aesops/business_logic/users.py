@@ -33,14 +33,14 @@ def has_admin_rights(user: User, tid):
     return False
 
 
-def has_reporting_rights(uid: int, mid: int):
-    user = User.query.get(uid)
-    match = Match.query.get(mid)
+def has_reporting_rights(user: User, mid: int):
     if user.is_anonymous:
         return False
     if user.admin_rights:
         return True
-
+    match = Match.query.get(mid)
+    if match.concluded:
+        return False
     corp_player = match.corp_player
     runner_player = match.runner_player
     if corp_player.uid == user.id or runner_player.uid == user.id:

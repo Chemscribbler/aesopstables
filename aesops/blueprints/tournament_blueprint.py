@@ -126,7 +126,7 @@ def round(tid, rnd):
         get_faction=get_faction,
         t_logic=t_logic,
         match_report=MatchReport,
-        has_reporting_rights=u_logic.has_reporting_rights,
+        has_reporting_rights=u_logic.has_reporting_rights(current_user, tid),
     )
 
 

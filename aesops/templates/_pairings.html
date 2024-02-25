@@ -28,8 +28,7 @@
             Bye
             {% endif %}
         </th>
-        {% if (match.result is none and (tournament.allow_self_results_report or has_reporting_rights(current_user.id,
-        match.id)))
+        {% if (match.result is none and (tournament.allow_self_results_report or has_reporting_rights))
         or admin %}
         <th>
             {% if not match.is_bye %}
