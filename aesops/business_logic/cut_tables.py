@@ -15,6 +15,8 @@ def get_bracket(num_players: int, double_elim: bool = False):
         elif num_players == 16:
             return double_elim_16
     else:
+        if num_players == 8:
+            return single_elim_8
         if num_players == 4:
             return single_elim_4
         elif num_players == 3:
@@ -234,6 +236,38 @@ single_elim_3 = {
             "table": 2,
             "higher_seed": 1,
             "lower_seed": (1, "winner"),
+            "elim": True,
+            "final": True,
+        }
+    ],
+}
+
+single_elim_8 = {
+    "round_1": [
+        {"table": 1, "higher_seed": 1, "lower_seed": 8, "elim": True},
+        {"table": 2, "higher_seed": 4, "lower_seed": 5, "elim": True},
+        {"table": 3, "higher_seed": 3, "lower_seed": 6, "elim": True},
+        {"table": 4, "higher_seed": 2, "lower_seed": 7, "elim": True},
+    ],
+    "round_2": [
+        {
+            "table": 5,
+            "higher_seed": (1, "winner"),
+            "lower_seed": (2, "winner"),
+            "elim": True,
+        },
+        {
+            "table": 6,
+            "higher_seed": (3, "winner"),
+            "lower_seed": (4, "winner"),
+            "elim": True,
+        },
+    ],
+    "round_3": [
+        {
+            "table": 7,
+            "higher_seed": (5, "winner"),
+            "lower_seed": (6, "winner"),
             "elim": True,
             "final": True,
         }
