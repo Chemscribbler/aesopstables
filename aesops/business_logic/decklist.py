@@ -1,7 +1,7 @@
 from data_models.model_store import db
 from data_models.players import Player
 from aesops import app
-from aesops.utility import get_cards
+from aesops.utility import get_cards, convert_stipped_to_card
 from data_models.users import User
 
 
@@ -27,23 +27,24 @@ def decklist_parser(decklist: str):
         for decklist_cards in decklist_cards
     }
     ordered_decklist = {}
-    for card in decklist_dict:
-        card = card.strip()
-        if card is None or card == "" or card in cardtypes:
+    for card_name in decklist_dict:
+        card_name = card_name.strip()
+        if card_name is None or card_name == "" or card_name in cardtypes:
             continue
-        if card not in all_cards:
-            if "(" in card and ")" in card:
-                print(card)
+        if card_name not in all_cards:
+            search_name = convert_stipped_to_card(card_name)
+            if search_name is None or ("(" in card_name and ")" in card_name):
+                print(card_name)
                 continue
-            raise ValueError(f"{card} is not a valid card name")
-        if all_cards[card]["type"] not in ordered_decklist.keys():
-            ordered_decklist[all_cards[card]["type"]] = []
-        ordered_decklist[all_cards[card]["type"]].append(
+            raise ValueError(f"{card_name} is not a valid card name")
+        if all_cards[card_name]["type"] not in ordered_decklist.keys():
+            ordered_decklist[all_cards[card_name]["type"]] = []
+        ordered_decklist[all_cards[card_name]["type"]].append(
             {
-                "name": card,
-                "qty": int(decklist_dict[card]),
-                "faction": all_cards[card]["faction"],
-                "influence": int(all_cards[card]["influence"]),
+                "name": card_name,
+                "qty": int(decklist_dict[card_name]),
+                "faction": all_cards[card_name]["faction"],
+                "influence": int(all_cards[card_name]["influence"]),
             }
         )
     return ordered_decklist

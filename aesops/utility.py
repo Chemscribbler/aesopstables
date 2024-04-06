@@ -22,11 +22,14 @@ def get_ids():
             {
                 "side": card["side_code"],
                 "faction": card["faction_code"],
-                "name": card["title"],
+                "name": card["stripped_title"],
             }
             for card in all_cards.json()["data"]
             if card["type_code"] == "identity"
         ]
+        for id in ids:
+            id["name"] = id["name"].replace("\u201c", '"')
+            id["name"] = id["name"].replace("\u201d", '"')
         with open("ids.json", "w") as f:
             dump(ids, f)
     else:
@@ -218,6 +221,7 @@ def get_cards():
                 "name": card["title"],
                 "type": card["type_code"],
                 "influence": card["faction_cost"],
+                "stripped_title": card["stripped_title"],
             }
             for card in all_cards.json()["data"]
             if card["type_code"] != "identity"
@@ -236,3 +240,11 @@ def get_cards():
         with open("cards.json", "r") as f:
             cards = load(f)
     return cards
+
+
+def convert_stipped_to_card(stripped_name):
+    cards = get_cards()
+    for card in cards:
+        if cards[card]["stripped_title"] == stripped_name:
+            return card
+    return None
