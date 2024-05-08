@@ -3,7 +3,7 @@ from data_models.model_store import db
 from data_models.players import Player
 
 
-def get_record(player: Player) -> dict[str, float]:
+def get_record(player: Player, count_byes=True) -> dict[str, float]:
     score = 0
     games_played = 0
     for match in player.runner_matches:
@@ -27,7 +27,8 @@ def get_record(player: Player) -> dict[str, float]:
             and match.concluded
         ):
             score += 1
-        games_played += 1
+        if count_byes or not match.is_bye:
+            games_played += 1
     return {"score": score, "games_played": games_played}
 
 
@@ -55,7 +56,11 @@ def get_sos(player: Player) -> float:
             if m.is_bye == False
         ]
     )
-    return round(opp_average_score / max(get_record(player)["games_played"], 1), 3)
+    return round(
+        opp_average_score
+        / max(get_record(player, count_byes=False)["games_played"], 1),
+        3,
+    )
 
 
 def get_esos(player: Player) -> float:
@@ -63,7 +68,9 @@ def get_esos(player: Player) -> float:
     opp_total_sos += sum(
         [get_sos(m.runner_player) for m in player.corp_matches if m.is_bye == False]
     )
-    return round(opp_total_sos / max(get_record(player)["games_played"], 1), 3)
+    return round(
+        opp_total_sos / max(get_record(player, count_byes=False)["games_played"], 1), 3
+    )
 
 
 def update_score(player: Player):
