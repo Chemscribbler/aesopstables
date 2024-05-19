@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<li class="alert alert-primary" role="alert">24/5/19: Updated Standings Calculation to reduce timeout issues when
+    concluding the round.</li>
 {% if current_user.is_authenticated %}
-<a href="{{ url_for('tournaments.create_tournament') }}">Create Tournament</a>
+<a href="{{ url_for('tournaments.create_tournament') }}" class="btn btn-primary">Create Tournament</a>
 {% endif %}
 <table class="table table-striped">
     <thead>
