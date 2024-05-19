@@ -51,9 +51,9 @@ def reset(match: Match):
 def delete(match: Match):
     if match.is_bye:
         match.corp_player.recieved_bye = False
-        p_logic.reset(match.corp_player)
-    else:
-        p_logic.reset(match.corp_player)
-        p_logic.reset(match.runner_player)
+        # p_logic.reset(match.corp_player)
+    # else:
+    #     p_logic.reset(match.corp_player)
+    #     p_logic.reset(match.runner_player)
     db.session.delete(match)
     db.session.commit()

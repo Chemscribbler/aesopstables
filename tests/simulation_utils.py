@@ -24,7 +24,8 @@ def sim_round(t: Tournament):
             m_logic.tie(m)
         else:
             m_logic.runner_win(m)
-
+    db.session.commit()
+    t = Tournament.query.get(t.id)
     t_logic.conclude_round(t)
 
 
