@@ -255,10 +255,10 @@
         "influence": 2,
         "stripped_title": "Modded"
     },
-    "The Maker\u2019s Eye": {
+    "The Maker's Eye": {
         "side": "runner",
         "faction": "shaper",
-        "name": "The Maker\u2019s Eye",
+        "name": "The Maker's Eye",
         "type": "event",
         "influence": 2,
         "stripped_title": "The Maker's Eye"
@@ -343,10 +343,10 @@
         "influence": 1,
         "stripped_title": "Pipeline"
     },
-    "Aesop\u2019s Pawnshop": {
+    "Aesop's Pawnshop": {
         "side": "runner",
         "faction": "shaper",
-        "name": "Aesop\u2019s Pawnshop",
+        "name": "Aesop's Pawnshop",
         "type": "resource",
         "influence": 2,
         "stripped_title": "Aesop's Pawnshop"
@@ -13735,10 +13735,10 @@
         "influence": 3,
         "stripped_title": "Amanuensis"
     },
-    "The Wizard\u2019s Chest": {
+    "The Wizard's Chest": {
         "side": "runner",
         "faction": "anarch",
-        "name": "The Wizard\u2019s Chest",
+        "name": "The Wizard's Chest",
         "type": "hardware",
         "influence": 2,
         "stripped_title": "The Wizard's Chest"
