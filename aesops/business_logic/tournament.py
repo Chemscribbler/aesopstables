@@ -65,7 +65,7 @@ def update_score_from_memory(player: Player, matches=dict):
 
 
 def get_average_score_from_memory(player: Player, matches: dict):
-    record = get_record_from_memory(player, matches)
+    record = get_record_from_memory(player, matches, count_byes=False)
     return record["score"] / max(record["games_played"], 1)
 
 
@@ -78,7 +78,7 @@ def update_sos_from_memory(player: Player, matches: dict, players: dict):
     )
     opp_average_score += sum(
         [
-            get_average_score_from_memory(players[m.corp_player_id], matches=matches)
+            get_average_score_from_memory(players[m.runner_player_id], matches=matches)
             for m in player.corp_matches
             if m.is_bye == False
         ]
