@@ -27,12 +27,12 @@ double_elim_16 = {
     "round_1": [
         {"table": 1, "higher_seed": 1, "lower_seed": 16, "elim": False},
         {"table": 2, "higher_seed": 8, "lower_seed": 9, "elim": False},
-        {"table": 3, "higher_seed": 4, "lower_seed": 13, "elim": False},
-        {"table": 4, "higher_seed": 5, "lower_seed": 12, "elim": False},
-        {"table": 5, "higher_seed": 2, "lower_seed": 15, "elim": False},
-        {"table": 6, "higher_seed": 7, "lower_seed": 10, "elim": False},
-        {"table": 7, "higher_seed": 3, "lower_seed": 14, "elim": False},
-        {"table": 8, "higher_seed": 6, "lower_seed": 11, "elim": False},
+        {"table": 3, "higher_seed": 5, "lower_seed": 12, "elim": False},
+        {"table": 4, "higher_seed": 4, "lower_seed": 13, "elim": False},
+        {"table": 5, "higher_seed": 3, "lower_seed": 14, "elim": False},
+        {"table": 6, "higher_seed": 6, "lower_seed": 11, "elim": False},
+        {"table": 7, "higher_seed": 7, "lower_seed": 10, "elim": False},
+        {"table": 8, "higher_seed": 2, "lower_seed": 15, "elim": False},
     ],
     "round_2": [
         {
@@ -105,7 +105,7 @@ double_elim_16 = {
         },
         {
             "table": 20,
-            "higher_seed": (13, "lose"),
+            "higher_seed": (13, "loser"),
             "lower_seed": (12, "winner"),
             "elim": True,
         },
@@ -145,13 +145,13 @@ double_elim_16 = {
     "round_5": [
         {
             "table": 26,
-            "higher_seed": (22, "loser"),
+            "higher_seed": (21, "loser"),
             "lower_seed": (23, "winner"),
             "elim": True,
         },
         {
             "table": 27,
-            "higher_seed": (21, "loser"),
+            "higher_seed": (22, "loser"),
             "lower_seed": (24, "winner"),
             "elim": True,
         },
@@ -168,7 +168,7 @@ double_elim_16 = {
         {
             "table": 29,
             "higher_seed": (25, "loser"),
-            "lower_seed": (23, "winner"),
+            "lower_seed": (28, "winner"),
             "elim": True,
         },
     ],
