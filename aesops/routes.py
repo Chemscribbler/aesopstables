@@ -256,7 +256,7 @@ def edit_pairings(tid, rnd):
         get_faction=get_faction,
         t_logic=t_logic,
         match_report=MatchReport,
-        has_reporting_rights=u_logic.has_reporting_rights
+        has_reporting_rights=u_logic.has_reporting_rights,
     )
 
 
@@ -352,6 +352,9 @@ def delete_cut(tid):
 
 
 @app.route("/<int:tid>/abr_export", methods=["GET"])
+@app.route("/<int:tid>.json", methods=["GET"])
+@app.route("/<int:tid>/standings/json", methods=["GET"])
+@app.route("/<int:tid>/standings.json", methods=["GET"])
 def abr_export(tid):
     response = Response(get_json(tid), mimetype="application/json")
     response.headers.set("Content-Disposition", "attachment", filename=f"{tid}.json")
@@ -397,3 +400,7 @@ def edit_tournament(tid):
     return render_template(
         "tournament_creation.html", form=form, tournament=tournament, heading="Edit"
     )
+
+
+def return_json(data):
+    return Response(data, mimetype="application/json")
