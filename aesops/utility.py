@@ -121,6 +121,7 @@ def get_json(tid):
         "eliminationPlayers": [],
         "rounds": [],
         "uploadedFrom": "AesopsTables",
+        "date": t.date,
         "links": [
             {
                 "rel": "schemaderivedfrom",
