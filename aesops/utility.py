@@ -171,6 +171,8 @@ def get_json(tid):
                     ),
                     "corpScore": format_results(match).split(" - ")[0],
                     "runnerScore": format_results(match).split(" - ")[1],
+                    "intentionalDraw": match.result
+                    == MatchResult.INTENTIONAL_DRAW.value,
                 }
             )
         t_json["rounds"].append(match_list)
