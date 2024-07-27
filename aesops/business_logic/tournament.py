@@ -5,6 +5,7 @@ import aesops.business_logic.players as p_logic
 from data_models.match import Match, MatchResult
 from data_models.model_store import db, Tournament
 from data_models.players import Player
+from random import shuffle
 
 
 def add_player(
@@ -177,6 +178,7 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
         ]
     else:
         elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
+        shuffle(elible_player_list)
     if len(elible_player_list) == 0:
         elible_player_list = least_byes(tournament, player_list)
     elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
