@@ -130,14 +130,14 @@ def side_cost(corp_player: Player, runner_player: Player):
 def score_cost(corp_player: Player, runner_player: Player):
     c_score = p_logic.get_record(corp_player)["score"]
     r_score = p_logic.get_record(runner_player)["score"]
-    return (c_score - r_score + 1) * (c_score - r_score) / 6
+    return abs((c_score - r_score + 1) * (c_score - r_score)) / 6
 
 
 def calc_cost(corp_player: Player, runner_player: Player):
     return (
         side_cost(corp_player, runner_player)
         + score_cost(corp_player, runner_player)
-        + (has_played(corp_player, runner_player) * 0.5)
+        + (has_played(corp_player, runner_player) * 0.1)
     )
 
 
