@@ -10,6 +10,8 @@ import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
 import json
 from decimal import Decimal
+import unicodedata
+import string
 
 
 def get_ids():
@@ -247,7 +249,12 @@ def get_cards():
 
 def convert_stipped_to_card(stripped_name):
     cards = get_cards()
+    unaccent = remove_accents(stripped_name)
     for card in cards:
-        if cards[card]["stripped_title"] == stripped_name:
+        if cards[card]["stripped_title"] == unaccent:
             return card
     return None
+
+# Modified from https://stackoverflow.com/questions/8694815/removing-accent-and-special-characters
+def remove_accents(data):
+    return ''.join(x for x in unicodedata.normalize('NFKD', data) if x in string.printable)
