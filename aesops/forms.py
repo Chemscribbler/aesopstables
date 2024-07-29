@@ -69,7 +69,7 @@ class PlayerForm(FlaskForm):
             decklist_parser(field.data)
         except Exception as e:
             raise ValidationError(
-                "Decklist is invalid. Make sure you're using Jinteki.net format."
+                "Decklist is invalid. Make sure you're using Jinteki.net format. "
                 + str(e)
             )
 
