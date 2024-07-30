@@ -33,9 +33,9 @@ def decklist_parser(decklist: str):
         # formatted version (convert_stipped_to_card). Thus, we keep track of
         # the qty for later.
         qty = decklist_dict[card_name]
-        card_name = card_name.strip()
-        if card_name is None or card_name == "" or card_name in cardtypes:
+        if qty in cardtypes:
             continue
+        card_name = card_name.strip()
         if card_name not in all_cards:
             # If card_name has a formatted version, it returns that version.
             # This is used to deal with the difference between stripped_title
@@ -60,6 +60,7 @@ def decklist_parser(decklist: str):
             }
         )
     return ordered_decklist
+
 
 def generate_decklist_html(decklist: dict, id_faction: str):
     decklist = decklist_parser(decklist)
