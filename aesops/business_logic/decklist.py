@@ -28,21 +28,33 @@ def decklist_parser(decklist: str):
     }
     ordered_decklist = {}
     for card_name in decklist_dict:
-        card_name = card_name.strip()
-        if card_name is None or card_name == "" or card_name in cardtypes:
+        # decklist_dict[card_name] will break if card_name is changed, which
+        # may be done on a later line if we convert the card name to its
+        # formatted version (convert_stipped_to_card). Thus, we keep track of
+        # the qty for later.
+        qty = decklist_dict[card_name]
+        if qty in cardtypes:
             continue
+        card_name = card_name.strip()
         if card_name not in all_cards:
+            # If card_name has a formatted version, it returns that version.
+            # This is used to deal with the difference between stripped_title
+            # (used in the Jinteki.net export format expected by the parser)
+            # and the formatted title on NetrunnerDB.
+            # For example, convert_stipped_to_card('"Pretty" Mary Da Silva')
+            # returns '“Pretty” Mary da Silva' (note the different quote marks).
+            # If there is no such entry, return None.
             search_name = convert_stipped_to_card(card_name)
-            if search_name is None or ("(" in card_name and ")" in card_name):
-                print(card_name)
-                continue
-            raise ValueError(f"{card_name} is not a valid card name")
+            print(search_name)
+            if search_name is None:
+                raise ValueError(f"{card_name} is not a valid card name")
+            card_name = search_name
         if all_cards[card_name]["type"] not in ordered_decklist.keys():
             ordered_decklist[all_cards[card_name]["type"]] = []
         ordered_decklist[all_cards[card_name]["type"]].append(
             {
                 "name": card_name,
-                "qty": int(decklist_dict[card_name]),
+                "qty": int(qty),
                 "faction": all_cards[card_name]["faction"],
                 "influence": int(all_cards[card_name]["influence"]),
             }
