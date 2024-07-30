@@ -63,7 +63,6 @@ class PlayerForm(FlaskForm):
         if not self.tournament.require_decklist:
             return True
         if len(field.data) == 0:
-            print("here")
             raise ValidationError("Decklist is required.")
         try:
             decklist_parser(field.data)
