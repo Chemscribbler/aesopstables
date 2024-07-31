@@ -19,6 +19,9 @@
             class="text-primary fs-4 d-inline-block me-3">{{round}}
         </a>
         {% endfor %}
+        <a href="{{ url_for('tournaments.round_current', tid=tournament.id)}}"
+           class="text-primary fs-4 d-inline-block me-3">Current
+        </a>
         {% endif %}
     </div>
     <div class="col-md-3">
