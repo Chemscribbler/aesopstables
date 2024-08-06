@@ -5,6 +5,7 @@ from json import dump, load
 from data_models.match import Match, MatchResult
 from data_models.players import Player
 from data_models.tournaments import Tournament
+from data_models.users import User
 import aesops.business_logic.players as p_logic
 import aesops.business_logic.top_cut as tc_logic
 import aesops.business_logic.tournament as t_logic
@@ -71,8 +72,16 @@ def display_side_bias(player: Player):
     return "Balanced"
 
 
-def rank_tables(match_list: list[Match]):
-    match_list.sort(key=lambda x: x.table_number or 1000)
+def rank_tables(match_list: list[Match], current_user: User):
+    current_user_id = current_user.id if not current_user.is_anonymous else None
+    # List table for the current user's player first.
+    match_list.sort(
+        key=lambda x: (
+            not ((x.corp_player and
+                  x.corp_player.user.id == current_user_id) or
+                 (x.runner_player and
+                  x.runner_player.user.id == current_user_id)),
+            x.table_number or 1000))
     return match_list
 
 
