@@ -120,10 +120,7 @@ def legal_options(p1: Player, p2: Player) -> list[bool]:
 def side_cost(corp_player: Player, runner_player: Player):
     corp_bal = p_logic.get_side_balance(corp_player)
     runner_bal = p_logic.get_side_balance(runner_player)
-    balance_post = abs(corp_bal + 1) + abs(runner_bal - 1)
-    balance_pre = abs(corp_bal) + abs(runner_bal)
-    if balance_post > balance_pre and balance_pre != 0:
-        return 1000
+    balance_post = max(abs(corp_bal + 1), abs(runner_bal - 1))
     return 8 ** abs(balance_post)
 
 
