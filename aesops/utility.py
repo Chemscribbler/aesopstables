@@ -173,7 +173,7 @@ def get_json(tid):
                         match.runner_player.runner if not match.is_bye else ""
                     ),
                     "corpScore": format_results(match).split(" - ")[0],
-                    "runnerScore": format_results(match).split(" - ")[1] if len(format_results(match).split(" - ")) > 0 else None,
+                    "runnerScore": format_results(match).split(" - ")[1] if len(format_results(match).split(" - ")) > 1 else None,
                     "intentionalDraw": match.result
                     == MatchResult.INTENTIONAL_DRAW.value,
                 }
