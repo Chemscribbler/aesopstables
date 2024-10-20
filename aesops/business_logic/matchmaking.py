@@ -25,6 +25,7 @@ def create_match(
             is_bye=is_bye,
             result=1,
         )
+        return m
     else:
         m = Match(
             tid=tournament.id,
@@ -37,6 +38,7 @@ def create_match(
         m.table_number = table_number
     db.session.add(m)
     db.session.commit()
+    return m
 
 
 def pair_round(t: Tournament):
