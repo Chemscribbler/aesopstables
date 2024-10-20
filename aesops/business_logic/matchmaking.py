@@ -25,7 +25,6 @@ def create_match(
             is_bye=is_bye,
             result=1,
         )
-        return m
     else:
         m = Match(
             tid=tournament.id,
