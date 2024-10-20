@@ -62,7 +62,7 @@ def get_side_balance(player: Player):
 #     )
 #     return round(
 #         opp_average_score
-#         / max(get_record(player, count_byes=False)["games_played"], 1),
+#         / max(get_record(player, count_byes=True)["games_played"], 1),
 #         3,
 #     )
 
