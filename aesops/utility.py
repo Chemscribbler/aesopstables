@@ -160,6 +160,7 @@ def get_json(tid):
     for rnd in range(1, t.current_round + 1):
         match_list = []
         for match in t_logic.get_round(t, rnd):
+
             match_list.append(
                 {
                     "tableNumber": match.table_number,
@@ -172,7 +173,7 @@ def get_json(tid):
                         match.runner_player.runner if not match.is_bye else ""
                     ),
                     "corpScore": format_results(match).split(" - ")[0],
-                    "runnerScore": format_results(match).split(" - ")[1],
+                    "runnerScore": format_results(match).split(" - ") if len(format_results(match).split(" - ")) > 0 else None,
                     "intentionalDraw": match.result
                     == MatchResult.INTENTIONAL_DRAW.value,
                 }
