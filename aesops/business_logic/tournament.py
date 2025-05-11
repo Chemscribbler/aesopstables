@@ -162,7 +162,23 @@ def rank_players(tournament: Tournament) -> list[Player]:
     return player_list
 
 
+def first_round_byes(tournament: Tournament) -> tuple[list[Player], list[Player]]:
+    guranteed_byes = [p for p in tournament.players if p.first_round_bye and p.active]
+    non_bye_players = [
+        p for p in tournament.players if not p.first_round_bye and p.active
+    ]
+    if len(non_bye_players) % 2 == 0:
+        return (non_bye_players, guranteed_byes)
+    else:
+        shuffle(non_bye_players)
+        bye_player = non_bye_players.pop(-1)
+        guranteed_byes.append(bye_player)
+        return (non_bye_players, guranteed_byes)
+
+
 def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
+    if tournament.current_round == 1:
+        return first_round_byes(tournament)
     if len(tournament.active_players) % 2 == 0:
         return (tournament.active_players, None)
     player_list = rank_players(tournament).copy()

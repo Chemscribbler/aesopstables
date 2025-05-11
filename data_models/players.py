@@ -29,3 +29,6 @@ class Player(db.Model):
 
     def __repr__(self) -> str:
         return f"<Player> {self.name}:{self.id} - Tournament {self.tid}"
+
+    def __len__(self) -> int:
+        return 1

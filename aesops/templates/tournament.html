@@ -56,7 +56,8 @@
     {% for player in t_logic.rank_players(tournament) %}
     <tr>
         <td>{{ loop.index0 + 1 }}</td>
-        <td>{{ player.name }}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>
+        <td>{{ player.name }} {% if player.first_round_bye %} {{"*"}} {%
+            endif %}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>
 
         <td>
             {% if tournament.current_round != 0 or admin %}

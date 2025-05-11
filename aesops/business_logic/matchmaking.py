@@ -79,10 +79,17 @@ def pair_round(t: Tournament):
             table_number=table_number,
         )
     if bye_player is not None:
-        bye_player.recieved_bye = True
-        create_match(
-            tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
-        )
+        if len(bye_player) > 1:
+            for player in bye_player:
+                player.recieved_bye = True
+                create_match(
+                    tournament=t, corp_player=player, runner_player=None, is_bye=True
+                )
+        else:
+            bye_player.recieved_bye = True
+            create_match(
+                tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
+            )
     ranked_matches = sorted(
         t.active_matches,
         key=lambda m: (
