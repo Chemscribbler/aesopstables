@@ -12,6 +12,7 @@ import json
 from decimal import Decimal
 import unicodedata
 import string
+from functools import lru_cache
 
 
 def get_ids():
@@ -25,6 +26,7 @@ def get_ids():
                 "side": card["side_code"],
                 "faction": card["faction_code"],
                 "name": card["stripped_title"],
+                "legal": check_legal(card["stripped_title"]),
             }
             for card in all_cards.json()["data"]
             if card["type_code"] == "identity"
@@ -48,18 +50,52 @@ def get_ids():
     return ids
 
 
+@lru_cache
 def get_corp_ids():
-    corp_ids = set(id["name"] for id in get_ids() if id["side"] == "corp")
-    corp_ids = list(corp_ids)
-    corp_ids.sort()
+    corp_ids = [id for id in get_ids() if id["side"] == "corp"]
+
+    legal_corp_ids = [
+        id["name"] for id in get_ids() if id["side"] == "corp" and id["legal"]
+    ]
+    non_legal_corp_ids = [
+        id["name"] for id in get_ids() if id["side"] == "corp" and not id["legal"]
+    ]
+    legal_corp_ids.sort()
+    non_legal_corp_ids.sort()
+    corp_ids = legal_corp_ids + non_legal_corp_ids
     return corp_ids
 
 
+@lru_cache
 def get_runner_ids():
-    runner_ids = set(id["name"] for id in get_ids() if id["side"] == "runner")
-    runner_ids = list(runner_ids)
-    runner_ids.sort()
+    runner_ids = [id for id in get_ids() if id["side"] == "runner"]
+    legal_runner_ids = [
+        id["name"] for id in get_ids() if id["side"] == "runner" and id["legal"]
+    ]
+    non_legal_runner_ids = [
+        id["name"] for id in get_ids() if id["side"] == "runner" and not id["legal"]
+    ]
+
+    legal_runner_ids.sort()
+    legal_runner_ids = set(legal_runner_ids)
+    legal_runner_ids = list(legal_runner_ids)
+    non_legal_runner_ids.sort()
+    non_legal_runner_ids = set(non_legal_runner_ids)
+    non_legal_runner_ids = list(non_legal_runner_ids)
+    runner_ids = legal_runner_ids + non_legal_runner_ids
     return runner_ids
+
+
+@lru_cache
+def check_legal(card_name, format_name="standard_30"):
+    # Check if the card is legal in the current format
+    standard_legal_ids = requests.get(
+        f"https://api.netrunnerdb.com/api/v3/public/cards?filter%5Bsearch%5D=snapshot:{format_name}%20t:runner_identity%7Ccorp_identity&fields%5Bcards%5D=title"
+    )
+    standard_legal_ids = [
+        card["attributes"]["title"] for card in standard_legal_ids.json()["data"]
+    ]
+    return card_name in standard_legal_ids
 
 
 def display_side_bias(player: Player):
@@ -173,7 +209,11 @@ def get_json(tid):
                         match.runner_player.runner if not match.is_bye else ""
                     ),
                     "corpScore": format_results(match).split(" - ")[0],
-                    "runnerScore": format_results(match).split(" - ")[1] if len(format_results(match).split(" - ")) > 1 else None,
+                    "runnerScore": (
+                        format_results(match).split(" - ")[1]
+                        if len(format_results(match).split(" - ")) > 1
+                        else None
+                    ),
                     "intentionalDraw": match.result
                     == MatchResult.INTENTIONAL_DRAW.value,
                 }
@@ -256,6 +296,9 @@ def convert_stipped_to_card(stripped_name):
             return card
     return None
 
+
 # Modified from https://stackoverflow.com/questions/8694815/removing-accent-and-special-characters
 def remove_accents(data):
-    return ''.join(x for x in unicodedata.normalize('NFKD', data) if x in string.printable)
+    return "".join(
+        x for x in unicodedata.normalize("NFKD", data) if x in string.printable
+    )
