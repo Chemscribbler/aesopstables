@@ -60,9 +60,14 @@ def get_corp_ids():
     non_legal_corp_ids = [
         id["name"] for id in get_ids() if id["side"] == "corp" and not id["legal"]
     ]
+    legal_corp_ids = set(legal_corp_ids)
+    legal_corp_ids = list(legal_corp_ids)
     legal_corp_ids.sort()
+
+    non_legal_corp_ids = set(non_legal_corp_ids)
+    non_legal_corp_ids = list(non_legal_corp_ids)
     non_legal_corp_ids.sort()
-    corp_ids = legal_corp_ids + non_legal_corp_ids
+    corp_ids = legal_corp_ids + [" --- Non Standard IDs --- "] + non_legal_corp_ids
     return corp_ids
 
 
@@ -76,13 +81,16 @@ def get_runner_ids():
         id["name"] for id in get_ids() if id["side"] == "runner" and not id["legal"]
     ]
 
-    legal_runner_ids.sort()
     legal_runner_ids = set(legal_runner_ids)
     legal_runner_ids = list(legal_runner_ids)
-    non_legal_runner_ids.sort()
+    legal_runner_ids.sort()
     non_legal_runner_ids = set(non_legal_runner_ids)
     non_legal_runner_ids = list(non_legal_runner_ids)
-    runner_ids = legal_runner_ids + non_legal_runner_ids
+    non_legal_runner_ids.sort()
+
+    runner_ids = (
+        legal_runner_ids + [" --- Non Standard IDs --- "] + non_legal_runner_ids
+    )
     return runner_ids
 
 

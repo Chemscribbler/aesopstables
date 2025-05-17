@@ -3,6 +3,7 @@
 {% block content %}
 <li class="alert alert-primary" role="alert">25/5/11 Enabled First Round Byes - will see * next to players who are
     registred with First Round Byes.</li>
+<li class="alert alert-primary" role="alert">25/5/17 Fixed/Improved ID Registration</li>
 {% if current_user.is_authenticated %}
 <a href="{{ url_for('tournaments.create_tournament') }}" class="btn btn-primary">Create Tournament</a>
 {% endif %}
