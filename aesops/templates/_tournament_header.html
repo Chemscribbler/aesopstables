@@ -13,6 +13,10 @@
         <a href="{{ url_for('tournaments.add_player', tid=tournament.id)}}" class="btn btn-primary">Register</a>
         {% endif %}
         {% if tournament.current_round > 0 %}
+        <!-- Current Round Link -->
+        <h3><a href="{{ url_for('tournaments.round', tid=tournament.id, rnd=tournament.current_round)}}">Current
+                Round</a></h3>
+
         <h3>Rounds</h3>
         {% for round in range(1,tournament.current_round+1) %}
         <a href="{{ url_for('tournaments.round', tid=tournament.id, rnd=round)}}"

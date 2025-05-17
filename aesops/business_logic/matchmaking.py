@@ -52,7 +52,7 @@ def pair_round(t: Tournament):
     db.session.commit()
     fixed_table_numbers = []
     graph = Graph()
-    pairing_pool, bye_player = t_logic.bye_setup(t)
+    pairing_pool, bye_players = t_logic.bye_setup(t)
     shuffle(pairing_pool)
     for player in pairing_pool:
         graph.add_node(player.id)
@@ -78,18 +78,18 @@ def pair_round(t: Tournament):
             runner_player=runner,
             table_number=table_number,
         )
-    if bye_player is not None:
-        if len(bye_player) > 1:
-            for player in bye_player:
-                player.recieved_bye = True
-                create_match(
-                    tournament=t, corp_player=player, runner_player=None, is_bye=True
-                )
-        else:
-            bye_player.recieved_bye = True
+    if bye_players is not None:
+        print(f"Bye players: {bye_players}")
+        for player in bye_players:
+            player.recieved_bye = True
             create_match(
-                tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
+                tournament=t, corp_player=player, runner_player=None, is_bye=True
             )
+        # else:
+        #     bye_player.recieved_bye = True
+        #     create_match(
+        #         tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
+        #     )
     ranked_matches = sorted(
         t.active_matches,
         key=lambda m: (

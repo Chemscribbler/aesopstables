@@ -244,6 +244,7 @@ def edit_pairings(tid, rnd):
                 get_faction=get_faction,
                 t_logic=t_logic,
                 match_report=MatchReport,
+                has_reporting_rights=u_logic.has_reporting_rights,
             )
     return render_template(
         "edit_pairings.html",

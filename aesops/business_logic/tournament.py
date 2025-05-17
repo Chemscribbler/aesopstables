@@ -201,7 +201,7 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
     bye_player = elible_player_list.pop(-1)
     pairable_players = tournament.active_players.copy()
     pairable_players.remove(bye_player)
-    return (pairable_players, bye_player)
+    return (pairable_players, [bye_player])
 
 
 def least_byes(tournament: Tournament, all_players: Sequence[Player]) -> list[Player]:
