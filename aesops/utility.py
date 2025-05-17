@@ -2,7 +2,7 @@ import requests
 import os
 import datetime
 from json import dump, load
-from data_models.match import Match, MatchResult
+from data_models.match import Match, MatchResult, convert_result_to_score
 from data_models.players import Player
 from data_models.tournaments import Tournament
 import aesops.business_logic.players as p_logic
@@ -208,22 +208,25 @@ def get_json(tid):
             match_list.append(
                 {
                     "tableNumber": match.table_number,
-                    "corpPlayer": match.corp_player.id,
-                    "runnerPlayer": (
-                        match.runner_player.id if not match.is_bye else "(BYE)"
-                    ),
-                    "corpIdentity": match.corp_player.corp,
-                    "runnerIdentity": (
-                        match.runner_player.runner if not match.is_bye else ""
-                    ),
-                    "corpScore": format_results(match).split(" - ")[0],
-                    "runnerScore": (
-                        format_results(match).split(" - ")[1]
-                        if len(format_results(match).split(" - ")) > 1
-                        else None
-                    ),
+                    "player1": {
+                        "id": match.corp_player.id,
+                        "role": "corp",
+                        "corpScore": convert_result_to_score(match.result, "corp"),
+                        "runnerScore": None,
+                    },
+                    "player2": {
+                        "id": (match.runner_player.id if not match.is_bye else None),
+                        "role": "runner",
+                        "corpScore": None,
+                        "runnerScore": (
+                            convert_result_to_score(match.result, "runner")
+                            if not match.is_bye
+                            else None
+                        ),
+                    },
                     "intentionalDraw": match.result
                     == MatchResult.INTENTIONAL_DRAW.value,
+                    "eliminationGame": False,
                 }
             )
         t_json["rounds"].append(match_list)
@@ -231,23 +234,26 @@ def get_json(tid):
         for rnd in range(1, t.cut.rnd + 1):
             match_list = []
             for match in tc_logic.get_round(t.cut, rnd):
-                corp_id = match.corp_player.player.id
-                runner_id = match.runner_player.player.id
                 match_list.append(
                     {
                         "tableNumber": match.table_number,
-                        "corpPlayer": corp_id,
-                        "runnerPlayer": runner_id,
-                        "winner_id": (
-                            corp_id
-                            if match.result == MatchResult.CORP_WIN.value
-                            else runner_id
-                        ),
-                        "loser_id": (
-                            runner_id
-                            if match.result == MatchResult.CORP_WIN.value
-                            else corp_id
-                        ),
+                        "player1": {
+                            "id": match.corp_player.id,
+                            "role": "corp",
+                            "corpScore": convert_result_to_score(match.result, "corp"),
+                            "runnerScore": None,
+                        },
+                        "player2": {
+                            "id": (
+                                match.runner_player.id if not match.is_bye else "(BYE)"
+                            ),
+                            "role": "runner",
+                            "corpScore": None,
+                            "runnerScore": convert_result_to_score(
+                                match.result, "runner"
+                            ),
+                        },
+                        "intentionalDraw": False,
                         "eliminationGame": True,
                     }
                 )
