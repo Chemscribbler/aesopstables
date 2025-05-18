@@ -244,9 +244,7 @@ def get_json(tid):
                             "runnerScore": None,
                         },
                         "player2": {
-                            "id": (
-                                match.runner_player.id if not match.is_bye else "(BYE)"
-                            ),
+                            "id": (match.runner_player.id),
                             "role": "runner",
                             "corpScore": None,
                             "runnerScore": convert_result_to_score(
