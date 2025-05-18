@@ -204,36 +204,7 @@ def get_json(tid):
     for rnd in range(1, t.current_round + 1):
         match_list = []
         for match in t_logic.get_round(t, rnd):
-
-            match_list.append(
-                {
-                    "tableNumber": match.table_number,
-                    "player1": {
-                        "id": match.corp_player.id,
-                        "role": "corp",
-                        "corpScore": convert_result_to_score(match.result, "corp"),
-                        "runnerScore": None,
-                    },
-                    "player2": {
-                        "id": (match.runner_player.id if not match.is_bye else None),
-                        "role": "runner",
-                        "corpScore": None,
-                        "runnerScore": (
-                            convert_result_to_score(match.result, "runner")
-                            if not match.is_bye
-                            else None
-                        ),
-                    },
-                    "intentionalDraw": match.result
-                    == MatchResult.INTENTIONAL_DRAW.value,
-                    "eliminationGame": False,
-                }
-            )
-        t_json["rounds"].append(match_list)
-    if t.cut is not None:
-        for rnd in range(1, t.cut.rnd + 1):
-            match_list = []
-            for match in tc_logic.get_round(t.cut, rnd):
+            if match.concluded:
                 match_list.append(
                     {
                         "tableNumber": match.table_number,
@@ -244,17 +215,51 @@ def get_json(tid):
                             "runnerScore": None,
                         },
                         "player2": {
-                            "id": (match.runner_player.id),
+                            "id": (
+                                match.runner_player.id if not match.is_bye else None
+                            ),
                             "role": "runner",
                             "corpScore": None,
-                            "runnerScore": convert_result_to_score(
-                                match.result, "runner"
+                            "runnerScore": (
+                                convert_result_to_score(match.result, "runner")
+                                if not match.is_bye
+                                else None
                             ),
                         },
-                        "intentionalDraw": False,
-                        "eliminationGame": True,
+                        "intentionalDraw": match.result
+                        == MatchResult.INTENTIONAL_DRAW.value,
+                        "eliminationGame": False,
                     }
                 )
+        t_json["rounds"].append(match_list)
+    if t.cut is not None:
+        for rnd in range(1, t.cut.rnd + 1):
+            match_list = []
+            for match in tc_logic.get_round(t.cut, rnd):
+                if match.concluded:
+                    match_list.append(
+                        {
+                            "tableNumber": match.table_number,
+                            "player1": {
+                                "id": match.corp_player.id,
+                                "role": "corp",
+                                "corpScore": convert_result_to_score(
+                                    match.result, "corp"
+                                ),
+                                "runnerScore": None,
+                            },
+                            "player2": {
+                                "id": (match.runner_player.id),
+                                "role": "runner",
+                                "corpScore": None,
+                                "runnerScore": convert_result_to_score(
+                                    match.result, "runner"
+                                ),
+                            },
+                            "intentionalDraw": False,
+                            "eliminationGame": True,
+                        }
+                    )
             t_json["rounds"].append(match_list)
 
     class DecimalEncoder(json.JSONEncoder):
