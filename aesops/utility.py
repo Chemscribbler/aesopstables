@@ -241,7 +241,7 @@ def get_json(tid):
                         {
                             "tableNumber": match.table_number,
                             "player1": {
-                                "id": match.corp_player.id,
+                                "id": match.corp_player.player.id,
                                 "role": "corp",
                                 "corpScore": convert_result_to_score(
                                     match.result, "corp"
@@ -249,7 +249,7 @@ def get_json(tid):
                                 "runnerScore": None,
                             },
                             "player2": {
-                                "id": (match.runner_player.id),
+                                "id": (match.runner_player.player.id),
                                 "role": "runner",
                                 "corpScore": None,
                                 "runnerScore": convert_result_to_score(
