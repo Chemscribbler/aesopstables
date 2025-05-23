@@ -24,3 +24,7 @@ Feature ToDos:
 - User overall record tracking/global leaderboard
 - Bracket visualization
 - New coat of paint
+
+## Testing
+
+`pytest` to run unit tests
