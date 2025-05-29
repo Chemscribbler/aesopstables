@@ -20,14 +20,12 @@ def get_corp_ids():
 def get_runner_ids():
     return cards.data.runner_ids()
 
-def display_side_bias(player: Player):
-    side_bal = p_logic.get_side_balance(player)
+def render_side_bias(side_bal):
     if side_bal > 0:
         return f"Corp +{side_bal}"
     elif side_bal < 0:
         return f"Runner +{side_bal * -1}"
     return "Balanced"
-
 
 def rank_tables(match_list: list[Match]):
     match_list.sort(key=lambda x: x.table_number or 1000)

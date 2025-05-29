@@ -4,7 +4,7 @@
 
 {% include '_tournament_header.html' %}
 <br>
-{% if tournament.cut is not none %}
+{% if cut_standings is not none %}
 
 <div class="row">
     <div class="col-md-4"></div>
@@ -18,16 +18,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for _ in range(tc_logic.get_standings(tournament.cut)['unranked_players']) %}
+                {% for _ in range(cut_standings['unranked_players']) %}
                 <tr>
                     <td> - </td>
                     <td> - </td>
                 </tr>
                 {% endfor %}
-                {% for player in tc_logic.get_standings(tournament.cut)['ranked_players'] %}
+                {% for player in cut_standings['ranked_players'] %}
                 <tr>
                     <td>{{ player.player.name }}</td>
-                    <td>{{ loop.index0 + 1 + tc_logic.get_standings(tournament.cut)['unranked_players']}}</td>
+                    <td>{{ loop.index0 + 1 + cut_standings['unranked_players']}}</td>
                 </tr>
                 {% endfor %}
         </table>
@@ -53,45 +53,43 @@
             <th>Side Bias</th>
         </tr>
     </thead>
-    {% for player in t_logic.rank_players(tournament) %}
+    {% for player in result %}
     <tr>
         <td>{{ loop.index0 + 1 }}</td>
-        <td>{{ player.name }} {% if player.first_round_bye %} {{"*"}} {%
-            endif %}<br>{% if player.pronouns %} {{player.pronouns}} {% endif %}</td>
+        <td>{{ player['player'].name }} {% if player['player'].first_round_bye %} {{"*"}} {%
+            endif %}<br>{% if player['player'].pronouns %} {{player['player'].pronouns}} {% endif %}</td>
 
         <td>
             {% if tournament.current_round != 0 or admin %}
-            <span class="{{ get_faction(player.corp)}}">{{ player.corp }}</span><br>{{
-            p_logic.side_record(player, "corp")['W']}}-{{
-            p_logic.side_record(player, "corp")['L']}}-{{ p_logic.side_record(player, "corp")['T']}}
+            <span class="{{ get_faction(player['player'].corp)}}">{{ player['player'].corp }}</span><br>
+            {{ player['corp_record']['W'] }}-{{ player['corp_record']['L'] }}-{{ player['corp_record']['T'] }}
             {% endif %}
         </td>
         <td>
             {% if tournament.current_round != 0 or admin%}
-            <span class="{{ get_faction(player.runner)}}">{{ player.runner }}</span><br> {{
-            p_logic.side_record(player, "runner")['W']}}-{{
-            p_logic.side_record(player, "runner")['L']}}-{{ p_logic.side_record(player, "runner")['T']}}
+            <span class="{{ get_faction(player['player'].runner)}}">{{ player['player'].runner }}</span><br>
+            {{ player['runner_record']['W'] }}-{{ player['runner_record']['L'] }}-{{ player['runner_record']['T'] }}
             {% endif %}
         </td>
-        <td>{{ p_logic.get_record(player)['score'] }}</td>
-        <td>{{ "%0.3f"|format(player.sos) }}</td>
-        <td>{{ "%0.3f"|format(player.esos) }}</td>
-        <td>{{ display_side_bias(player) }}</td>
+        <td>{{ player['score'] }}</td>
+        <td>{{ "%0.3f"|format(player['player'].sos) }}</td>
+        <td>{{ "%0.3f"|format(player['player'].esos) }}</td>
+        <td>{{ render_side_bias(player['side_bias']) }}</td>
 
         <td>
             {% if admin %}
-            <a href="{{ url_for('edit_player', pid=player.id) }}" class="btn btn-success">Edit</a>
+            <a href="{{ url_for('edit_player', pid=player['player'].id) }}" class="btn btn-success">Edit</a>
             {% if tournament.current_round == 0 %}
-            <a href="{{ url_for('delete_player', pid=player.id) }}" class="btn btn-danger">Delete</a>
+            <a href="{{ url_for('delete_player', pid=player['player'].id) }}" class="btn btn-danger">Delete</a>
             {% endif %}
             {% if player.active %}
-            <a href="{{ url_for('drop_player', pid=player.id) }}" class="btn btn-warning">Drop</a>
+            <a href="{{ url_for('drop_player', pid=player['player'].id) }}" class="btn btn-warning">Drop</a>
             {% else %}
-            <a href="{{ url_for('undrop_player', pid=player.id) }}" class="btn btn-primary">Undrop</a>
+            <a href="{{ url_for('undrop_player', pid=player['player'].id) }}" class="btn btn-primary">Undrop</a>
             {% endif %}
             {% endif %}
-            {% if admin or p_logic.reveal_decklists(player, tournament) %}
-            <a href="{{ url_for('tournaments.display_decklist', tid=tournament.id, pid=player.id) }}"
+            {% if admin or p_logic.reveal_decklists(player['player'], tournament) %}
+            <a href="{{ url_for('tournaments.display_decklist', tid=tournament.id, pid=player['player'].id) }}"
                 class="btn btn-primary">View
                 Decklist</a>
             {% endif %}

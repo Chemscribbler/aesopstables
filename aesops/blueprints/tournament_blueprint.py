@@ -15,7 +15,7 @@ from aesops.forms import (
 from data_models.users import User
 import aesops.business_logic.users as u_logic
 from aesops.utility import (
-    display_side_bias,
+    render_side_bias,
     format_results,
     get_faction,
     rank_tables,
@@ -33,14 +33,25 @@ def redirect_for_tournament(tid):
 @tournament_blueprint.route("/<int:tid>/standings", methods=["GET", "POST"])
 def tournament(tid):
     tournament = Tournament.query.get(tid)
+
+    # Rank the players in the tournament and calculate their info required
+    # to be rendered on the page
+    result = t_logic.calculate_player_ranks(tournament)
+
+    # Generate the cut standings
+    cut_standings = None
+    if tournament.cut is not None:
+        cut_standings = tc_logic.get_standings(tournament.cut)
+
     return render_template(
         "tournament.html",
         tournament=tournament,
         admin=u_logic.has_admin_rights(current_user, tid),
-        display_side_bias=display_side_bias,
+        render_side_bias=render_side_bias,
         get_faction=get_faction,
         t_logic=t_logic,
-        tc_logic=tc_logic,
+        cut_standings=cut_standings,
+        result=result,
         p_logic=p_logic,
         last_concluded_round=(
             tournament.current_round
