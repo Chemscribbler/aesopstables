@@ -151,6 +151,90 @@ def conclude_round(tournament: Tournament):
     return tournament
 
 
+def calculate_player_ranks(tournament: Tournament):
+    """
+    Calculates the rankings for players in this tournament.
+
+    Also gathers required information about the tournament results used to render
+    the tournament page in a single pass of the results.
+    """
+    players = tournament.players
+
+    # We're going to look at each match individually, but we need to keep
+    # information about each player. So we keep this in a handy dictionary
+    # for fast access
+    player_map = {}
+    for player in players:
+        player_map[player.id] = {
+            'player': player,
+            'score': 0,
+            'games_played': 0,
+            'corp_record': {"W": 0, "L": 0, "T": 0},
+            'runner_record': {"W": 0, "L": 0, "T": 0},
+            'side_bias': 0,
+        }
+
+    # To avoid multiple trips to the database per player, we iterate the
+    # matches instead, updating the relevant player's results for each match
+    for match in tournament.matches:
+        # Select the player data for the current set of players
+        corp_id = match.corp_player_id
+        runner_id = match.runner_player_id
+        corp_data = player_map[corp_id]
+        runner_data = player_map[runner_id]
+
+        if match.concluded:
+            # Players on a bye are set as the corp player
+            # For the purposes of display we always count a bye as a game
+            # but no change to the side bias
+            if match.is_bye:
+                corp_data['games_played'] += 1
+                continue
+
+            # Each side played a game, so bump their counts
+            corp_data['games_played'] += 1
+            runner_data['games_played'] += 1
+
+            # Adjust the bias score based upon which side they played
+            corp_data['side_bias'] += 1
+            runner_data['side_bias'] -= 1
+
+            # Update each player's results based upon the result of the match
+            if match.result == MatchResult.RUNNER_WIN.value:
+                corp_data['corp_record']['L'] += 1
+                runner_data['runner_record']['W'] += 1
+
+                runner_data['score'] += 3
+
+            elif match.result == MatchResult.CORP_WIN.value:
+                corp_data['corp_record']['W'] += 1
+                runner_data['runner_record']['L'] += 1
+
+                corp_data['score'] += 3
+            else:
+                corp_data['corp_record']['T'] += 1
+                runner_data['runner_record']['T'] += 1
+
+                corp_data['score'] += 1
+                runner_data['score'] += 1
+
+
+    # This ranking matches what is done in the `rank_players` function below
+    # However in the case of a tournament that has begun, we sort this list of players
+    # 3 times which is not very efficient
+    # A potential improvement here is to only sort the result once, and use a more complex function
+    # to determine the final rank, but do it in a single pass (which is going to be much quicker
+    # over larger tournaments)
+    result = list(player_map.values())
+    if tournament.current_round == 0:
+        result.sort(key=lambda p: p['player'].name.lower())
+    else:
+        result.sort(key=lambda p: p['player'].esos, reverse=True)
+        result.sort(key=lambda p: p['player'].sos, reverse=True)
+        result.sort(key=lambda p: p['score'], reverse=True)
+
+    return result
+
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
     if tournament.current_round == 0:
