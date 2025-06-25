@@ -14,7 +14,7 @@ class Player(db.Model):
     tid: Mapped[int] = db.Column(
         db.Integer, db.ForeignKey("tournament.id"), nullable=False
     )
-    recieved_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
+    received_bye: Mapped[bool] = db.Column(db.Boolean, default=False)
     score: Mapped[int] = db.Column(db.Integer, default=0)
     sos: Mapped[float] = db.Column(db.Numeric, default=0.0)
     esos: Mapped[float] = db.Column(db.Numeric, default=0.0)
