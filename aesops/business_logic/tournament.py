@@ -166,12 +166,13 @@ def calculate_player_ranks(tournament: Tournament):
     player_map = {}
     for player in players:
         player_map[player.id] = {
-            'player': player,
-            'score': 0,
-            'games_played': 0,
-            'corp_record': {"W": 0, "L": 0, "T": 0},
-            'runner_record': {"W": 0, "L": 0, "T": 0},
-            'side_bias': 0,
+            "player": player,
+            "score": 0,
+            "games_played": 0,
+            "corp_record": {"W": 0, "L": 0, "T": 0},
+            "runner_record": {"W": 0, "L": 0, "T": 0},
+            "side_bias": 0,
+            "active": player.active,
         }
 
     # To avoid multiple trips to the database per player, we iterate the
@@ -181,7 +182,7 @@ def calculate_player_ranks(tournament: Tournament):
         corp_id = match.corp_player_id
         runner_id = match.runner_player_id
         corp_data = player_map[corp_id]
-        if runner_id:
+        if runner_id is not None:
             runner_data = player_map[runner_id]
 
         if match.concluded:
@@ -189,37 +190,36 @@ def calculate_player_ranks(tournament: Tournament):
             # For the purposes of display we always count a bye as a game
             # but no change to the side bias
             if match.is_bye:
-                corp_data['games_played'] += 1
-                corp_data['corp_record']['W'] += 1
+                corp_data["games_played"] += 1
+                corp_data["score"] += 3
                 continue
 
             # Each side played a game, so bump their counts
-            corp_data['games_played'] += 1
-            runner_data['games_played'] += 1
+            corp_data["games_played"] += 1
+            runner_data["games_played"] += 1
 
             # Adjust the bias score based upon which side they played
-            corp_data['side_bias'] += 1
-            runner_data['side_bias'] -= 1
+            corp_data["side_bias"] += 1
+            runner_data["side_bias"] -= 1
 
             # Update each player's results based upon the result of the match
             if match.result == MatchResult.RUNNER_WIN.value:
-                corp_data['corp_record']['L'] += 1
-                runner_data['runner_record']['W'] += 1
+                corp_data["corp_record"]["L"] += 1
+                runner_data["runner_record"]["W"] += 1
 
-                runner_data['score'] += 3
+                runner_data["score"] += 3
 
             elif match.result == MatchResult.CORP_WIN.value:
-                corp_data['corp_record']['W'] += 1
-                runner_data['runner_record']['L'] += 1
+                corp_data["corp_record"]["W"] += 1
+                runner_data["runner_record"]["L"] += 1
 
-                corp_data['score'] += 3
+                corp_data["score"] += 3
             else:
-                corp_data['corp_record']['T'] += 1
-                runner_data['runner_record']['T'] += 1
+                corp_data["corp_record"]["T"] += 1
+                runner_data["runner_record"]["T"] += 1
 
-                corp_data['score'] += 1
-                runner_data['score'] += 1
-
+                corp_data["score"] += 1
+                runner_data["score"] += 1
 
     # This ranking matches what is done in the `rank_players` function below
     # However in the case of a tournament that has begun, we sort this list of players
@@ -229,13 +229,14 @@ def calculate_player_ranks(tournament: Tournament):
     # over larger tournaments)
     result = list(player_map.values())
     if tournament.current_round == 0:
-        result.sort(key=lambda p: p['player'].name.lower())
+        result.sort(key=lambda p: p["player"].name.lower())
     else:
-        result.sort(key=lambda p: p['player'].esos, reverse=True)
-        result.sort(key=lambda p: p['player'].sos, reverse=True)
-        result.sort(key=lambda p: p['score'], reverse=True)
+        result.sort(key=lambda p: p["player"].esos, reverse=True)
+        result.sort(key=lambda p: p["player"].sos, reverse=True)
+        result.sort(key=lambda p: p["score"], reverse=True)
 
     return result
+
 
 def rank_players(tournament: Tournament) -> list[Player]:
     player_list = tournament.players
@@ -272,14 +273,14 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
         elible_player_list = [
             p
             for p in player_list
-            if not p.recieved_bye
+            if not p.received_bye
             and p.active
             and (
                 len(p.runner_matches) + len(p.corp_matches) > 0
             )  # This is to prevent late joiners from getting a bye their first round
         ]
     else:
-        elible_player_list = [p for p in player_list if not p.recieved_bye and p.active]
+        elible_player_list = [p for p in player_list if not p.received_bye and p.active]
         shuffle(elible_player_list)
     if len(elible_player_list) == 0:
         elible_player_list = least_byes(tournament, player_list)

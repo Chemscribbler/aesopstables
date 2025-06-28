@@ -140,6 +140,9 @@ def calc_cost(corp_player: Player, runner_player: Player):
         side_cost(corp_player, runner_player)
         + score_cost(corp_player, runner_player)
         + (has_played(corp_player, runner_player) * 5)
+        + bye_vs_bye_penalty(
+            corp_player, runner_player, corp_player.tournament.current_round
+        )
     )
 
 
@@ -150,6 +153,7 @@ def find_min_edge(p1: Player, p2: Player):
         min_cost = min(calc_cost(p1, p2), min_cost)
     if options[1]:
         min_cost = min(calc_cost(p2, p1), min_cost)
+    print(f"Min cost between {p1.name} and {p2.name}: {min_cost}")
     return min_cost
 
 
@@ -159,6 +163,16 @@ def has_played(p1: Player, p2: Player):
     if p2.id in [m.runner_player_id for m in p1.corp_matches]:
         return True
     return False
+
+
+def bye_vs_bye_penalty(p1: Player, p2: Player, round: int):
+    if not p1.first_round_bye or not p2.first_round_bye:
+        return 0
+    else:
+        print(f"Both players received a bye by round {round}")
+        return max(
+            12 - round, 0
+        )  # Penalize by 8 for each round they both received a bye, but not more than 8
 
 
 def assign_side(p1: Player, p2: Player):
