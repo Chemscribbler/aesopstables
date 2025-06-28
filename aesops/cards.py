@@ -8,22 +8,23 @@ import os
 
 logger = logging.getLogger(__name__)
 
+
 # This class might seem a bit redundant, just wrapping the inner workings of the Cards class,
 # however keeping it nested like this lets us refresh the data in the background and swap the
 # inner reference out in 1 go, avoiding threading related issues
 class CardData:
     def __init__(self, ids, name_to_code, runner_ids, corp_ids):
-            self.ids = ids
-            self.name_to_code = name_to_code
-            self.runner_ids = runner_ids
-            self.corp_ids = corp_ids
+        self.ids = ids
+        self.name_to_code = name_to_code
+        self.runner_ids = runner_ids
+        self.corp_ids = corp_ids
 
     def get_faction(self, name: str):
-        """ Given the card name, return the faction it belongs to """
-
-        card_code = self.name_to_code[name]
-        if card_code is not None:
-            return self.ids[card_code]["faction"]
+        """Given the card name, return the faction it belongs to"""
+        if name is not None:
+            card_code = self.name_to_code[name]
+            if card_code is not None:
+                return self.ids[card_code]["faction"]
 
         return None
 
@@ -38,10 +39,11 @@ class CardData:
             json.dump(self.__dict__, f)
 
     def load(self):
-        """ If we have a copy of the cards on disk, load it """
+        """If we have a copy of the cards on disk, load it"""
         if os.path.exists("card-data.json"):
             with open("card-data.json", "r") as f:
                 self.__dict__ = json.load(f)
+
 
 class Cards:
     """
@@ -54,7 +56,7 @@ class Cards:
     """
 
     def __init__(self):
-        """ Construct the data store and populate with the most recent data """
+        """Construct the data store and populate with the most recent data"""
         # Load what we have on disk in case we can't talk to NetrunnerDB
         self.data = CardData(None, None, None, None)
         self.data.load()
@@ -63,7 +65,7 @@ class Cards:
         self.refresh_data()
 
     def refresh_data(self):
-        """ Refreshes the card data from the Netrunner DB source """
+        """Refreshes the card data from the Netrunner DB source"""
         try:
             refresh_begin = datetime.now()
 
@@ -83,11 +85,16 @@ class Cards:
             non_legal_runner_ids = set()
 
             # Go and fetch both the set of all cards, as well as the set of legal cards so we can collect all the info we need
-            card_data = requests.get("https://netrunnerdb.com/api/2.0/public/cards", timeout=5).json()
+            card_data = requests.get(
+                "https://netrunnerdb.com/api/2.0/public/cards", timeout=5
+            ).json()
 
-            standard_legal_ids = requests.get("https://api.netrunnerdb.com/api/v3/public/cards?filter%5Bsearch%5D=snapshot:standard_30%20t:runner_identity%7Ccorp_identity&fields%5Bcards%5D=title")
+            standard_legal_ids = requests.get(
+                "https://api.netrunnerdb.com/api/v3/public/cards?filter%5Bsearch%5D=snapshot:standard_30%20t:runner_identity%7Ccorp_identity&fields%5Bcards%5D=title"
+            )
             standard_legal_ids = [
-                card["attributes"]["title"] for card in standard_legal_ids.json()["data"]
+                card["attributes"]["title"]
+                for card in standard_legal_ids.json()["data"]
             ]
 
             # We only want to loop over these cards once at refresh time, and never again, so lets build all
@@ -106,11 +113,11 @@ class Cards:
 
                     name_to_code[name] = card_code
                     ids[card_code] = {
-                            "code": card_code,
-                            "side": side,
-                            "faction": card["faction_code"],
-                            "name": name,
-                            "legal": is_legal
+                        "code": card_code,
+                        "side": side,
+                        "faction": card["faction_code"],
+                        "name": name,
+                        "legal": is_legal,
                     }
 
                     if is_legal:
@@ -133,8 +140,12 @@ class Cards:
             non_legal_runner_ids.sort()
             non_legal_corp_ids = list(non_legal_corp_ids)
             non_legal_corp_ids.sort()
-            runner_ids = (legal_runner_ids + [" --- Non Standard IDs --- "] + non_legal_runner_ids)
-            corp_ids = (legal_corp_ids + [" --- Non Standard IDs --- "] + non_legal_corp_ids)
+            runner_ids = (
+                legal_runner_ids + [" --- Non Standard IDs --- "] + non_legal_runner_ids
+            )
+            corp_ids = (
+                legal_corp_ids + [" --- Non Standard IDs --- "] + non_legal_corp_ids
+            )
 
             # Store all data under 1 reference so we can swap the entire data set in one atomic update
             data = CardData(ids, name_to_code, runner_ids, corp_ids)
@@ -143,15 +154,17 @@ class Cards:
             data.save()
 
             refresh_duration = (datetime.now() - refresh_begin).microseconds / 1000
-            logger.info(f'Refreshed card data in {refresh_duration}ms')
+            logger.info(f"Refreshed card data in {refresh_duration}ms")
 
             # Construct the new data structures then swap the single reference at the end for thread safety
             self.data = data
         except Exception as e:
-            logger.error(f'Failed to refresh card data. Retaining existing data. Error: {e}')
+            logger.error(
+                f"Failed to refresh card data. Retaining existing data. Error: {e}"
+            )
 
     def get_faction(self, name: str):
-        """ Given the card name, return the faction it belongs to """
+        """Given the card name, return the faction it belongs to"""
         return self.data.get_faction(name)
 
     def corp_ids(self):
@@ -165,13 +178,15 @@ class Cards:
 # without needing to reprocess the card data again
 data = Cards()
 
+
 def refresh_card_list():
-    """ In the background, every hour, refresh the card data """
+    """In the background, every hour, refresh the card data"""
     while True:
         # We can sleep before refreshing the data, as the data is initialised
         # when we initially construct the CardData object
         sleep(60 * 60)
         data.refresh_data()
+
 
 # When this module is first loaded, start a background task that will periodically
 # refresh the card data in the background, as to not do it during a request from a user

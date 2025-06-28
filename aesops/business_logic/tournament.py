@@ -181,7 +181,8 @@ def calculate_player_ranks(tournament: Tournament):
         corp_id = match.corp_player_id
         runner_id = match.runner_player_id
         corp_data = player_map[corp_id]
-        runner_data = player_map[runner_id]
+        if runner_id:
+            runner_data = player_map[runner_id]
 
         if match.concluded:
             # Players on a bye are set as the corp player
@@ -189,6 +190,7 @@ def calculate_player_ranks(tournament: Tournament):
             # but no change to the side bias
             if match.is_bye:
                 corp_data['games_played'] += 1
+                corp_data['corp_record']['W'] += 1
                 continue
 
             # Each side played a game, so bump their counts

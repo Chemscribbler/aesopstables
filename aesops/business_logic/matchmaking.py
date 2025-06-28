@@ -60,7 +60,10 @@ def pair_round(t: Tournament):
             fixed_table_numbers.append(player.table_number)
     for pair in combinations(pairing_pool, 2):
         pair_weight = find_min_edge(*pair)
-        graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
+        if pair_weight < 100:
+            graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
+        else:
+            continue
     pairings = max_weight_matching(graph, maxcardinality=True)
     for pair in pairings:
         corp, runner = assign_side(
@@ -79,17 +82,11 @@ def pair_round(t: Tournament):
             table_number=table_number,
         )
     if bye_players is not None:
-        print(f"Bye players: {bye_players}")
         for player in bye_players:
             player.recieved_bye = True
             create_match(
                 tournament=t, corp_player=player, runner_player=None, is_bye=True
             )
-        # else:
-        #     bye_player.recieved_bye = True
-        #     create_match(
-        #         tournament=t, corp_player=bye_player, runner_player=None, is_bye=True
-        #     )
     ranked_matches = sorted(
         t.active_matches,
         key=lambda m: (
@@ -142,7 +139,7 @@ def calc_cost(corp_player: Player, runner_player: Player):
     return (
         side_cost(corp_player, runner_player)
         + score_cost(corp_player, runner_player)
-        + (has_played(corp_player, runner_player) * 0.1)
+        + (has_played(corp_player, runner_player) * 5)
     )
 
 
