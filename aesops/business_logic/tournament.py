@@ -16,6 +16,7 @@ def add_player(
     corp_deck=None,
     runner_deck=None,
     user_id=None,
+    first_round_bye=False,
 ) -> Player:
     p = Player(
         name=name,
@@ -25,6 +26,7 @@ def add_player(
         runner_deck=runner_deck,
         tid=tournament.id,
         uid=None if user_id is None else user_id,
+        first_round_bye=first_round_bye,
     )
     db.session.add(p)
     db.session.commit()
@@ -62,7 +64,7 @@ def get_record_from_memory(player: Player, matches: dict, count_byes=True):
 
 
 def update_score_from_memory(player: Player, matches=dict):
-    return get_record_from_memory(player, matches)["score"]
+    return get_record_from_memory(player, matches, count_byes=True)["score"]
 
 
 def get_average_score_from_memory(player: Player, matches: dict):
@@ -276,7 +278,7 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
             if not p.received_bye
             and p.active
             and (
-                len(p.runner_matches) + len(p.corp_matches) > 0
+                p_logic.get_record(p, count_byes=False)["games_played"] > 0
             )  # This is to prevent late joiners from getting a bye their first round
         ]
     else:

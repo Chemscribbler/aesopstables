@@ -125,7 +125,7 @@ def legal_options(p1: Player, p2: Player) -> list[bool]:
 def side_cost(corp_player: Player, runner_player: Player):
     corp_bal = p_logic.get_side_balance(corp_player)
     runner_bal = p_logic.get_side_balance(runner_player)
-    balance_post = max(abs(corp_bal + 1), abs(runner_bal - 1))
+    balance_post = max(abs(max(corp_bal, 0)), abs(min(runner_bal, 0)))
     return 8 ** abs(balance_post)
 
 
@@ -140,9 +140,9 @@ def calc_cost(corp_player: Player, runner_player: Player):
         side_cost(corp_player, runner_player)
         + score_cost(corp_player, runner_player)
         + (has_played(corp_player, runner_player) * 5)
-        + bye_vs_bye_penalty(
-            corp_player, runner_player, corp_player.tournament.current_round
-        )
+        # + bye_vs_bye_penalty(
+        #     corp_player, runner_player, corp_player.tournament.current_round
+        # )
     )
 
 
@@ -153,7 +153,7 @@ def find_min_edge(p1: Player, p2: Player):
         min_cost = min(calc_cost(p1, p2), min_cost)
     if options[1]:
         min_cost = min(calc_cost(p2, p1), min_cost)
-    print(f"Min cost between {p1.name} and {p2.name}: {min_cost}")
+    # print(f"Min cost between {p1.name} and {p2.name}: {min_cost}")
     return min_cost
 
 
