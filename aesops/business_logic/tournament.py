@@ -233,9 +233,9 @@ def calculate_player_ranks(tournament: Tournament):
     if tournament.current_round == 0:
         result.sort(key=lambda p: p["player"].name.lower())
     else:
-        result.sort(key=lambda p: p["player"].esos, reverse=True)
-        result.sort(key=lambda p: p["player"].sos, reverse=True)
-        result.sort(key=lambda p: p["score"], reverse=True)
+        result.sort(
+            key=lambda p: (p["score"], p["player"].sos, p["player"].esos), reverse=True
+        )
 
     return result
 

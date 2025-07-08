@@ -126,13 +126,13 @@ def side_cost(corp_player: Player, runner_player: Player):
     corp_bal = p_logic.get_side_balance(corp_player)
     runner_bal = p_logic.get_side_balance(runner_player)
     balance_post = max(abs(max(corp_bal, 0)), abs(min(runner_bal, 0)))
-    return 8 ** abs(balance_post)
+    return 50 ** abs(balance_post)
 
 
 def score_cost(corp_player: Player, runner_player: Player):
     c_score = p_logic.get_record(corp_player)["score"]
     r_score = p_logic.get_record(runner_player)["score"]
-    return abs((c_score - r_score + 1) * (c_score - r_score)) / 6
+    return (c_score - r_score) ** 2
 
 
 def calc_cost(corp_player: Player, runner_player: Player):
