@@ -40,6 +40,20 @@ def create_match(
     return m
 
 
+class CachedPlayer:
+    def __init__(self, player: Player):
+        self.id = player.id
+        self.score = player.score
+        self.side_bias = p_logic.get_side_balance(player)
+        self.active = player.active
+        self.corp_matches = p_logic.get_opponent_ids(player, side="corp")
+        self.runner_matches = p_logic.get_opponent_ids(player, side="runner")
+        self.fixed_table = player.fixed_table
+
+    def __repr__(self):
+        return f"<CachedPlayer {self.name} ({self.id})>"
+
+
 def pair_round(t: Tournament):
     if not all([m.concluded for m in t.active_matches]):
         raise PairingException(
@@ -54,21 +68,23 @@ def pair_round(t: Tournament):
     graph = Graph()
     pairing_pool, bye_players = t_logic.bye_setup(t)
     shuffle(pairing_pool)
-    for player in pairing_pool:
-        graph.add_node(player.id)
+    pairing_pool_dict = {player.id: CachedPlayer(player) for player in pairing_pool}
+    for pid, player in pairing_pool_dict.items():
+        graph.add_node(pid)
         if player.fixed_table:
             fixed_table_numbers.append(player.table_number)
-    for pair in combinations(pairing_pool, 2):
-        pair_weight = find_min_edge(*pair)
+    for pair in combinations(pairing_pool_dict, 2):
+        pair_weight = find_min_edge(
+            pairing_pool_dict[pair[0]], pairing_pool_dict[pair[1]]
+        )
         if pair_weight < 100:
-            graph.add_edge(pair[0].id, pair[1].id, weight=1000 - pair_weight)
+            graph.add_edge(pair[0], pair[1], weight=1000 - pair_weight)
         else:
             continue
     pairings = max_weight_matching(graph, maxcardinality=True)
     for pair in pairings:
         corp, runner = assign_side(
-            db.session.query(Player).get(pair[0]),
-            db.session.query(Player).get(pair[1]),
+            pairing_pool_dict[pair[0]], pairing_pool_dict[pair[1]]
         )
         table_number = None
         if corp.fixed_table or runner.fixed_table:
@@ -84,6 +100,7 @@ def pair_round(t: Tournament):
     if bye_players is not None:
         for player in bye_players:
             player.recieved_bye = True
+            db.session.add(player)
             create_match(
                 tournament=t, corp_player=player, runner_player=None, is_bye=True
             )
@@ -112,30 +129,28 @@ def pair_round(t: Tournament):
     db.session.commit()
 
 
-def legal_options(p1: Player, p2: Player) -> list[bool]:
+def legal_options(p1: CachedPlayer, p2: CachedPlayer) -> list[bool]:
     p1_can_corp = True
     p2_can_corp = True
-    if p2.id in [m.corp_player_id for m in p1.runner_matches]:
+    if p2.id in p1.runner_matches:
         p2_can_corp = False
-    if p2.id in [m.runner_player_id for m in p1.corp_matches]:
+    if p2.id in p1.corp_matches:
         p1_can_corp = False
     return [p1_can_corp, p2_can_corp]
 
 
-def side_cost(corp_player: Player, runner_player: Player):
-    corp_bal = p_logic.get_side_balance(corp_player)
-    runner_bal = p_logic.get_side_balance(runner_player)
-    balance_post = max(abs(max(corp_bal, 0)), abs(min(runner_bal, 0)))
-    return 50 ** abs(balance_post)
+def side_cost(corp_player: CachedPlayer, runner_player: CachedPlayer):
+    balance_factor = max(
+        abs(max(corp_player.side_bias, 0)), abs(min(runner_player.side_bias, 0))
+    )
+    return 50 ** abs(balance_factor)
 
 
-def score_cost(corp_player: Player, runner_player: Player):
-    c_score = p_logic.get_record(corp_player)["score"]
-    r_score = p_logic.get_record(runner_player)["score"]
-    return (c_score - r_score) ** 2
+def score_cost(corp_player: CachedPlayer, runner_player: CachedPlayer):
+    return (corp_player.score - runner_player.score) ** 2
 
 
-def calc_cost(corp_player: Player, runner_player: Player):
+def calc_cost(corp_player: CachedPlayer, runner_player: CachedPlayer):
     return (
         side_cost(corp_player, runner_player)
         + score_cost(corp_player, runner_player)
@@ -146,7 +161,7 @@ def calc_cost(corp_player: Player, runner_player: Player):
     )
 
 
-def find_min_edge(p1: Player, p2: Player):
+def find_min_edge(p1: CachedPlayer, p2: CachedPlayer):
     options = legal_options(p1, p2)
     min_cost = 1000
     if options[0]:
@@ -157,36 +172,27 @@ def find_min_edge(p1: Player, p2: Player):
     return min_cost
 
 
-def has_played(p1: Player, p2: Player):
-    if p2.id in [m.corp_player_id for m in p1.runner_matches]:
+def has_played(p1: CachedPlayer, p2: CachedPlayer):
+    if p2.id in p1.corp_matches:
         return True
-    if p2.id in [m.runner_player_id for m in p1.corp_matches]:
+    if p2.id in p1.runner_matches:
         return True
     return False
 
 
-def bye_vs_bye_penalty(p1: Player, p2: Player, round: int):
-    if not p1.first_round_bye or not p2.first_round_bye:
-        return 0
-    else:
-        print(f"Both players received a bye by round {round}")
-        return max(
-            12 - round, 0
-        )  # Penalize by 8 for each round they both received a bye, but not more than 8
+def assign_side(p1: CachedPlayer, p2: CachedPlayer) -> tuple[Player, Player]:
 
-
-def assign_side(p1: Player, p2: Player):
     # Currently this sorta breaks if it's the third times players are matched
-    if p1.id in [m.corp_player_id for m in p2.runner_matches]:
+    if p1.id in p2.runner_matches:
         corp = p2
         runner = p1
-    elif p2.id in [m.corp_player_id for m in p1.runner_matches]:
+    elif p2.id in p1.runner_matches:
         corp = p1
         runner = p2
-    elif p_logic.get_side_balance(p1) > p_logic.get_side_balance(p2):
+    elif p1.side_bias > p2.side_bias:
         corp = p2
         runner = p1
-    elif p_logic.get_side_balance(p2) > p_logic.get_side_balance(p1):
+    elif p2.side_bias > p1.side_bias:
         corp = p1
         runner = p2
     elif random() > 0.5:
@@ -195,4 +201,4 @@ def assign_side(p1: Player, p2: Player):
     else:
         corp = p2
         runner = p1
-    return (corp, runner)
+    return (db.session.get(Player, corp.id), db.session.get(Player, runner.id))

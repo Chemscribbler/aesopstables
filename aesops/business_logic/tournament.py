@@ -169,12 +169,14 @@ def calculate_player_ranks(tournament: Tournament):
     for player in players:
         player_map[player.id] = {
             "player": player,
+            "id": player.id,
             "score": 0,
             "games_played": 0,
             "corp_record": {"W": 0, "L": 0, "T": 0},
             "runner_record": {"W": 0, "L": 0, "T": 0},
             "side_bias": 0,
             "active": player.active,
+            "received_bye": player.received_bye,
         }
 
     # To avoid multiple trips to the database per player, we iterate the
@@ -236,19 +238,7 @@ def calculate_player_ranks(tournament: Tournament):
         result.sort(
             key=lambda p: (p["score"], p["player"].sos, p["player"].esos), reverse=True
         )
-
     return result
-
-
-def rank_players(tournament: Tournament) -> list[Player]:
-    player_list = tournament.players
-    if tournament.current_round == 0:
-        player_list.sort(key=lambda x: x.name.lower())
-    else:
-        player_list.sort(key=lambda x: x.esos, reverse=True)
-        player_list.sort(key=lambda x: x.sos, reverse=True)
-        player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
-    return player_list
 
 
 def first_round_byes(tournament: Tournament) -> tuple[list[Player], list[Player]]:
@@ -270,24 +260,30 @@ def bye_setup(tournament: Tournament) -> tuple[list[Player], Player]:
         return first_round_byes(tournament)
     if len(tournament.active_players) % 2 == 0:
         return (tournament.active_players, None)
-    player_list = rank_players(tournament).copy()
+    player_list = calculate_player_ranks(tournament)
     if tournament.current_round > 1:
         elible_player_list = [
             p
             for p in player_list
-            if not p.received_bye
-            and p.active
+            if not p["received_bye"]
+            and p["active"]
             and (
-                p_logic.get_record(p, count_byes=False)["games_played"] > 0
+                p_logic.get_record(db.session.get(Player, p["id"]), count_byes=False)[
+                    "games_played"
+                ]
+                > 0
             )  # This is to prevent late joiners from getting a bye their first round
         ]
     else:
-        elible_player_list = [p for p in player_list if not p.received_bye and p.active]
+        elible_player_list = [
+            p for p in player_list if not p["received_bye"] and p["active"]
+        ]
         shuffle(elible_player_list)
     if len(elible_player_list) == 0:
-        elible_player_list = least_byes(tournament, player_list)
-    elible_player_list.sort(key=lambda x: p_logic.get_record(x)["score"], reverse=True)
-    bye_player = elible_player_list.pop(-1)
+        elible_player_list = least_byes(tournament, tournament.active_players)
+    elible_player_list.sort(key=lambda x: x["score"], reverse=True)
+    bye_player_dict = elible_player_list.pop(-1)
+    bye_player = db.session.get(Player, bye_player_dict["id"])
     pairable_players = tournament.active_players.copy()
     pairable_players.remove(bye_player)
     return (pairable_players, [bye_player])

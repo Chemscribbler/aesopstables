@@ -14,11 +14,14 @@ from decimal import Decimal
 import unicodedata
 import string
 
+
 def get_corp_ids():
     return cards.data.corp_ids()
 
+
 def get_runner_ids():
     return cards.data.runner_ids()
+
 
 def render_side_bias(side_bal):
     if side_bal > 0:
@@ -27,6 +30,7 @@ def render_side_bias(side_bal):
         return f"Runner +{side_bal * -1}"
     return "Balanced"
 
+
 def rank_tables(match_list: list[Match]):
     match_list.sort(key=lambda x: x.table_number or 1000)
     return match_list
@@ -34,6 +38,7 @@ def rank_tables(match_list: list[Match]):
 
 def get_faction(corp_name: str):
     return cards.data.get_faction(corp_name)
+
 
 def get_faction_color(faction: str):
 
@@ -84,28 +89,30 @@ def get_json(tid):
         ],
     }
 
-    for i, player in enumerate(t_logic.rank_players(t)):
+    for i, player_dict in enumerate(t_logic.calculate_player_ranks(t)):
         t_json["players"].append(
             {
-                "id": player.id,
-                "name": player.name,
+                "id": player_dict["player"].id,
+                "name": player_dict["player"].name,
                 "rank": i + 1,
-                "corpIdentity": player.corp,
-                "runnerIdentity": player.runner,
-                "matchPoints": player.score,
-                "strengthOfSchedule": player.sos,
-                "extendedStrengthOfSchedule": player.esos,
-                "sideBalance": p_logic.get_side_balance(player),
+                "corpIdentity": player_dict["player"].corp,
+                "runnerIdentity": player_dict["player"].runner,
+                "matchPoints": player_dict["score"],
+                "strengthOfSchedule": player_dict["player"].sos,
+                "extendedStrengthOfSchedule": player_dict["player"].esos,
+                "sideBalance": player_dict["side_bias"],
             }
         )
     if t.cut is not None:
-        for i, player in enumerate(tc_logic.get_standings(t.cut)["ranked_players"]):
+        for i, player_dict in enumerate(
+            tc_logic.get_standings(t.cut)["ranked_players"]
+        ):
             t_json["eliminationPlayers"].append(
                 {
-                    "id": player.player.id,
-                    "name": player.player.name,
+                    "id": player_dict.player.id,
+                    "name": player_dict.player.name,
                     "rank": i + 1,
-                    "seed": player.seed,
+                    "seed": player_dict.seed,
                 }
             )
     for rnd in range(1, t.current_round + 1):
