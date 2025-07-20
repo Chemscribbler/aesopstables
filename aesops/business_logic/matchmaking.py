@@ -84,6 +84,7 @@ def pair_round(t: Tournament):
     if bye_players is not None:
         for player in bye_players:
             player.recieved_bye = True
+            db.session.add(player)
             create_match(
                 tournament=t, corp_player=player, runner_player=None, is_bye=True
             )
