@@ -27,4 +27,4 @@ Feature ToDos:
 
 ## Testing
 
-`pytest` to run unit tests
+`PYTHONPATH=. pytest` to run unit tests
