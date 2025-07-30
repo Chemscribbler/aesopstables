@@ -42,7 +42,6 @@ def decklist_parser(decklist: str):
     decklist = decklist.replace("●​", "")
     decklist = decklist.replace("•", "")
     decklist_cards = decklist.split("\n")
-    print(decklist_cards)
     # Create a dictionary mapping card name to its quantity.
     # Note that if a user provides a copy/paste deck from Jinteki.net, there
     # will be entries like "Agenda (5)" in their decklist which are converted
@@ -73,7 +72,6 @@ def decklist_parser(decklist: str):
             # returns '“Pretty” Mary da Silva' (note the different quote marks).
             # If there is no such entry, return None.
             search_name = convert_stipped_to_card(card_name)
-            print(search_name)
             if search_name is None:
                 raise ValueError(f"{card_name} is not a valid card name")
             card_name = search_name

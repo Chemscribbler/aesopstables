@@ -130,8 +130,9 @@ def unpair_round(tid):
 @app.route("/<int:pid>/edit_player", methods=["GET", "POST"])
 def edit_player(pid):
     player = Player.query.get(pid)
-    tournament = player.tournament
-    form = PlayerForm(tournament=tournament)
+    tournament_id = player.tournament
+    form = PlayerForm(tournament=tournament_id)
+    admin_rights = u_logic.has_admin_rights(current_user, tournament_id)
     if form.validate_on_submit():
         player.name = form.name.data
         player.corp = form.corp.data
@@ -159,8 +160,9 @@ def edit_player(pid):
     form.table_number.data = player.table_number
     return render_template(
         "player_registration.html",
-        tournament=tournament,
+        tournament=tournament_id,
         form=form,
+        admin=admin_rights,
         player=player,
         edit_player=True,
     )

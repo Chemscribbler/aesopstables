@@ -230,6 +230,7 @@ def convert_stipped_to_card(stripped_name):
 
 # Modified from https://stackoverflow.com/questions/8694815/removing-accent-and-special-characters
 def remove_accents(data):
+    data = data.replace("\u2019", '\'')
     return "".join(
         x for x in unicodedata.normalize("NFKD", data) if x in string.printable
     )
