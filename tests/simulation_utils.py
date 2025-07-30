@@ -65,13 +65,14 @@ def display_players(t: Tournament):
 def drop_players(t: Tournament, drops_per_round: int, drop_rate: float = 0.9):
     if drops_per_round <= 0:
         return
+    ranked_players = t_logic.calculate_player_ranks(t)
+    active_ranked_players = [p for p in ranked_players if p["active"]]
     for i in range(drops_per_round):
-        ranked_players = t_logic.rank_players(t)
-        active_ranked_players = [p for p in ranked_players if p.active]
         if random() < drop_rate:
-            active_ranked_players[-i - 1].active = False
-            db.session.add(active_ranked_players[-i - 1])
-        db.session.commit()
+            player = db.session.get(Player, active_ranked_players[-i - 1]["id"])
+            player.active = False
+            db.session.add(player)
+    db.session.commit()
 
 
 def sim_tournament(

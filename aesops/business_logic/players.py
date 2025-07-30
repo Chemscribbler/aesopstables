@@ -141,6 +141,26 @@ def side_record(player: Player, side):
     return results
 
 
+def get_opponent_ids(player: Player, side=None):
+    opponents = set()
+    corp_opponents = [
+        m.runner_player for m in player.corp_matches if m.concluded and not m.is_bye
+    ]
+    runner_opponents = [
+        m.corp_player for m in player.runner_matches if m.concluded and not m.is_bye
+    ]
+    if side is None:
+        for opponent in corp_opponents + runner_opponents:
+            opponents.add(opponent.id)
+    elif side == "corp":
+        for opponent in corp_opponents:
+            opponents.add(opponent.id)
+    elif side == "runner":
+        for opponent in runner_opponents:
+            opponents.add(opponent.id)
+    return list(opponents)
+
+
 def reveal_decklists(player, tournament):
     if tournament.reveal_decklists:
         return True
