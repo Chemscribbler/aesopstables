@@ -153,13 +153,7 @@ def conclude_round(tournament: Tournament):
     return tournament
 
 
-def calculate_player_ranks(tournament: Tournament):
-    """
-    Calculates the rankings for players in this tournament.
-
-    Also gathers required information about the tournament results used to render
-    the tournament page in a single pass of the results.
-    """
+def load_players_to_memory(tournament: Tournament):
     players = tournament.players
 
     # We're going to look at each match individually, but we need to keep
@@ -225,20 +219,25 @@ def calculate_player_ranks(tournament: Tournament):
                 corp_data["score"] += 1
                 runner_data["score"] += 1
 
-    # This ranking matches what is done in the `rank_players` function below
-    # However in the case of a tournament that has begun, we sort this list of players
-    # 3 times which is not very efficient
-    # A potential improvement here is to only sort the result once, and use a more complex function
-    # to determine the final rank, but do it in a single pass (which is going to be much quicker
-    # over larger tournaments)
-    result = list(player_map.values())
+    return list(player_map.values())
+
+
+def calculate_player_ranks(tournament: Tournament):
+    """
+    Calculates the rankings for players in this tournament.
+
+    Also gathers required information about the tournament results used to render
+    the tournament page in a single pass of the results.
+    """
+
+    players = load_players_to_memory(tournament)
     if tournament.current_round == 0:
-        result.sort(key=lambda p: p["player"].name.lower())
+        players.sort(key=lambda p: p["player"].name.lower())
     else:
-        result.sort(
+        players.sort(
             key=lambda p: (p["score"], p["player"].sos, p["player"].esos), reverse=True
         )
-    return result
+    return players
 
 
 def first_round_byes(tournament: Tournament) -> tuple[list[Player], list[Player]]:
