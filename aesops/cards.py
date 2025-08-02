@@ -21,12 +21,15 @@ class CardData:
 
     def get_faction(self, name: str):
         """Given the card name, return the faction it belongs to"""
-        if name is not None:
-            card_code = self.name_to_code[name]
-            if card_code is not None:
-                return self.ids[card_code]["faction"]
+        try:
+            if name is not None:
+                card_code = self.name_to_code[name]
+                if card_code is not None:
+                    return self.ids[card_code]["faction"]
 
-        return None
+            return None
+        except:
+            return None
 
     def corp_ids(self):
         return self.corp_ids

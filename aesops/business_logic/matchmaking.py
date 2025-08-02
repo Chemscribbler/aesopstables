@@ -51,6 +51,7 @@ class CachedPlayer:
         self.corp_matches = p_logic.get_opponent_ids(player, side="corp")
         self.runner_matches = p_logic.get_opponent_ids(player, side="runner")
         self.fixed_table = player.fixed_table
+        self.table_number = player.table_number
 
     def __repr__(self):
         return f"<CachedPlayer {self.name} ({self.id})>"
