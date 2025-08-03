@@ -11,16 +11,20 @@ from .cut_tables import get_bracket
 
 
 def get_side_balance(cut_player: CutPlayer):
-    corp_games = len([match for match in cut_player.corp_cut_matches if match.concluded])
+    corp_games = len(
+        [match for match in cut_player.corp_cut_matches if match.concluded]
+    )
     runner_games = len(
         [match for match in cut_player.runner_cut_matches if match.concluded]
     )
     return corp_games - runner_games
 
+
 def get_players_by_seed(cut: Cut):
     player_list = cut.players
     player_list.sort(key=lambda x: x.seed)
     return player_list
+
 
 def generate_round(cut: Cut):
     bracket = get_bracket(cut.num_players, cut.double_elim)
@@ -77,11 +81,13 @@ def generate_round(cut: Cut):
             db.session.add(cut_match)
         db.session.commit()
 
+
 def get_match_by_table(cut: Cut, table_number):
     match = ElimMatch.query.filter(
         and_(ElimMatch.table_number == table_number, ElimMatch.cut_id == cut.id)
     ).first()
     return match
+
 
 def create(cut: Cut, tournament: Tournament, num_players: int, double_elim: bool):
     cut.tid = tournament.id
@@ -94,11 +100,12 @@ def create(cut: Cut, tournament: Tournament, num_players: int, double_elim: bool
     top_players = t_logic.top_n_cut(tournament, n=num_players)
     for i, player in enumerate(top_players):
         cut_player = CutPlayer()
-        cut_player.player_id = player.id
+        cut_player.player_id = player["id"]
         cut_player.seed = i + 1
         cut_player.cut_id = cut.id
         db.session.add(cut_player)
     db.session.commit()
+
 
 def destroy(cut: Cut):
     for match in ElimMatch.query.filter_by(cut_id=cut.id).all():
@@ -109,12 +116,14 @@ def destroy(cut: Cut):
     db.session.delete(cut)
     db.session.commit()
 
+
 def conclude_round(cut: Cut):
     for match in cut.current_matches:
         e_logic.conclude(match)
     cut.rnd += 1
     db.session.add(cut)
     db.session.commit()
+
 
 def get_standings(cut: Cut):
     players = cut.players
@@ -134,10 +143,12 @@ def get_standings(cut: Cut):
             "unranked_players": len(remaining_players),
         }
 
+
 def get_round(cut: Cut, rnd: int):
     return ElimMatch.query.filter(
         and_(ElimMatch.cut_id == cut.id, ElimMatch.rnd == rnd)
     ).all()
+
 
 def delete_round(cut: Cut, rnd: int):
     if rnd == 1:
@@ -159,6 +170,7 @@ def delete_round(cut: Cut, rnd: int):
             player.elim_round = None
             db.session.add(player)
             db.session.commit()
+
 
 def is_second_final(cut: Cut):
     if not cut.double_elim:

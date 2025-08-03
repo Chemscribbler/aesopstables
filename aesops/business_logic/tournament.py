@@ -319,10 +319,10 @@ def unpair_round(tournament: Tournament):
 
 
 def top_n_cut(tournament: Tournament, n):
-    player_list = rank_players(tournament)
+    player_list = calculate_player_ranks(tournament)
     cut_players = []
     for i in range(len(player_list)):
-        if player_list[i].active:
+        if player_list[i]["active"]:
             cut_players.append(player_list[i])
             if len(cut_players) == n:
                 break
