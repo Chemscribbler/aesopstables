@@ -124,21 +124,31 @@ def add_player(tid: int):
     )
 
 
-@tournament_blueprint.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])
-def round(tid, rnd):
-    tournament = Tournament.query.get(tid)
+def _render_round(tournament_: Tournament, rnd: int):
     return render_template(
         "round.html",
-        tournament=tournament,
+        tournament=tournament_,
         rnd=rnd,
         format_results=format_results,
-        admin=u_logic.has_admin_rights(current_user, tid),
+        admin=u_logic.has_admin_rights(current_user, tournament_.id),
         rank_tables=rank_tables,
         get_faction=get_faction,
         t_logic=t_logic,
         match_report=MatchReport,
         has_reporting_rights=u_logic.has_reporting_rights,
     )
+
+
+@tournament_blueprint.route("/<int:tid>/<int:rnd>", methods=["GET", "POST"])
+def round(tid: int, rnd: int):
+    tournament_ = Tournament.query.get(tid)
+    return _render_round(tournament_, rnd)
+
+
+@tournament_blueprint.route("/<int:tid>/current", methods=["GET", "POST"])
+def round_current(tid: int):
+    tournament_ = Tournament.query.get(tid)
+    return _render_round(tournament_, tournament_.current_round)
 
 
 @login_required

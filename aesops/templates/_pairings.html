@@ -10,7 +10,7 @@
             {% endif %}
         </tr>
     </thead>
-    {% for match in rank_tables(t_logic.get_round(tournament, round=rnd)) %}
+    {% for match in rank_tables(t_logic.get_round(tournament, round=rnd), current_user) %}
     <tr>
         <th>{{ match.table_number }}</th>
         <th>{{ match.corp_player.name }} {% if match.corp_player.pronouns %} ({{match.corp_player.pronouns}}) {% endif
