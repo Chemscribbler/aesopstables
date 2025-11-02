@@ -63,6 +63,7 @@ def tournament(tid):
 
 @tournament_blueprint.route("/create_tournament", methods=["GET", "POST"])
 def create_tournament():
+    return "No Longer Supported", 410
     form = TournamentForm()
     if form.validate_on_submit():
         tournament = Tournament(
